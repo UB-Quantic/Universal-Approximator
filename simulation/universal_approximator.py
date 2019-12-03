@@ -76,7 +76,7 @@ class UniversalApproximator():
         return P_e
     
 if __name__ == "__main__":
-    print("a")
+    pass
 
             
 

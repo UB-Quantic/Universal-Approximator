@@ -94,25 +94,3 @@ class SingleQubitControl():
 
 
         
-
-
-
-
-
-
-# simulation_object = ScriptTools.MeasurementObject(
-#                 os.path.join( relPath, "Simulation.hdf5"),
-#                 os.path.join( relPath, "Simulation_Result.hdf5" ) )
-
-
-# sqc = SingleQubitControl(simulation_object)
-# sqc.calibrate()
-
-# sqc.add_x_gate(np.pi/2)
-# sqc.add_z_gate(np.pi/2)
-# sqc.add_y_gate(3 * np.pi/2)
-# sqc.finish_sequence()
-
-# pol = simulation_object.performMeasurement()
-
-# print(pol)
