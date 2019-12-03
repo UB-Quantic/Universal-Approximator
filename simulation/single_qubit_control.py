@@ -69,6 +69,10 @@ class SingleQubitControl():
 
     def finish_sequence(self):
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse - 1 )
+    
+    def reset(self):
+        self._meas_object.updateValue( "Control Pulse - # of pulses", 0 )
+        self._next_pulse = 1
         
 
 
