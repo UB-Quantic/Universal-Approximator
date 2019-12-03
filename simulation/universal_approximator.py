@@ -72,8 +72,8 @@ class UniversalApproximator():
     def run(self):
         self._create_sequence()
         pol = self._measurement.performMeasurement()
-        P_e = (1 + pol[0])/2
-        return P_e
+        P0 = (1 + pol[0])/2
+        return P0
     
 if __name__ == "__main__":
     pass
