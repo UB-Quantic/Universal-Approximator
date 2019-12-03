@@ -52,7 +52,8 @@ class SingleQubitControl():
         phi = parameters[1]
 
         return w, phi
-    
+
+
     def _get_time_for_angle(self, angle):
         
         if angle < self._phi_0:
@@ -60,7 +61,8 @@ class SingleQubitControl():
         pulse_time = (angle - self._phi_0) / self._w
 
         return pulse_time
-    
+
+
     def add_x_gate(self, angle):
         pulse_plat_name = "Control Pulse - Plateau #" + str(self._next_pulse)
         phase_plat_name = "Control Pulse - Phase #" + str(self._next_pulse)
@@ -69,7 +71,6 @@ class SingleQubitControl():
         self._meas_object.updateValue( phase_plat_name, self._accumulated_z_phase )
     
         self._next_pulse += 1
-
 
     
     def add_y_gate(self, angle):
@@ -80,12 +81,15 @@ class SingleQubitControl():
         self._meas_object.updateValue( phase_plat_name, self._accumulated_z_phase + 90 )
     
         self._next_pulse += 1
-    
+
+
     def add_z_gate(self, angle):
         self._accumulated_z_phase += np.rad2deg( angle )
 
+
     def finish_sequence(self):
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse - 1 )
+
     
     def reset(self):
         self._meas_object.updateValue( "Control Pulse - # of pulses", 0 )

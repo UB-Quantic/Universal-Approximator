@@ -7,7 +7,7 @@ import numpy as np
 if __name__ == "__main__":
 
      x_dummy = [-1,0,1]
-     p_dummy = [ [np.pi/2, np.pi/2, 0], [np.pi/2,0,0] ] # It goes like this: Ry(p[0]*x + p[1]) -> Rz(p[2])
+     p_dummy = [ [np.pi/2, 0, np.pi], [0,np.pi/2,0] ] # It goes like this: Ry(p[0]*x + p[1]) -> Rz(p[2])
      
 
      univ_app = UniversalApproximator(n_layers=2)
