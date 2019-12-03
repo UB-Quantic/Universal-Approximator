@@ -1,5 +1,22 @@
 # Author: David López-Núñez <dln492@gmail.com> 
 
+import sys
+import os
+
+import numpy as np
+from scipy.optimize import curve_fit
+
+import matplotlib.pyplot as plt
+
+sys.path.append("C:\\Program Files (x86)\\Labber\\Script")
+import Labber
+from Labber import ScriptTools
+
+# set path to executable
+ScriptTools.setExePath('C:\\Program Files (x86)\\Labber\\Program\\Measurement.exe')
+
+relPath = os.path.dirname( "C:\\Users\\Quantum\\Labber\\Scripts\\Universal Approximator\\simulation\\" ) 
+
 
 
 def polarization_cosinus(t, w, phi):
@@ -83,36 +100,19 @@ class SingleQubitControl():
 
 
 
-import sys
-import os
-
-import numpy as np
-from scipy.optimize import curve_fit
-
-import matplotlib.pyplot as plt
-
-sys.path.append("C:\\Program Files (x86)\\Labber\\Script")
-import Labber
-from Labber import ScriptTools
-
-# set path to executable
-ScriptTools.setExePath('C:\\Program Files (x86)\\Labber\\Program\\Measurement.exe')
-
-relPath = os.path.dirname( "C:\\Users\\Quantum\\Labber\\Scripts\\Universal Approximator\\simulation\\" ) 
-
-simulation_object = ScriptTools.MeasurementObject(
-                os.path.join( relPath, "Simulation.hdf5"),
-                os.path.join( relPath, "Simulation_Result.hdf5" ) )
+# simulation_object = ScriptTools.MeasurementObject(
+#                 os.path.join( relPath, "Simulation.hdf5"),
+#                 os.path.join( relPath, "Simulation_Result.hdf5" ) )
 
 
-sqc = SingleQubitControl(simulation_object)
-sqc.calibrate()
+# sqc = SingleQubitControl(simulation_object)
+# sqc.calibrate()
 
-sqc.add_x_gate(np.pi/2)
-sqc.add_z_gate(np.pi/2)
-sqc.add_y_gate(3 * np.pi/2)
-sqc.finish_sequence()
+# sqc.add_x_gate(np.pi/2)
+# sqc.add_z_gate(np.pi/2)
+# sqc.add_y_gate(3 * np.pi/2)
+# sqc.finish_sequence()
 
-pol = simulation_object.performMeasurement()
+# pol = simulation_object.performMeasurement()
 
-print(pol)
+# print(pol)

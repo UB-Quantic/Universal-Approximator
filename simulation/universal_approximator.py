@@ -44,12 +44,13 @@ class UniversalApproximator():
                         os.path.join( relPath, "Simulation_Result.hdf5" ) )
         
         self._sqc = single_qubit_control.SingleQubitControl( self._measurement )
+        self._sqc.calibrate()
 
         self._p = []
         self._x = 0
 
     def update_param(self, p):
-        self._p = p[:self._n_layers-1, :]
+        self._p = p
     
     def update_x(self,x):
         self._x = x
@@ -61,8 +62,7 @@ class UniversalApproximator():
     def _create_sequence(self):
         
         self._sqc.reset()
-        p = self._p[:self._n_layers,:]
-        for param in p:
+        for param in self._p:
             
             self._sqc.add_y_gate( \
                 self._calc_theta( param[0], param[1], self._x ))
@@ -70,8 +70,10 @@ class UniversalApproximator():
         self._sqc.finish_sequence()
     
     def run(self):
+        self._create_sequence()
         pol = self._measurement.performMeasurement()
-        return pol
+        P_e = (1 + pol[0])/2
+        return P_e
     
 if __name__ == "__main__":
     print("a")
