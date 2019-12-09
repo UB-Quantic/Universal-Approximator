@@ -1,22 +1,9 @@
 # Author: David López-Núñez <dln492@gmail.com> 
-
-import sys
 import os
-
 import numpy as np
 from scipy.optimize import curve_fit
 
-import matplotlib.pyplot as plt
-
-sys.path.append("C:\\Program Files (x86)\\Labber\\Script")
-import Labber
 from Labber import ScriptTools
-
-# set path to executable
-ScriptTools.setExePath('C:\\Program Files (x86)\\Labber\\Program\\Measurement.exe')
-
-relPath = os.path.dirname( "C:\\Users\\Quantum\\Labber\\Scripts\\Universal Approximator\\simulation\\" ) 
-
 
 
 def polarization_cosinus(t, w, phi):
@@ -30,6 +17,8 @@ class SingleQubitControl():
     def __init__(self, meas_object, pulse_type = "ARBITRARY", calibration_file = "Simulation_Calibration.hdf5"):
         self._meas_object = meas_object
         self._pulse_type = pulse_type
+        
+        relPath = os.path.dirname(os.path.abspath(__file__))
         self._calibration_meas = ScriptTools.MeasurementObject(
                 os.path.join( relPath, calibration_file),
                 os.path.join( relPath, "Calibration_Result.hdf5" ) )
@@ -90,7 +79,7 @@ class SingleQubitControl():
     def finish_sequence(self):
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse - 1 )
 
-    
+
     def reset(self):
         self._meas_object.updateValue( "Control Pulse - # of pulses", 0 )
         self._next_pulse = 1
