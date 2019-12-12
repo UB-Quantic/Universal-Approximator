@@ -5,7 +5,7 @@ import numpy as np
 
 from Labber import ScriptTools
 
-import single_qubit_control
+import single_qubit_control as sqc
 
 MEAS_TYPE_SIMULATION = "SIMULATION"
 MEAS_TYPE_EXPERIMENT = "EXPERIMENT"
@@ -117,8 +117,8 @@ class _UnivApproxSimulation( _UnivApproxExecuter ):
         self._measurement = ScriptTools.MeasurementObject(
                         os.path.join( _RELPATH, SIM_MEAS_TEMPLATE),
                         os.path.join( _RELPATH, SIM_MEAS_RESULT ) )
-        self._sqc = single_qubit_control.SingleQubitControl( \
-            self._measurement, measurement_type = MEAS_TYPE_SIMULATION )
+        self._sqc = sqc.SQCFactory.get_single_qubit_controller( \
+             self._measurement, meas_type = MEAS_TYPE_SIMULATION)
 
         _UnivApproxExecuter.__init__(self, n_layers, single_qubit_control_type)
 
@@ -137,8 +137,8 @@ class _UnivApproxExperiment( _UnivApproxExecuter ):
         self._measurement = ScriptTools.MeasurementObject(
                         os.path.join( _RELPATH, EXP_MEAS_TEMPLATE),
                         os.path.join( _RELPATH, EXP_MEAS_RESULT ) )
-        self._sqc = single_qubit_control.SingleQubitControlExp( \
-            self._measurement, measurement_type = MEAS_TYPE_EXPERIMENT )
+        self._sqc = sqc.SQCFactory.get_single_qubit_controller( \
+             self._measurement, meas_type = MEAS_TYPE_EXPERIMENT)
 
         _UnivApproxExecuter.__init__(self, n_layers, single_qubit_control_type)
 
@@ -146,7 +146,6 @@ class _UnivApproxExperiment( _UnivApproxExecuter ):
         
         P0 = self._sqc.process_result(np.abs(result[1]))
         return P0
-
 
 
 if __name__ == "__main__":
