@@ -203,7 +203,7 @@ class _UnivApproxExperiment( _UnivApproxExecuter ):
     when in experiment mode
     """
 
-    def __init__(selflayers, single_qubit_control_type):
+    def __init__(self, single_qubit_control_type):
         
         # Creates the Labber measurement object
         self._measurement = ScriptTools.MeasurementObject(

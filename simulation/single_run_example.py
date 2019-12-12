@@ -37,7 +37,7 @@ if __name__ == "__main__":
      for i, p_line in enumerate(p): p[i] = [x*2 for x in p_line] # This is due to a convention in the algorithm
 
      # Create the UniversalApproximator object and update parameters
-     univ_app = UniversalApproximator(n_layers=3, measurement_type="SIMULATION")
+     univ_app = UniversalApproximator(n_layers=3, measurement_type="EXPERIMENT")
 
      univ_app.update_param(p)
 
