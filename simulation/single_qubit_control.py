@@ -230,9 +230,9 @@ class SQCFactory():
     @staticmethod
     def get_single_qubit_controller(meas_object, meas_type, pulse_type = "ARBITRARY"):
         
-        if measurement_type == MEAS_TYPE_SIMULATION:
+        if meas_type == MEAS_TYPE_SIMULATION:
             return SQCSim(meas_object, pulse_type, meas_type)
-        elif measurement_type == MEAS_TYPE_EXPERIMENT:
+        elif meas_type == MEAS_TYPE_EXPERIMENT:
             return SQCExp(meas_object, pulse_type, meas_type)
 
         

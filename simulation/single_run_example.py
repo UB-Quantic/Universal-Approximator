@@ -21,16 +21,21 @@ if __name__ == "__main__":
      # Parameters of the gates to be computed
      p = [[ 7.30775879e-01, -5.11802708e-02, -1.53394120e-06], \
           [ 4.90298425e-01,  8.36578751e-01,  5.36512016e-01]]
-     p = [[ 5.70445799e+00,  1.57081148e+00,  1.22220816e+00], \
-          [ 2.77603782e+00,  2.90030600e-06, -4.35489567e-01], \
-          [ 2.14084701e+00,  7.98600609e-01, -8.56527131e-05], \
-          [ 7.45353020e-01,  7.72153830e-01,  5.17595767e-01], \
-          [ 1.45124672e+00,  7.85470816e-01,  6.55444925e-01]]
+     
+     p = [[-5.00333011e-05,  7.83699572e-01,  4.31687529e-01], \
+          [ 2.66722653e+00,  2.61685260e-03,  7.07511546e-01], \
+          [-1.33359853e+00,  6.07931285e-06,  3.57390521e-02]]
+
+     # p = [[ 5.70445799e+00,  1.57081148e+00,  1.22220816e+00], \
+     #      [ 2.77603782e+00,  2.90030600e-06, -4.35489567e-01], \
+     #      [ 2.14084701e+00,  7.98600609e-01, -8.56527131e-05], \
+     #      [ 7.45353020e-01,  7.72153830e-01,  5.17595767e-01], \
+     #      [ 1.45124672e+00,  7.85470816e-01,  6.55444925e-01]]
 
      for i, p_line in enumerate(p): p[i] = [x*2 for x in p_line] # This is due to a convention in the algorithm
 
      # Create the UniversalApproximator object. We want for now only two layers
-     univ_app = UniversalApproximator(n_layers=5, measurement_type="SIMULATION")
+     univ_app = UniversalApproximator(n_layers=3, measurement_type="SIMULATION")
 
      # We add the parameters of the algorithm
      univ_app.update_param(p)
