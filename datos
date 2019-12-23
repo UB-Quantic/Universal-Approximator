@@ -137,3 +137,29 @@ U(p0,p1,p2) = 	cos(p1 + p0 * x)e^(i p2) 	-sin(p1 + p0 * x)e^(i p2)
 Los parámetros deben aplicarse empezando por la primera fila, y la x es la que viene en Data
 
 El resultado de "lo que debería salir" es la probabilidad de medir |1>
+
+
+Ahora para tanh: 
+
+Tangente hiperbólica de -10 a 10 hasta 5 capas, te mando los parámetros
+
+no es exactamente la tanh, es 0.5(1 + tanh(x)), está colocada en su sitio para calcular probabilidad
+2 layers:
+[[ 2.82388717e-01 -7.92945098e-05  2.84881410e+00]
+ [ 5.24087654e-01  1.57071607e+00  8.97491417e-01]]
+3 layers:
+[[ 2.59814459e-01 -8.40594852e-06  1.77668041e+00]
+ [ 5.19644894e-01  6.98617036e-01 -1.01408773e+00]
+ [-1.24415605e-05  1.15313816e+00  3.60325230e-01]]
+4 layers:
+[[-2.59803483e-01 -1.68474316e-05  1.36497562e+00]
+ [ 5.19571864e-01  3.26053638e-01  6.17190448e-01]
+ [ 2.75606996e-05  9.90624509e-01  6.94996320e-01]
+ [-4.99341659e-06  4.64907779e-01  9.65668603e-01]]
+5 layers:
+[[ 0.5535071  -0.096717    2.50623578]
+ [ 0.0159662  -0.37351418  1.43809871]
+ [ 0.54754098  0.91932381  1.03097342]
+ [ 0.53828845  0.71573941 -2.11100829]
+ [ 0.27341608 -0.55536742  0.15635837]]
+Si no me fallan los cálculos, ya no hace falta que multipliques estos parámetros por 2

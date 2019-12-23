@@ -44,6 +44,12 @@ class SingleQubitControl(ABC):
         """
         Calibrate both the qubit pulses and the qubit measurement
         """
+        # calibration done
+        # self._w = 130706947.3895477
+        # self._phi_0 = 1.2997382639681208
+        # self._A = 0.00010330938870216828
+        # self._c = 0.00030081969676472867
+        # return
         # Perform calibration measurement
         ( t_cal, y_cal ) = self._calibration_meas.performMeasurement()
         
@@ -63,6 +69,8 @@ class SingleQubitControl(ABC):
         Fit the calibration result to a general cosinus
         """
         # First some trials are obtained so that the fit is succesful
+        if isinstance(y_cal[0], complex):
+            y_cal = np.absolute(y_cal)
         max_y = np.amax(y_cal)
         min_y = np.amin(y_cal)
         A_trial = abs(max_y - min_y) / 2
@@ -90,7 +98,7 @@ class SingleQubitControl(ABC):
         #         general_cosinus(t, 25e6 * 2*np.pi, 0.1, 1, 0))
 
         # plt.plot(t_cal, y_sim)
-        # plt.plot(t_cal, y_trial)
+        # # plt.plot(t_cal, y_trial)
         # plt.show()
         return w, phi, A, c
 
@@ -100,7 +108,7 @@ class SingleQubitControl(ABC):
         Obtain the pulse time for a desired angle rotation
         """
         
-        if angle < self._phi_0:
+        while angle < self._phi_0:
             angle = angle + 2*np.pi
         pulse_time = (angle - self._phi_0) / self._w
 
@@ -141,6 +149,11 @@ class SingleQubitControl(ABC):
         # in next x-y pulses
         self._accumulated_z_phase += np.rad2deg( angle )
 
+        while self._accumulated_z_phase < 0:
+            self._accumulated_z_phase += 2 * np.pi
+        while self._accumulated_z_phase <= 2 * np.pi:
+            self._accumulated_z_phase -= 2 * np.pi
+
     
     def finish_sequence(self):
         """
@@ -155,6 +168,7 @@ class SingleQubitControl(ABC):
         """
         self._meas_object.updateValue( "Control Pulse - # of pulses", 0 )
         self._next_pulse = 1
+        self._accumulated_z_phase = 0
         
 
 
@@ -180,6 +194,8 @@ class SQCExp(SingleQubitControl):
         
         self._calibration_file = EXP_CAL_TEMPLATE
         self._calibration_file_result = EXP_CAL_RESULT
+
+        self._start_time = 1e-6
         
         SingleQubitControl.__init__(self, meas_object, pulse_type)        
     
@@ -219,12 +235,17 @@ class SQCExp(SingleQubitControl):
 
         self._meas_object.updateValue( pulse_amp_name, 1 )
         self._meas_object.updateValue( pulse_plat_name, plateau )
-        self._meas_object.updateValue( pulse_phase_name, self._accumulated_z_phase + 90 )
+        if self._accumulated_z_phase + 90 <= 2 * np.pi:
+            phase = self._accumulated_z_phase + 90 - 2 * np.pi
+        else:
+            phase = self._accumulated_z_phase + 90
+        self._meas_object.updateValue( pulse_phase_name, phase )
         self._meas_object.updateValue( pulse_output_name, 0 )
     
         self._next_pulse += 1
         self._seq_time += 10e-9 + 20e-9 + plateau # width + spacing + plateau
 
+        # print(plateau*1e9)
 
     def finish_sequence(self):
         """
@@ -242,6 +263,7 @@ class SQCExp(SingleQubitControl):
         """
         first_pulse_delay = self._start_time - self._seq_time + 10e-9 # add one width
         self._meas_object.updateValue( "Control Pulse - First pulse delay", first_pulse_delay )
+        print("FOr following x, sequence time is ", self._seq_time)
 
     def _add_measurement_pulse(self):    
         """

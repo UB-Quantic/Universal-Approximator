@@ -11,9 +11,10 @@ import single_qubit_control as sqc
 MEAS_TYPE_SIMULATION = "SIMULATION"
 MEAS_TYPE_EXPERIMENT = "EXPERIMENT"
 
-SIM_MEAS_TEMPLATE = "Simulation.hdf5"
+# SIM_MEAS_TEMPLATE = "Simulation.hdf5"
+SIM_MEAS_TEMPLATE = "Simulation_No_noise.hdf5"
 SIM_MEAS_RESULT = "Simulation_Result.hdf5"
-EXP_MEAS_TEMPLATE = "Experiment.hdf5"
+EXP_MEAS_TEMPLATE = "Experiment_No_spa.hdf5"
 EXP_MEAS_RESULT = "Experiment_Result.hdf5"
 
 _RELPATH = os.path.dirname(os.path.abspath(__file__))
