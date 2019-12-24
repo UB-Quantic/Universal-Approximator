@@ -1,5 +1,6 @@
 from universal_approximator import UniversalApproximator
 import matplotlib.pyplot as plt
+import numpy as np
 
 # x values to be evaluated     
 x = [-1.,-0.95918367,-0.91836735,-0.87755102,-0.83673469,-0.79591837,-0.75510204,-0.71428571,\
@@ -25,11 +26,11 @@ x = [-1.,-0.95918367,-0.91836735,-0.87755102,-0.83673469,-0.79591837,-0.75510204
 #      [-1.33359853e+00,  6.07931285e-06,  3.57390521e-02]]
 
 # 5 layers
-p = [[ 5.70445799e+00,  1.57081148e+00,  1.22220816e+00], \
-     [ 2.77603782e+00,  2.90030600e-06, -4.35489567e-01], \
-     [ 2.14084701e+00,  7.98600609e-01, -8.56527131e-05], \
-     [ 7.45353020e-01,  7.72153830e-01,  5.17595767e-01], \
-     [ 1.45124672e+00,  7.85470816e-01,  6.55444925e-01]]
+# p = [[ 5.70445799e+00,  1.57081148e+00,  1.22220816e+00], \
+#      [ 2.77603782e+00,  2.90030600e-06, -4.35489567e-01], \
+#      [ 2.14084701e+00,  7.98600609e-01, -8.56527131e-05], \
+#      [ 7.45353020e-01,  7.72153830e-01,  5.17595767e-01], \
+#      [ 1.45124672e+00,  7.85470816e-01,  6.55444925e-01]]
 
 # Parameters for tanh
 
@@ -50,29 +51,31 @@ p = [[ 5.70445799e+00,  1.57081148e+00,  1.22220816e+00], \
 
 
 # 5 layers:
-# p = [[ 0.5535071,  -0.096717,    2.50623578], \
-#      [ 0.0159662,  -0.37351418,  1.43809871], \
-#      [ 0.54754098,  0.91932381,  1.03097342], \
-#      [ 0.53828845,  0.71573941, -2.11100829], \
-#      [ 0.27341608, -0.55536742,  0.15635837]]
+p = [[ 0.5535071,  -0.096717,    2.50623578], \
+     [ 0.0159662,  -0.37351418,  1.43809871], \
+     [ 0.54754098,  0.91932381,  1.03097342], \
+     [ 0.53828845,  0.71573941, -2.11100829], \
+     [ 0.27341608, -0.55536742,  0.15635837]]
 
 
 
 if __name__ == "__main__":
 
-     for i, p_line in enumerate(p): p[i] = [x*2 for x in p_line] # This is due to a convention in the algorithm
-     # x = [y*10 for y in x] # Range is now -10 to 10
+     # for i, p_line in enumerate(p): p[i] = [x*2 for x in p_line] # This is due to a convention in the algorithm
+     x = [y*10 for y in x] # Range is now -10 to 10
 
      # x = [-3]
 
      # Create the UniversalApproximator object and update parameters
-     univ_app = UniversalApproximator(n_layers=5, measurement_type="EXPERIMENT")
+     univ_app = UniversalApproximator(n_layers=5, measurement_type="SIMULATION")
 
      univ_app.update_param(p)
 
      print()
      P_1 = [] 
      
+     # f= open("tanh__sim__5l.txt","w+")
+
      for x_i in x:
           univ_app.update_x(x_i)
           P_0 = univ_app.run()
@@ -80,9 +83,20 @@ if __name__ == "__main__":
           # Result is P0 and we want P1. We add it to the array.
           P_1.append( 1 - P_0 )
           print("For x =", x_i, ", Pe is ",1 - P_0)
+          # f.write(x_i, 1-P_0)
      print()
 
+     # f.close()
      # Plot results
      plt.figure(1)
      plt.plot(x,P_1)
+
+     np.savetxt("tanh__sim__5l.txt", np.stack((x, P_1)))
+     # plt.figure(2)
+     # diff = []
+     # for x_i, pi in zip(x,P_1):
+     #      diff_i = (1 + np.tanh(x_i)) / 2 - pi
+     #      diff.append(diff_i)
+     # plt.plot(x,abs(diff))
      plt.show()
+
