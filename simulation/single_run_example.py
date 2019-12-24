@@ -67,7 +67,9 @@ if __name__ == "__main__":
      # x = [-3]
 
      # Create the UniversalApproximator object and update parameters
-     univ_app = UniversalApproximator(n_layers=5, measurement_type="SIMULATION")
+     univ_app = UniversalApproximator(n_layers=5, \
+          measurement_type="SIMULATION", pulse_type="GAUSS_PLAT",
+          meas_feat="", cal_feat="")
 
      univ_app.update_param(p)
 

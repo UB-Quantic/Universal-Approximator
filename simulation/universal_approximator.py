@@ -28,7 +28,7 @@ class UniversalApproximator():
     """
 
     def __init__(self, n_layers=2, measurement_type="SIMULATION",\
-                 single_qubit_control_type="ARBITRARY"):
+                 pulse_type="GAUSS_PLAT", meas_feat="", cal_feat=""):
         """
         Initialize the class by sending the measurement type and the number of layers
         of the algorithm. If known, also the type of qubit control is sent
@@ -42,13 +42,28 @@ class UniversalApproximator():
         
         if measurement_type not in [MEAS_TYPE_EXPERIMENT, MEAS_TYPE_SIMULATION]:
             print("Measurement types not supported")
+            exti()
         
-        if single_qubit_control_type != "ARBITRARY":
+        if pulse_type != "GAUSS_PLAT":
             print("Single Qubit control type not supported")
             exit()
+        
+        if measurement_type == MEAS_TYPE_EXPERIMENT:
+            meas_file = "EXP_"
+        elif measurement_type == MEAS_TYPE_SIMULATION:
+            meas_file = "SIM_"
+
+        if pulse_type == "GAUSS_PLAT":
+            meas_file += "Gpl"
+            cal_file = meas_file +_ "_Cal"
+        
+        meas_file += meas_feat + ".hdf5"
+        cal_file += cal_feat + ".hdf5"
+
 
         # get the actual executer of the algorithm        
-        self._executer = _UnivApproxFactory.get_executer( n_layers, measurement_type )
+        self._executer = _UnivApproxFactory.get_executer( n_layers, measurement_type\
+            , meas_file, cal_file )
 
 
     def update_param(self, p):
@@ -87,15 +102,15 @@ class _UnivApproxFactory():
     """
 
     @staticmethod
-    def get_executer( n_layers, measurement_type, ):
+    def get_executer( n_layers, measurement_type, pulse_type, meas_file, cal_file):
         """
         Returns the suitable executer depending on the measurement type
         ( "SIMULATION" or "EXPERIMENT"). Number of layers must also be supplied.
         """
         if measurement_type == MEAS_TYPE_EXPERIMENT:
-            return _UnivApproxExperiment("ARBITRARY")
+            return _UnivApproxExperiment(pulse_type, meas_file, cal_file)
         elif measurement_type == MEAS_TYPE_SIMULATION:
-            return _UnivApproxSimulation("ARBITRARY")
+            return _UnivApproxSimulation(pulse_type, meas_file, cal_file)
         
 
 class _UnivApproxExecuter(ABC):
@@ -104,7 +119,7 @@ class _UnivApproxExecuter(ABC):
     of the universal approximator executer
     """
 
-    def __init__(self, single_qubit_control_type):
+    def __init__(self, pulse_type, meas_file, cal_file):
         """
         Initialize the basic parameters of the Universal Approximator Executer
         """
@@ -173,20 +188,21 @@ class _UnivApproxSimulation( _UnivApproxExecuter ):
     when in simulation mode
     """
 
-    def __init__(self, single_qubit_control_type):
+    def __init__(self, pulse_type, meas_file, cal_file):
         
         # Creates the Labber measurement object
         self._measurement = ScriptTools.MeasurementObject(
-                        os.path.join( _RELPATH, SIM_MEAS_TEMPLATE),
+                        os.path.join( _RELPATH, meas_file ),
                         os.path.join( _RELPATH, SIM_MEAS_RESULT ) )
         
         # Creates and calibrates the single qubit controller
         self._sqc = sqc.SQCFactory.get_single_qubit_controller( \
-             self._measurement, meas_type = MEAS_TYPE_SIMULATION)
+             self._measurement, meas_type = MEAS_TYPE_SIMULATION,\
+                 pulse_type= pulse_type, cal_file = cal_file)
         self._sqc.calibrate()
 
         # Performs superclass initialization
-        _UnivApproxExecuter.__init__(self, single_qubit_control_type)
+        _UnivApproxExecuter.__init__(self, pulse_type)
 
 
     def _convert_to_P0(self, result):
@@ -204,21 +220,22 @@ class _UnivApproxExperiment( _UnivApproxExecuter ):
     when in experiment mode
     """
 
-    def __init__(self, single_qubit_control_type):
+    def __init__(self, pulse_type, meas_file, cal_file):
         
         # Creates the Labber measurement object
         self._measurement = ScriptTools.MeasurementObject(
-                        os.path.join( _RELPATH, EXP_MEAS_TEMPLATE),
+                        os.path.join( _RELPATH, meas_file),
                         os.path.join( _RELPATH, EXP_MEAS_RESULT ) )
 
         # Creates and calibrates the single qubit controller
         self._sqc = sqc.SQCFactory.get_single_qubit_controller( \
-             self._measurement, meas_type = MEAS_TYPE_EXPERIMENT)
+             self._measurement, meas_type = MEAS_TYPE_EXPERIMENT, \
+            pulse_type= pulse_type, cal_file = cal_file)
         self._sqc.calibrate()
 
 
         # Performs superclass initialization
-        _UnivApproxExecuter.__init__(self, single_qubit_control_type)
+        _UnivApproxExecuter.__init__(self, pulse_type)
 
     def _convert_to_P0(self, result):
         """
