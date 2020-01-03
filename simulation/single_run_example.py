@@ -2,19 +2,6 @@ from universal_approximator import UniversalApproximator
 import matplotlib.pyplot as plt
 import numpy as np
 
-# x values to be evaluated     
-x = [-1.,-0.95918367,-0.91836735,-0.87755102,-0.83673469,-0.79591837,-0.75510204,-0.71428571,\
-     -0.67346939,-0.63265306,-0.59183673,-0.55102041,-0.51020408,-0.46938776,-0.42857143,\
-     -0.3877551 ,-0.34693878,-0.30612245,-0.26530612,-0.2244898 ,-0.18367347,-0.14285714,\
-     -0.10204082,-0.06122449,-0.02040816, 0.02040816, 0.06122449, 0.10204082, 0.14285714,\
-     0.18367347, 0.2244898 , 0.26530612, 0.30612245, 0.34693878, 0.3877551 , 0.42857143, \
-     0.46938776, 0.51020408, 0.55102041, 0.59183673, 0.63265306, 0.67346939, 0.71428571, \
-     0.75510204, 0.79591837, 0.83673469, 0.87755102, 0.91836735, 0.95918367, 1.]
-
-# reduced version of x vaues
-# x = [-1.,-0.75510204, -0.46938776, -0.26530612, 0.02040816,  0.26530612, 0.46938776, 0.75510204, 1.]
-
-
 # Parameters of the gates to be computed
 # 2 layers
 # p = [[ 7.30775879e-01, -5.11802708e-02, -1.53394120e-06], \
@@ -57,24 +44,34 @@ p = [[ 0.5535071,  -0.096717,    2.50623578], \
      [ 0.53828845,  0.71573941, -2.11100829], \
      [ 0.27341608, -0.55536742,  0.15635837]]
 
+# for i, p_line in enumerate(p): p[i] = [x*2 for x in p_line] # This is due to a convention in the algorithm
 
 
 if __name__ == "__main__":
 
-     # for i, p_line in enumerate(p): p[i] = [x*2 for x in p_line] # This is due to a convention in the algorithm
-     x = [y*10 for y in x] # Range is now -10 to 10
+     # x values to be evaluated     
+     x = np.linspace( -10, 10, num=201)
 
-     # x = [-3]
+     features = {
+          "n_averages": 5e3,
+          "spacing": 2, # in terms of width
+          "width": 15e-9, # s 
+          "power_qubit_pulse": 10, #dBm
+          "truncation_range": 3, #n sigmas for gaussian trunc.range
+          "calib_point": 51
+     }
 
      # Create the UniversalApproximator object and update parameters
      univ_app = UniversalApproximator(n_layers=5, \
-          measurement_type="SIMULATION", pulse_type="GAUSS_PLAT",
-          meas_feat="", cal_feat="")
+          measurement_type="EXPERIMENT", pulse_type="GAUSSIAN",
+          meas_feat="_10dBm_Precise", cal_feat="_10dBm_Precise",
+          features = features)
 
      univ_app.update_param(p)
 
      print()
      P_1 = [] 
+     theta = []
      
      # f= open("tanh__sim__5l.txt","w+")
 
@@ -84,16 +81,38 @@ if __name__ == "__main__":
 
           # Result is P0 and we want P1. We add it to the array.
           P_1.append( 1 - P_0 )
+          theta.append(univ_app.theta)
           print("For x =", x_i, ", Pe is ",1 - P_0)
           # f.write(x_i, 1-P_0)
      print()
+
+     theta_desv, theta_max = [], []
+     for theta_list in theta:
+          desv_sum = 0
+          for theta_i in theta_list:
+               theta_i_corrected = theta_i
+               while theta_i_corrected < 0:
+                    theta_i_corrected += 2*np.pi
+               while theta_i_corrected >= 2*np.pi:
+                    theta_i_corrected -= 2*np.pi
+
+               desv_sum += abs(theta_i_corrected)
+          theta_desv.append(desv_sum)
+          theta_max.append( np.amax(theta_list) )
+
 
      # f.close()
      # Plot results
      plt.figure(1)
      plt.plot(x,P_1)
+     plt.figure(2)
+     plt.plot(x,theta_desv)
+     plt.figure(3)
+     plt.plot(x,theta_max)
 
-     np.savetxt("tanh__sim__5l.txt", np.stack((x, P_1)))
+
+
+     # np.savetxt("tanh__sim__5l.txt", np.stack((x, P_1)))
      # plt.figure(2)
      # diff = []
      # for x_i, pi in zip(x,P_1):

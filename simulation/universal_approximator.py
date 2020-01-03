@@ -28,7 +28,8 @@ class UniversalApproximator():
     """
 
     def __init__(self, n_layers=2, measurement_type="SIMULATION",\
-                 pulse_type="GAUSS_PLAT", meas_feat="", cal_feat=""):
+                 pulse_type="GAUSS_PLAT", meas_feat="", cal_feat="",
+                 features= {}):
         """
         Initialize the class by sending the measurement type and the number of layers
         of the algorithm. If known, also the type of qubit control is sent
@@ -44,26 +45,29 @@ class UniversalApproximator():
             print("Measurement types not supported")
             exti()
         
-        if pulse_type != "GAUSS_PLAT":
+        if pulse_type not in ["GAUSS_PLAT","GAUSSIAN"]:
             print("Single Qubit control type not supported")
             exit()
         
         if measurement_type == MEAS_TYPE_EXPERIMENT:
-            meas_file = "EXP_"
+            meas_file = "Exp_"
         elif measurement_type == MEAS_TYPE_SIMULATION:
-            meas_file = "SIM_"
+            meas_file = "Sim_"
 
         if pulse_type == "GAUSS_PLAT":
             meas_file += "Gpl"
-            cal_file = meas_file +_ "_Cal"
+            cal_file = meas_file + "_Cal"
+        elif pulse_type == "GAUSSIAN":
+            meas_file += "Gau"
+            cal_file = meas_file + "_Cal"
         
-        meas_file += meas_feat + ".hdf5"
+        meas_file +=  meas_feat + ".hdf5"
         cal_file += cal_feat + ".hdf5"
 
 
         # get the actual executer of the algorithm        
-        self._executer = _UnivApproxFactory.get_executer( n_layers, measurement_type\
-            , meas_file, cal_file )
+        self._executer = _UnivApproxFactory.get_executer( n_layers, measurement_type, \
+            pulse_type,  meas_file, cal_file, features )
 
 
     def update_param(self, p):
@@ -90,8 +94,9 @@ class UniversalApproximator():
         """
         Run the experiment
         """
-
+        self.theta = []
         P0 = self._executer.run()
+        self.theta = self._executer.theta
         return P0
 
 
@@ -102,15 +107,15 @@ class _UnivApproxFactory():
     """
 
     @staticmethod
-    def get_executer( n_layers, measurement_type, pulse_type, meas_file, cal_file):
+    def get_executer( n_layers, measurement_type, pulse_type, meas_file, cal_file, features):
         """
         Returns the suitable executer depending on the measurement type
         ( "SIMULATION" or "EXPERIMENT"). Number of layers must also be supplied.
         """
         if measurement_type == MEAS_TYPE_EXPERIMENT:
-            return _UnivApproxExperiment(pulse_type, meas_file, cal_file)
+            return _UnivApproxExperiment(pulse_type, meas_file, cal_file, features)
         elif measurement_type == MEAS_TYPE_SIMULATION:
-            return _UnivApproxSimulation(pulse_type, meas_file, cal_file)
+            return _UnivApproxSimulation(pulse_type, meas_file, cal_file, features)
         
 
 class _UnivApproxExecuter(ABC):
@@ -119,12 +124,14 @@ class _UnivApproxExecuter(ABC):
     of the universal approximator executer
     """
 
-    def __init__(self, pulse_type, meas_file, cal_file):
+    def __init__(self, pulse_type):
         """
         Initialize the basic parameters of the Universal Approximator Executer
         """
         self._p = []
         self._x = 0
+        self.theta = []
+
 
     def update_param(self, p):
         """
@@ -153,13 +160,14 @@ class _UnivApproxExecuter(ABC):
         """
         # First a reset is done to previous pulses
         self._sqc.reset()
+        self.theta = []
 
         # For each layer, the following pulse are added:
         # Ry(p1 + p0*x) -> Rz(p2)
         for param in self._p:
-            
-            self._sqc.add_y_gate( \
-                self._calc_theta( param[0], param[1], self._x ))
+            theta = self._calc_theta( param[0], param[1], self._x )
+            self.theta.append( theta )
+            self._sqc.add_y_gate( theta )
             self._sqc.add_z_gate( param[2] )
         
         self._sqc.finish_sequence()
@@ -188,7 +196,7 @@ class _UnivApproxSimulation( _UnivApproxExecuter ):
     when in simulation mode
     """
 
-    def __init__(self, pulse_type, meas_file, cal_file):
+    def __init__(self, pulse_type, meas_file, cal_file, features):
         
         # Creates the Labber measurement object
         self._measurement = ScriptTools.MeasurementObject(
@@ -197,8 +205,9 @@ class _UnivApproxSimulation( _UnivApproxExecuter ):
         
         # Creates and calibrates the single qubit controller
         self._sqc = sqc.SQCFactory.get_single_qubit_controller( \
-             self._measurement, meas_type = MEAS_TYPE_SIMULATION,\
-                 pulse_type= pulse_type, cal_file = cal_file)
+            self._measurement, meas_type = MEAS_TYPE_SIMULATION,\
+            pulse_type= pulse_type, cal_file = cal_file, \
+            features = features)
         self._sqc.calibrate()
 
         # Performs superclass initialization
@@ -220,7 +229,7 @@ class _UnivApproxExperiment( _UnivApproxExecuter ):
     when in experiment mode
     """
 
-    def __init__(self, pulse_type, meas_file, cal_file):
+    def __init__(self, pulse_type, meas_file, cal_file, features):
         
         # Creates the Labber measurement object
         self._measurement = ScriptTools.MeasurementObject(
@@ -229,8 +238,9 @@ class _UnivApproxExperiment( _UnivApproxExecuter ):
 
         # Creates and calibrates the single qubit controller
         self._sqc = sqc.SQCFactory.get_single_qubit_controller( \
-             self._measurement, meas_type = MEAS_TYPE_EXPERIMENT, \
-            pulse_type= pulse_type, cal_file = cal_file)
+            self._measurement, meas_type = MEAS_TYPE_EXPERIMENT, \
+            pulse_type= pulse_type, cal_file = cal_file, \
+            features = features)
         self._sqc.calibrate()
 
 
