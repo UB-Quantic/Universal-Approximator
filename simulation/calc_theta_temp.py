@@ -58,8 +58,8 @@ accumulated_phase = [phase_0, \
                      phase_0 + phase_1 + phase_2 + phase_3 + phase_4, \
                     ]
 
-print(plateaus)
-print(accumulated_phase)
+# print(plateaus)
+# print(accumulated_phase)
 
 A = 0.00010330938870216828
 c = 0.00030081969676472867
@@ -67,9 +67,9 @@ c = 0.00030081969676472867
 
 seq_time = 10e-9 * 6 + 20e-9 * 5 + plateau_0 + plateau_1 + plateau_2 + plateau_3 + plateau_4
 first_pulse_delay = 1e-6 - seq_time
-print(first_pulse_delay)
+# print(first_pulse_delay)
 
 #result is 245uV
 result = 380e-6
 P0 = ( result - (c - A) ) / (2 * A)
-print(P0)
+# print(P0)

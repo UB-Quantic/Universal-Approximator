@@ -50,21 +50,22 @@ p = [[ 0.5535071,  -0.096717,    2.50623578], \
 if __name__ == "__main__":
 
      # x values to be evaluated     
-     x = np.linspace( -10, 10, num=201)
+     x = np.linspace( -10, 10, num=21)
 
      features = {
-          "n_averages": 5e3,
-          "spacing": 2, # in terms of width
-          "width": 15e-9, # s 
+          "n_averages_meas": 5e3,
+          "n_averages_cal": 1e3,
+          # "spacing": 2, # in terms of width
+          "width": 10e-9, # s 
           "power_qubit_pulse": 10, #dBm
-          "truncation_range": 3, #n sigmas for gaussian trunc.range
-          "calib_point": 51
+          # "truncation_range": 3, #n sigmas for gaussian trunc.range
+          # "calib_point": 51
      }
 
      # Create the UniversalApproximator object and update parameters
      univ_app = UniversalApproximator(n_layers=5, \
           measurement_type="EXPERIMENT", pulse_type="GAUSSIAN",
-          meas_feat="_10dBm_Precise", cal_feat="_10dBm_Precise",
+          meas_feat="", cal_feat="",
           features = features)
 
      univ_app.update_param(p)
@@ -105,10 +106,10 @@ if __name__ == "__main__":
      # Plot results
      plt.figure(1)
      plt.plot(x,P_1)
-     plt.figure(2)
-     plt.plot(x,theta_desv)
-     plt.figure(3)
-     plt.plot(x,theta_max)
+     # plt.figure(2)
+     # plt.plot(x,theta_desv)
+     # plt.figure(3)
+     # plt.plot(x,theta_max)
 
 
 

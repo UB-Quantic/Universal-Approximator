@@ -69,7 +69,6 @@ class UniversalApproximator():
         self._executer = _UnivApproxFactory.get_executer( n_layers, measurement_type, \
             pulse_type,  meas_file, cal_file, features )
 
-
     def update_param(self, p):
         """
         Update the parameters of the algorithm. This should be a 
@@ -89,7 +88,6 @@ class UniversalApproximator():
 
         self._executer.update_x(x)
 
-    
     def run(self):
         """
         Run the experiment
@@ -131,7 +129,6 @@ class _UnivApproxExecuter(ABC):
         self._p = []
         self._x = 0
         self.theta = []
-
 
     def update_param(self, p):
         """
@@ -212,7 +209,6 @@ class _UnivApproxSimulation( _UnivApproxExecuter ):
 
         # Performs superclass initialization
         _UnivApproxExecuter.__init__(self, pulse_type)
-
 
     def _convert_to_P0(self, result):
         """

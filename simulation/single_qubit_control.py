@@ -40,6 +40,8 @@ class SingleQubitControl(ABC):
 
         self.sq_exec = SQExFactory.get_single_qubit_controller(\
                     meas_object, pulse_type, features)
+
+        self.sq_exec.apply_features(features, self._calibration_meas)
     
     def calibrate(self):
         """
@@ -233,12 +235,46 @@ class SQExecuter(ABC):
         self._next_pulse = 1
         self._seq_time = 0
 
-        self._apply_features(features)
 
-    def _apply_features(self, features):
+    def apply_features(self, features, cal_object):
         """
         Apply desired features
         """
+        n_averages_meas_name = "Digitizer - Number of averages"
+        if "n_averages_meas" in features:
+            self._meas_object.updateValue( n_averages_meas_name, features["n_averages_meas"] )
+
+        n_averages_cal_name = "Digitizer - Number of averages"
+        if "n_averages_cal" in features:
+            cal_object.updateValue( n_averages_cal_name, features["n_averages_cal"] )
+
+        if "spacing" in features:
+            self._spacing = features["spacing"]
+
+        width_cal_name = "Control Pulse - Width #1"
+        if "width" in features:
+            self._width = features["width"]
+            cal_object.updateValue( width_cal_name, features["width"])
+
+        power_qubit_pulse_name = "Qubit Pulse Power"
+        if "power_qubit_pulse" in features:
+            self._meas_object.updateValue( power_qubit_pulse_name, features["power_qubit_pulse"] )
+            cal_object.updateValue( power_qubit_pulse_name, features["power_qubit_pulse"] )
+
+        n_averages_cal_name = "Digitizer - Number of averages"
+        if "n_averages_cal" in features:
+            cal_object.updateValue( n_averages_cal_name, features["n_averages_cal"] )
+
+        truncation_range_name = "Control Pulse - Truncation range"
+        if "truncation_range" in features:
+            self._meas_object.updateValue( truncation_range_name, features["truncation_range"] )
+            cal_object.updateValue( truncation_range_name, features["truncation_range"] )
+
+        calib_point_name = "Control Pulse - Amplitude # 1 - # of points"
+        if "calib_point" in features:
+            cal_object.updateValue( calib_point_name, features["calib_point"] )
+
+
 
 
     def introduce_calibration(self, w, phi_0, A, c):
