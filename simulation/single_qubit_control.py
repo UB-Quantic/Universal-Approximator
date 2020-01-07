@@ -1,4 +1,4 @@
-# Author: David López-Núñez <dln492@gmail.com> 
+# Author: David López-Núñez <dln492@gmail.com>
 import os
 from abc import ABC, abstractmethod
 
@@ -14,11 +14,6 @@ PULSE_TYPE_GAUSS_PLAT = "GAUSSIAN_PLATEAU"
 PULSE_TYPE_GAUSSIAN = "GAUSSIAN"
 
 
-SIM_CAL_TEMPLATE = "Sim_Calibration.hdf5"
-SIM_CAL_RESULT = "Sim_Calibration_Result.hdf5"
-EXP_CAL_TEMPLATE = "Exp_Calibration.hdf5"
-EXP_CAL_RESULT = "Exp_Calibration_Result.hdf5"
-
 def general_cosinus(t, w, phi, A, c):
     return A * np.cos(w * t + phi) + c
 
@@ -26,10 +21,13 @@ class SingleQubitControl(ABC):
     """
     A class that controls the qubit
     """
-    def __init__(self, meas_object, pulse_type, features):
-        
+    def __init__(self, meas_object, pulse_type, cal_file, features):
+
         self._meas_object = meas_object
         self._pulse_type = pulse_type
+
+        self._calibration_file = cal_file
+        self._calibration_file_result = "Cal_Res.hdf5"
 
         # Prepares calibration measurement to be done
         relPath = os.path.dirname(os.path.abspath(__file__))
@@ -42,7 +40,7 @@ class SingleQubitControl(ABC):
                     meas_object, pulse_type, features)
 
         self.sq_exec.apply_features(features, self._calibration_meas)
-    
+
     def calibrate(self):
         """
         Calibrate both the qubit pulses and the qubit measurement
@@ -55,18 +53,18 @@ class SingleQubitControl(ABC):
         # return
         # Perform calibration measurement
         ( x_cal, y_cal ) = self._calibration_meas.performMeasurement()
-        
+
         # Adjust oscillations to cosinus and retrieve values
         self._w, self._phi_0, self._A, self._c = self._fit_cosinus( x_cal, y_cal )
         self.sq_exec.introduce_calibration(self._w, self._phi_0, self._A, self._c)
-    
+
     def process_result(self, result):
         """
         Process result and convert it into P_0
         """
         P0 = ( result - (self._c - self._A) ) / (2 * self._A)
         return P0
-    
+
     def _fit_cosinus(self, x_cal, y_cal):
         """
         Fit the calibration result to a general cosinus
@@ -111,7 +109,7 @@ class SingleQubitControl(ABC):
         """
         Obtain the pulse time for a desired angle rotation
         """
-        
+
         while angle < self._phi_0:
             angle = angle + 2*np.pi
         pulse_time = (angle - self._phi_0) / self._w
@@ -123,7 +121,7 @@ class SingleQubitControl(ABC):
         Add an x gate with specific angle to the sequence
         """
         self.sq_exec.add_x_gate(angle)
-    
+
     def add_y_gate(self, angle):
         """
         Add an y gate with specific angle to the sequence
@@ -135,72 +133,19 @@ class SingleQubitControl(ABC):
         Add an z gate with specific angle to the sequence
         """
         self.sq_exec.add_z_gate(angle)
-    
-    def finish_sequence(self):
-        """
-        Finish sequence so that it's ready for measurement
-        """
-        pass
 
-    def reset(self):
-        """
-        Reset parameters when a new sequence is started
-        """
-        self.sq_exec.reset()
-        
-
-
-class SQCSim(SingleQubitControl):
-    """
-    A class that controls the qubit when in simulation mode
-    """
-    def __init__(self, meas_object, pulse_type, cal_file, features):
-
-        # Initialize the single qubit control object with proper calibration
-        # files
-        self._calibration_file = cal_file
-        self._calibration_file_result = SIM_CAL_RESULT
-        SingleQubitControl.__init__(self, meas_object, pulse_type, features)
-
-
-
-class SQCExp(SingleQubitControl):
-    """
-    A class that controls the qubit when in experiment mode
-    """
-    def __init__(self, meas_object, pulse_type, cal_file, features):
-        
-        self._calibration_file = cal_file
-        self._calibration_file_result = EXP_CAL_RESULT
-        
-        SingleQubitControl.__init__(self, meas_object, pulse_type, features)        
-    
     def finish_sequence(self):
         """
         Finish sequence so that it's ready for measurement
         """
         self.sq_exec.prepare_measurement()
 
-    
-        
-class SQCFactory():
-    """
-    Factory class that creates the single qubit pulse object depending on 
-    the measurement and pulse type
-    """
+    def reset(self):
+        """
+        Reset parameters when a new sequence is started
+        """
+        self.sq_exec.reset()
 
-    @staticmethod
-    def get_single_qubit_controller(meas_object, meas_type, \
-        pulse_type, cal_file, features):
-        """
-        Create a single qubit pulse object depending on the measurement 
-        and pulse type
-        """
-        
-        if meas_type == MEAS_TYPE_SIMULATION:
-            return SQCSim(meas_object, pulse_type, cal_file, features)
-        elif meas_type == MEAS_TYPE_EXPERIMENT:
-            return SQCExp(meas_object, pulse_type, cal_file, features)
 
 
 class SQExFactory():
@@ -214,7 +159,7 @@ class SQExFactory():
         """
         Create a single qubit pulse executer object depending on the pulse type
         """
-        
+
         if pulse_type == PULSE_TYPE_GAUSS_PLAT:
             return SQExGaussPlat(meas_object, features)
         elif pulse_type == PULSE_TYPE_GAUSSIAN:
@@ -275,8 +220,6 @@ class SQExecuter(ABC):
             cal_object.updateValue( calib_point_name, features["calib_point"] )
 
 
-
-
     def introduce_calibration(self, w, phi_0, A, c):
         """
         Introduce calibration values
@@ -285,7 +228,7 @@ class SQExecuter(ABC):
         self._phi_0 = phi_0
         self._A = A
         self._c = c
-    
+
     @abstractmethod
     def add_x_gate(self, angle):
         """
@@ -325,7 +268,7 @@ class SQExecuter(ABC):
         """
         Add measurement pulse after the qubit pulse sequence
         """
-        pass       
+        pass
 
     @abstractmethod
     def _add_first_pulse_delay(self):
@@ -341,6 +284,8 @@ class SQExecuter(ABC):
         self._meas_object.updateValue( "Control Pulse - # of pulses", 0 )
         self._next_pulse = 1
         self._seq_time = 0
+        self._accum_z_phase = 0
+
 
 class SQExGaussPlat(SQExecuter):
     """
@@ -357,7 +302,7 @@ class SQExGaussPlat(SQExecuter):
         """
         Obtain the pulse time for a desired angle rotation
         """
-        
+
         while angle < self._phi_0:
             angle = angle + 2*np.pi
         plateau_time = (angle - self._phi_0) / self._w
@@ -380,8 +325,8 @@ class SQExGaussPlat(SQExecuter):
         self._meas_object.updateValue( pulse_plat_name, plateau )
         self._meas_object.updateValue( pulse_phase_name, self._accum_z_phase )
         self._meas_object.updateValue( pulse_output_name, 0 )
-    
-        self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )    
+
+        self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
         self._next_pulse += 1
         self._seq_time += 10e-9 + 20e-9 + plateau # width + spacing + plateau
 
@@ -405,7 +350,7 @@ class SQExGaussPlat(SQExecuter):
             phase = self._accum_z_phase + 90
         self._meas_object.updateValue( pulse_phase_name, phase )
         self._meas_object.updateValue( pulse_output_name, 0 )
-    
+
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
         self._next_pulse += 1
         self._seq_time += 10e-9 + 20e-9 + plateau # width + spacing + plateau
@@ -426,6 +371,7 @@ class SQExGaussPlat(SQExecuter):
         self._meas_object.updateValue( pulse_output_name, 1 )
 
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
+
 
     def _add_first_pulse_delay(self):
         """
@@ -479,10 +425,10 @@ class SQExGaussian(SQExecuter):
         self._meas_object.updateValue( pulse_spac_name, self._spacing )
         self._meas_object.updateValue( pulse_phase_name, self._accum_z_phase )
         self._meas_object.updateValue( pulse_output_name, 0 )
-    
-        self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )    
+
+        self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
         self._next_pulse += 1
-        self._seq_time += self._width + self._spacing # width + spacing + plateau        
+        self._seq_time += self._width + self._spacing # width + spacing + plateau
 
     def add_y_gate(self, angle):
         """
@@ -507,10 +453,10 @@ class SQExGaussian(SQExecuter):
             phase = self._accum_z_phase + 90
         self._meas_object.updateValue( pulse_phase_name, phase )
         self._meas_object.updateValue( pulse_output_name, 0 )
-    
-        self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )    
+
+        self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
         self._next_pulse += 1
-        self._seq_time += self._width + self._spacing # width + spacing + plateau        
+        self._seq_time += self._width + self._spacing # width + spacing + plateau
 
     def _add_measurement_pulse(self):
         """

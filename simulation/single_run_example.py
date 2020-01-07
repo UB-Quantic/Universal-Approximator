@@ -53,10 +53,10 @@ if __name__ == "__main__":
      x = np.linspace( -10, 10, num=21)
 
      features = {
-          "n_averages_meas": 5e3,
-          "n_averages_cal": 1e3,
+          "n_averages_meas": 50e3,
+          "n_averages_cal": 50e3,
           # "spacing": 2, # in terms of width
-          "width": 10e-9, # s 
+          "width": 15e-9, # s 
           "power_qubit_pulse": 10, #dBm
           # "truncation_range": 3, #n sigmas for gaussian trunc.range
           # "calib_point": 51
