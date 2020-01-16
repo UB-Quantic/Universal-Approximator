@@ -6,7 +6,8 @@ def cosine(A_pulse, w, A, c ):
     return A * np.cos(w * A_pulse) + c
 
 
-data = np.loadtxt('simulation/Analysis/Rabi w Amplitude for Phase Calibration Reset.txt', skiprows=3)
+data = np.loadtxt('simulation/Analysis/Rabi oscillations with DRAG.txt', skiprows=3)
+# data = np.loadtxt('simulation/Analysis/Rabi w Amplitude for Phase Calibration Reset.txt', skiprows=3)
 AData = data[0,:]
 yData = data[1,:] 
 
