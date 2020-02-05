@@ -22,8 +22,7 @@ class UniversalApproximator():
     """
 
     def __init__(self, n_layers=2, measurement_type="SIMULATION",\
-                 pulse_type="GAUSS_PLAT", meas_feat="", cal_feat="",
-                 features= {}):
+                 pulse_type="GAUSS_PLAT", features= {}):
         """
         Initialize the class by sending the measurement type and the number of layers
         of the algorithm. If known, also the type of qubit control is sent
@@ -56,13 +55,15 @@ class UniversalApproximator():
             meas_file += "Gau"
             cal_file = meas_file + "_Cal"
         
-        meas_result = meas_file + meas_feat + "_Res.hdf5"
-        meas_file +=  meas_feat + ".hdf5"
-        cal_file += cal_feat + ".hdf5"
+        meas_result = meas_file + "_Res.hdf5"
+        meas_file +=  ".hdf5"
+        cal_file +=  ".hdf5"
 
         self._p = []
         self._x = 0
         self.theta = []
+
+        self._features = features
 
         self._measurement = ScriptTools.MeasurementObject(
                         os.path.join( _RELPATH, meas_file),
@@ -93,7 +94,6 @@ class UniversalApproximator():
 
         self._x = x
 
-
     def _calc_theta(self, p0, p1, x):
         """
         Provide the parameters and the x value, it calculates the
@@ -111,6 +111,8 @@ class UniversalApproximator():
         self._sqc.reset()
         self.theta = []
 
+        if self._features["reset"] == True:
+            self._sqc.add_pre_reset()
         # For each layer, the following pulse are added:
         # Ry(p1 + p0*x) -> Rz(p2)
         for param in self._p:

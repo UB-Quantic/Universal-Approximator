@@ -88,7 +88,7 @@ class SingleQubitControl(ABC):
         A = parameters[2]
         c = parameters[3]
 
-        # # Plot results in case you want to be sure of the calibration
+        # Plot results in case you want to be sure of the calibration
         # plt.figure(1)
         # plt.plot(x_cal,y_cal)
         # y_sim = []
@@ -146,6 +146,12 @@ class SingleQubitControl(ABC):
         """
         self.sq_exec.reset()
 
+    def add_pre_reset(self):
+        """
+        Add pre-reset protocol por cooling the qubit
+        """
+        self.sq_exec.add_pre_reset()
+
 
 
 class SQExFactory():
@@ -179,6 +185,7 @@ class SQExecuter(ABC):
         self._accum_z_phase = 0
         self._next_pulse = 1
         self._seq_time = 0
+        self._features = features
 
 
     def apply_features(self, features, cal_object):
@@ -218,6 +225,19 @@ class SQExecuter(ABC):
         calib_point_name = "Control Pulse - Amplitude # 1 - # of points"
         if "calib_point" in features:
             cal_object.updateValue( calib_point_name, features["calib_point"] )
+        
+        drag_scaling_name = "Control Pulse - DRAG scaling"
+        if "drag_scaling" in features:
+            self._meas_object.updateValue( drag_scaling_name, features["drag_scaling"] )
+            cal_object.updateValue( drag_scaling_name, features["drag_scaling"] )
+
+
+        reset_pulse_qub_amp_name = "Control Pulse - Amplitude #1" 
+        reset_pulse_cav_amp_name = "Control Pulse - Amplitude #2"
+        if features["reset"] == True:
+            cal_object.updateValue( reset_pulse_qub_amp_name, features["reset_qub_amp"] )
+            cal_object.updateValue( reset_pulse_cav_amp_name, features["reset_cav_amp"] )
+
 
 
     def introduce_calibration(self, w, phi_0, A, c):
@@ -274,6 +294,13 @@ class SQExecuter(ABC):
     def _add_first_pulse_delay(self):
         """
         Caculate and add the first pulse delay
+        """
+        pass
+
+    @abstractmethod
+    def add_pre_reset(self):
+        """
+        Add pre-reset protocol por cooling the qubit
         """
         pass
 
@@ -372,7 +399,6 @@ class SQExGaussPlat(SQExecuter):
 
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
 
-
     def _add_first_pulse_delay(self):
         """
         Caculate and add the first pulse delay
@@ -380,6 +406,11 @@ class SQExGaussPlat(SQExecuter):
         first_pulse_delay = self._meas_time - self._seq_time + 10e-9 # add one width
         self._meas_object.updateValue( "Control Pulse - First pulse delay", first_pulse_delay )
 
+    def add_pre_reset(self):
+        """
+        Add pre-reset protocol por cooling the qubit
+        """
+        pass
 
 class SQExGaussian(SQExecuter):
     """
@@ -387,23 +418,23 @@ class SQExGaussian(SQExecuter):
     """
 
     def __init__(self, meas_object, features):
-        self.expected_w = 1.4 * 2*np.pi
+        self.expected_w = 2*np.pi
         self.expected_phi_0 = 0
-        self._meas_time = 1e-6
+        self._meas_time = 5e-6
         self._width = 15e-9
         self._spacing = 2 * self._width
+        self._mod_freq = 200e6
         SQExecuter.__init__(self, meas_object, features)
 
     def _get_amplitude_for_angle(self, angle):
         """
         Get the amplitude necessary for the desired rotation
         """
-        while angle < self._phi_0:
+        while angle < self._phi_0 - np.pi:
             angle += 2*np.pi
-        while angle >= 2*np.pi + self._phi_0:
+        while angle >= self._phi_0 + np.pi:
             angle -= 2*np.pi
         amplitude = (angle - self._phi_0) / self._w
-
         return amplitude
 
     def add_x_gate(self, angle):
@@ -415,6 +446,7 @@ class SQExGaussian(SQExecuter):
         pulse_plat_name = "Control Pulse - Plateau #" + str(self._next_pulse)
         pulse_spac_name = "Control Pulse - Spacing #" + str(self._next_pulse)
         pulse_phase_name = "Control Pulse - Phase #" + str(self._next_pulse)
+        pulse_mod_freq_name = "Control Pulse - Mod. frequency #" + str(self._next_pulse)
         pulse_output_name = "Control Pulse - Output #" + str(self._next_pulse)
 
         amplitude = self._get_amplitude_for_angle(angle)
@@ -424,6 +456,7 @@ class SQExGaussian(SQExecuter):
         self._meas_object.updateValue( pulse_plat_name, 0 )
         self._meas_object.updateValue( pulse_spac_name, self._spacing )
         self._meas_object.updateValue( pulse_phase_name, self._accum_z_phase )
+        self._meas_object.updateValue( pulse_mod_freq_name, self._mod_freq )
         self._meas_object.updateValue( pulse_output_name, 0 )
 
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
@@ -439,6 +472,7 @@ class SQExGaussian(SQExecuter):
         pulse_plat_name = "Control Pulse - Plateau #" + str(self._next_pulse)
         pulse_spac_name = "Control Pulse - Spacing #" + str(self._next_pulse)
         pulse_phase_name = "Control Pulse - Phase #" + str(self._next_pulse)
+        pulse_mod_freq_name = "Control Pulse - Mod. frequency #" + str(self._next_pulse)
         pulse_output_name = "Control Pulse - Output #" + str(self._next_pulse)
 
         amplitude = self._get_amplitude_for_angle(angle)
@@ -452,6 +486,7 @@ class SQExGaussian(SQExecuter):
         else:
             phase = self._accum_z_phase + 90
         self._meas_object.updateValue( pulse_phase_name, phase )
+        self._meas_object.updateValue( pulse_mod_freq_name, self._mod_freq )
         self._meas_object.updateValue( pulse_output_name, 0 )
 
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
@@ -467,6 +502,7 @@ class SQExGaussian(SQExecuter):
         pulse_plat_name = "Control Pulse - Plateau #" + str(self._next_pulse)
         pulse_spac_name = "Control Pulse - Spacing #" + str(self._next_pulse - 1) # changed the previous spacing!
         pulse_phase_name = "Control Pulse - Phase #" + str(self._next_pulse)
+        pulse_mod_freq_name = "Control Pulse - Mod. frequency #" + str(self._next_pulse)
         pulse_output_name = "Control Pulse - Output #" + str(self._next_pulse)
 
 
@@ -475,6 +511,7 @@ class SQExGaussian(SQExecuter):
         self._meas_object.updateValue( pulse_plat_name, 2e-6 )
         self._meas_object.updateValue( pulse_spac_name, 40e-9 )
         self._meas_object.updateValue( pulse_phase_name, 0 )
+        self._meas_object.updateValue( pulse_mod_freq_name, 70e6 )
         self._meas_object.updateValue( pulse_output_name, 1 )
 
         self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
@@ -485,3 +522,49 @@ class SQExGaussian(SQExecuter):
         """
         first_pulse_delay = self._meas_time - self._seq_time + self._width # add two width
         self._meas_object.updateValue( "Control Pulse - First pulse delay", first_pulse_delay )
+
+    def add_pre_reset(self):
+        """
+        Add pre-reset protocol por cooling the qubit
+        """
+        # Add cavity pulse
+        pulse_amp_name = "Control Pulse - Amplitude #" + str(self._next_pulse)
+        pulse_width_name = "Control Pulse - Width #" + str(self._next_pulse)
+        pulse_plat_name = "Control Pulse - Plateau #" + str(self._next_pulse)
+        pulse_spac_name = "Control Pulse - Spacing #" + str(self._next_pulse)
+        pulse_phase_name = "Control Pulse - Phase #" + str(self._next_pulse)
+        pulse_mod_freq_name = "Control Pulse - Mod. frequency #" + str(self._next_pulse)
+        pulse_output_name = "Control Pulse - Output #" + str(self._next_pulse)
+
+        self._meas_object.updateValue( pulse_amp_name, self._features["reset_qub_amp"] )
+        self._meas_object.updateValue( pulse_width_name, self._width )
+        self._meas_object.updateValue( pulse_plat_name, 2e-6 )
+        self._meas_object.updateValue( pulse_spac_name, -2e-6 )
+        self._meas_object.updateValue( pulse_phase_name, 0 )
+        self._meas_object.updateValue( pulse_mod_freq_name, self._mod_freq )
+        self._meas_object.updateValue( pulse_output_name, 0 )
+
+        self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
+        self._next_pulse += 1
+        self._seq_time += self._width # width + spacing + plateau
+        
+        # Add qubit pulse
+        pulse_amp_name = "Control Pulse - Amplitude #" + str(self._next_pulse)
+        pulse_width_name = "Control Pulse - Width #" + str(self._next_pulse)
+        pulse_plat_name = "Control Pulse - Plateau #" + str(self._next_pulse)
+        pulse_spac_name = "Control Pulse - Spacing #" + str(self._next_pulse)
+        pulse_phase_name = "Control Pulse - Phase #" + str(self._next_pulse)
+        pulse_mod_freq_name = "Control Pulse - Mod. frequency #" + str(self._next_pulse)
+        pulse_output_name = "Control Pulse - Output #" + str(self._next_pulse)
+
+        self._meas_object.updateValue( pulse_amp_name, self._features["reset_cav_amp"] )
+        self._meas_object.updateValue( pulse_width_name, self._width )
+        self._meas_object.updateValue( pulse_plat_name, 2e-6 )
+        self._meas_object.updateValue( pulse_spac_name, 2e-6 )
+        self._meas_object.updateValue( pulse_phase_name, 0 )
+        self._meas_object.updateValue( pulse_mod_freq_name, 70e6 )
+        self._meas_object.updateValue( pulse_output_name, 1 )
+
+        self._meas_object.updateValue( "Control Pulse - # of pulses", self._next_pulse )
+        self._next_pulse += 1
+        self._seq_time += self._width + 4e-6 # width + spacing + plateau
