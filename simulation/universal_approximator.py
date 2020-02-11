@@ -81,11 +81,15 @@ class UniversalApproximator():
         (n_layers x 3) array
         """
 
-        if len(p) != self._n_layers or len(p[0]) != 3:
-            print("Parameters don't have the proper length")
-            exit()
+        # if len(p) != self._n_layers or len(p[0]) != 3:
+        #     print(len(p))
+        #     print(len(p[0]))
+        #     print("Parameters don't have the proper length")
+        #     exit()
 
-        self._p = p
+        p_i = []
+        p_i.append(p)
+        self._p = p_i
     
     def update_x(self,x):
         """
@@ -93,6 +97,13 @@ class UniversalApproximator():
         """
 
         self._x = x
+
+    def set_x_range(self,x):
+        """
+        Set x range to be computed
+        """
+
+        self._x_range = x
 
     def _calc_theta(self, p0, p1, x):
         """
@@ -140,7 +151,24 @@ class UniversalApproximator():
         P0 = self._convert_to_P0(result)
         return P0
 
+    def probability(self, p, x):
+        self.update_param(p)
+        P_1 = [] 
+        for x_i in self._x_range:
+            self.update_x(x_i)
+            P_0_value = self.run()
+            # Result is P0 and we want P1. We add it to the array.
+            P_1.append( 1 - P_0_value )
+        return P_1
 
+    def chi_square(self, p):
+        P_1 = self.probability(p, self._x_range)
+        fx = self._function(self._x_range)
+        result = ( 0.5 / len(self._x_range) ) * np.sum( ( P_1 - fx )**2 )
+        return result
+        
+    def define_function(self,f):
+        self._function = f
 
 if __name__ == "__main__":
     pass

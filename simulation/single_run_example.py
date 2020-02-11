@@ -45,12 +45,13 @@ p = [[ 5.70445799e+00,  1.57081148e+00,  1.22220816e+00], \
 #      [ 0.27341608, -0.55536742,  0.15635837]]
 
 for i, p_line in enumerate(p): p[i] = [x*2 for x in p_line] # This is due to a convention in the algorithm
+from scipy.optimize import minimize
 
 
 if __name__ == "__main__":
 
      # x values to be evaluated     
-     x = np.linspace( -1, 1, num=101)
+     x = np.linspace( -np.pi, np.pi, num=21)
 
      features = {
           "n_averages_meas": 5e3,
@@ -67,9 +68,20 @@ if __name__ == "__main__":
      }
 
      # Create the UniversalApproximator object and update parameters
-     univ_app = UniversalApproximator(n_layers=5, \
+     univ_app = UniversalApproximator(n_layers=1, \
           measurement_type="EXPERIMENT", pulse_type="GAUSSIAN",
           features = features)
+
+     univ_app.set_x_range(x)
+     univ_app.define_function( lambda x: (1 + np.cos(x) ) / 2 )
+     p = [.95, 0, 0]
+
+# coseno de menos pi a pi, con una sola capa
+     
+     results = minimize(univ_app.chi_square, p, method='Nelder-Mead', options={"disp": True})
+
+#      pass
+     print(results)
 
      univ_app.update_param(p)
 
@@ -116,7 +128,7 @@ if __name__ == "__main__":
      plt.show()
 
 
-     np.savetxt("tanh_DRAG_m1_7w.txt", np.stack((x, P_1)))
+     np.savetxt("last_measure.txt", np.stack((x, P_1)))
      # plt.figure(2)
      # diff = []
      # for x_i, pi in zip(x,P_1):
