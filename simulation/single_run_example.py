@@ -2,6 +2,8 @@ from universal_approximator import UniversalApproximator
 import matplotlib.pyplot as plt
 import numpy as np
 
+from noisyopt import minimizeSPSA, minimizeCompass
+
 # Parameters of the gates to be computed
 # 2 layers
 # p = [[ 7.30775879e-01, -5.11802708e-02, -1.53394120e-06], \
@@ -51,37 +53,39 @@ from scipy.optimize import minimize
 if __name__ == "__main__":
 
      # x values to be evaluated     
-     x = np.linspace( -np.pi, np.pi, num=21)
+     x = np.linspace( -1, 1, num=101)
 
      features = {
-          "n_averages_meas": 5e3,
-          "n_averages_cal": 5e3,
+          # "n_averages_meas": 5e3,
+          # "n_averages_cal": 50e3,
           "spacing": 10e-9, # in terms of width
           "width": 5e-9, # s 
-          "power_qubit_pulse": 15, #dBm
+          # "power_qubit_pulse": 15, #dBm
           # "truncation_range": 3, #n sigmas for gaussian trunc.range
           # "calib_point": 51,
           "reset": False,
-          "reset_cav_amp": 157.75e-3,
-          "reset_qub_amp": 4.5e-3,
-          "drag_scaling": -523.19163e-12
+          # "reset_cav_amp": 157.75e-3,
+          # "reset_qub_amp": 4.5e-3,
+          # "drag_scaling": -523.19163e-12
      }
 
      # Create the UniversalApproximator object and update parameters
-     univ_app = UniversalApproximator(n_layers=1, \
-          measurement_type="EXPERIMENT", pulse_type="GAUSSIAN",
+     univ_app = UniversalApproximator(n_layers=5, \
+          measurement_type="SIMULATION", pulse_type="GAUSSIAN",
           features = features)
 
-     univ_app.set_x_range(x)
-     univ_app.define_function( lambda x: (1 + np.cos(x) ) / 2 )
-     p = [.95, 0, 0]
+     # univ_app.set_x_range(x)
+     # univ_app.define_function( lambda x: (1 + np.cos(x + np.pi) ) / 2 )
+     # p = [0,0]
 
 # coseno de menos pi a pi, con una sola capa
      
-     results = minimize(univ_app.chi_square, p, method='Nelder-Mead', options={"disp": True})
+     # results = minimize(univ_app.chi_square, p, method='Powell', options={"disp": True})
+     # bounds = [ [-10,10], [-10,10] ]
+     # results = minimizeSPSA(univ_app.chi_square, p, bounds=bounds, disp=True, paired=False)
 
-#      pass
-     print(results)
+     # pass
+     # print(results)
 
      univ_app.update_param(p)
 

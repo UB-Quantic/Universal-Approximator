@@ -81,15 +81,18 @@ class UniversalApproximator():
         (n_layers x 3) array
         """
 
-        # if len(p) != self._n_layers or len(p[0]) != 3:
-        #     print(len(p))
-        #     print(len(p[0]))
-        #     print("Parameters don't have the proper length")
-        #     exit()
+        if len(p) != self._n_layers or len(p[0]) != 3:
+            print(len(p))
+            print(len(p[0]))
+            print("Parameters don't have the proper length")
+            exit()
 
-        p_i = []
-        p_i.append(p)
-        self._p = p_i
+        self._p = p
+
+        # p_i = []
+        # p = np.append(p,0)
+        # p_i.append(p)
+        # self._p = p_i
     
     def update_x(self,x):
         """
@@ -132,13 +135,15 @@ class UniversalApproximator():
             self._sqc.add_y_gate( theta )
             self._sqc.add_z_gate( param[2] )
         
+        # if self._meas_type == MEAS_TYPE_EXPERIMENT:
         self._sqc.finish_sequence()
 
     def _convert_to_P0(self, result):
         """
         Method to be overriden from subclasses
         """
-        P0 = self._sqc.process_result(np.abs(result[1]))
+        # P0 = self._sqc.process_result(np.abs(result[1]))
+        P0 = self._sqc.process_result(result[1])
         return P0
         
     def run(self):
@@ -162,9 +167,13 @@ class UniversalApproximator():
         return P_1
 
     def chi_square(self, p):
+        print("Parameters to be tried are ", p)
         P_1 = self.probability(p, self._x_range)
         fx = self._function(self._x_range)
         result = ( 0.5 / len(self._x_range) ) * np.sum( ( P_1 - fx )**2 )
+        print("The result of this parameters is ", result)
+        print()
+        print()
         return result
         
     def define_function(self,f):

@@ -281,7 +281,7 @@ class SQExecuter(ABC):
         Prepare for measurement
         """
         self._add_measurement_pulse()
-        self._add_first_pulse_delay()
+        # self._add_first_pulse_delay()
 
     @abstractmethod
     def _add_measurement_pulse(self):
