@@ -2,8 +2,10 @@
 
 # Basic imports
 import numpy as np
+import scipy as sc
 import os
 from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
 
 # Labber imports
 from Labber import ScriptTools
@@ -49,14 +51,16 @@ class UniversalApproximant():
         self._features = features
 
         self.p = []
+        self.f = None
+        self.x = None
 
         self.scn_mng =  scn.ScenarioManager( meas_type, n_layers, features)
 
         self.cal_meas = ScriptTools.MeasurementObject(
                 os.path.join( _RELPATH, "calibration.labber"), # Here we should write the name parametrically
-                os.path.join( _RELPATH, "res.hdf5" ) )
+                os.path.join( _RELPATH, "res_cal.hdf5" ) )
         calibration_raw = self.cal_meas.performMeasurement()
-        self.calibrate(calibration_raw)
+        self.calibrate(calibration_raw, plot=False)
 
     def _check_meas_type(self, meas_type):
         if meas_type not in [SIMULATION, EXPERIMENT]:
@@ -81,12 +85,14 @@ class UniversalApproximant():
 
         param = self._fit_calib_cosinus(calibration_data)
         self._w = param[0]
-        self._A = param[1]
+        self._A = param[1]  
         self._c = param[2]
 
         if plot == True:
-            print("Plotting option not yet done. Sorry :(")
-            # TO BE DONE
+            plt.plot(calibration_data[0], calibration_data[1])
+            sim = calib_cosinus(calibration_data[0], self._w, self._A, self._c)
+            plt.plot(calibration_data[0], sim)
+            plt.show()
 
     def _fit_calib_cosinus(self, data):
         x_cal = data[0]
@@ -125,6 +131,9 @@ class UniversalApproximant():
         self.x = x
         self.scn_mng.set_x_range(x)
 
+        if self.f is not None:
+            self._create_function_value()
+
     def run(self):
         self._calc_thetas()
         self._calc_amplitudes()
@@ -139,11 +148,12 @@ class UniversalApproximant():
                 os.path.join( _RELPATH, "algorithm.labber"), # Here we should write the name parametrically
                 os.path.join( _RELPATH, "res.hdf5" ) )
         algorithm_raw = self.alg_meas.performMeasurement()
-        return algorithm_raw
+        result = self._convert_result(algorithm_raw[1])
+        return result
    
     def _calc_thetas(self):
-        theta_y = np.zeros((len(self.x), self._n_layers))
-        theta_z = np.zeros(self._n_layers)
+        theta_y = np.zeros((len(self.x), self._n_layers), dtype=np.longdouble)
+        theta_z = np.zeros(self._n_layers, dtype=np.longdouble)
 
         for i, x_i in enumerate(self.x):
             for layer in range(self._n_layers):
@@ -156,7 +166,7 @@ class UniversalApproximant():
         self.theta_z = theta_z 
 
     def _calc_amplitudes(self):
-        ampl = np.zeros((len(self.x), self._n_layers))
+        ampl = np.zeros((len(self.x), self._n_layers), dtype=np.longdouble)
         for i in range(len(self.x)):
             for j in range(self._n_layers):
                 ampl[i][j] = self._get_amplitude_for_angle(\
@@ -167,10 +177,16 @@ class UniversalApproximant():
         """
         Get the amplitude necessary for the desired rotation
         """
-        while angle < - np.pi:
-            angle += 2*np.pi
-        while angle >=  np.pi:
-            angle -= 2*np.pi
+        # while angle < - np.pi:
+        #     angle += 2.0*np.pi
+        # while angle >=  np.pi:
+        #     angle -= 2.0*np.pi
+
+        # while angle < 0:
+        #     angle += 2*np.pi
+        # while angle >=  2*np.pi:
+        #     angle -= 2*np.pi
+
         amplitude = angle / self._w
         return amplitude
 
@@ -186,9 +202,29 @@ class UniversalApproximant():
     def _save_algorithm(self):
         self.scn_mng.save_algorithm()
 
+    def define_function(self,f):
+        self.f = f
+        if self.x is not None:
+            self._create_function_value()
 
+    def _create_function_value(self):
+        self._fx = self.f(self.x)
 
+    def chi_square(self, p):
 
+        self.update_param(p)
+        P_1 = []
+        P_0 = self.run()
+        P_1 = [1 - x for x in P_0 ]
+        result = ( 0.5 / len(self.x) ) * np.sum( ( P_1 - self._fx )**2 )
+        plt.plot(self.x,P_1)
+        plt.plot(self.x,self._fx)
+        plt.show()
+        return result
+
+    def _convert_result(self, raw_result):
+        P0 = ( raw_result - (self._c - self._A) ) / (2 * self._A)
+        return P0
 
 
 

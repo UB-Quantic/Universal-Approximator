@@ -109,7 +109,7 @@ class ScenarioManager():
             # Qubit
             feat("Delta", 4.825e9),
             feat("Epsilon", 0),
-            feat("Drive frequency", 5.025e9),
+            feat("Drive frequency", 4.895e9),
             feat("Drive relative to qubit frequency", False),
             feat("Drive amplitude", 250e6),
             feat("Drive type", 1),
@@ -122,7 +122,7 @@ class ScenarioManager():
             feat("Noise sources", 1),
             feat("Disable noise during pulses", False),
             feat("Noise type 1", 1),
-            feat("Noise, Delta 1", 100e6),
+            feat("Noise, Delta 1", 0),
             feat("Noise, Epsilon 1", 0),
             feat("Noise, Drive 1", 0),
             feat("High frequency cut-off 1", 20e9)
@@ -182,7 +182,6 @@ class ScenarioManager():
         self._set_log_name(scn, "Calibration")
         self._save_log(scn, "Calibration")
 
-
     def _prepare_sim_algorithm(self):
         scn = ALG
         self._add_single_qubit_pulse_generator(scn)
@@ -212,7 +211,7 @@ class ScenarioManager():
             feat("Plateau #1", 0),
             feat("Spacing #1", 0),
             feat("Phase #1", 0),
-            feat("Mod. frequency #1", 200e6),
+            feat("Mod. frequency #1", 70e6),
             feat("Ratio I/Q #1", 1),
             feat("Phase diff. #1", 0)
         ]
@@ -225,6 +224,7 @@ class ScenarioManager():
 
     def _add_sim_log_channel(self, scn):
         self._scn_dict[scn].add_log("Qubit Simulator - Polarization - Z")
+        self._scn_dict[scn].add_log("Qubit Simulator - Trace - Pz")
 
     def _set_log_name(self, scn, name):
         self._scn_dict[scn].log_name = name
@@ -243,7 +243,7 @@ class ScenarioManager():
                 feat("Plateau #" + str(i+1), 0),
                 feat("Spacing #" + str(i+1), 15e-9),
                 feat("Phase #" + str(i+1), 90),
-                feat("Mod. frequency #" + str(i+1), 200e6),
+                feat("Mod. frequency #" + str(i+1), 70e6),
                 feat("Ratio I/Q #" + str(i+1), 1),
                 feat("Phase diff. #" + str(i+1), 0)
             ]
