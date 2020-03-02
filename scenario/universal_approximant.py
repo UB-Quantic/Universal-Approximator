@@ -135,6 +135,7 @@ class UniversalApproximant():
             self._create_function_value()
 
     def run(self):
+        self._reset_scenario()
         self._calc_thetas()
         self._calc_amplitudes()
 
@@ -217,16 +218,17 @@ class UniversalApproximant():
         P_0 = self.run()
         P_1 = [1 - x for x in P_0 ]
         result = ( 0.5 / len(self.x) ) * np.sum( ( P_1 - self._fx )**2 )
-        plt.plot(self.x,P_1)
-        plt.plot(self.x,self._fx)
-        plt.show()
+        # plt.plot(self.x,P_1)
+        # plt.plot(self.x,self._fx)
+        # plt.show()
         return result
 
     def _convert_result(self, raw_result):
         P0 = ( raw_result - (self._c - self._A) ) / (2 * self._A)
         return P0
 
-
+    def _reset_scenario(self):
+        self.scn_mng.remove_steps()
 
 
 
