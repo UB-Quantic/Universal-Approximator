@@ -306,3 +306,6 @@ class ScenarioManager():
         for step_name in scn.step_names():
             if step_name.startswith("Control Pulse - Amplitude #"):
                 scn.remove_step(step_name)
+
+    def reset_phase(self):
+        self._accum_z_phase = 0

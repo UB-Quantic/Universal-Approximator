@@ -229,6 +229,7 @@ class UniversalApproximant():
 
     def _reset_scenario(self):
         self.scn_mng.remove_steps()
+        self.scn_mng.reset_phase()
 
 
 
