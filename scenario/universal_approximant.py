@@ -57,7 +57,7 @@ class UniversalApproximant():
         self.scn_mng =  scn.ScenarioManager( meas_type, n_layers, features)
 
         self.cal_meas = ScriptTools.MeasurementObject(
-                os.path.join( _RELPATH, "calibration.labber"), # Here we should write the name parametrically
+                os.path.join( _RELPATH, "Calibration.labber"), # Here we should write the name parametrically
                 os.path.join( _RELPATH, "res_cal.hdf5" ) )
         calibration_raw = self.cal_meas.performMeasurement()
         self.calibrate(calibration_raw, plot=False)
@@ -146,15 +146,15 @@ class UniversalApproximant():
         self._save_algorithm()
 
         self.alg_meas = ScriptTools.MeasurementObject(
-                os.path.join( _RELPATH, "algorithm.labber"), # Here we should write the name parametrically
+                os.path.join( _RELPATH, "Algorithm.labber"), # Here we should write the name parametrically
                 os.path.join( _RELPATH, "res.hdf5" ) )
         algorithm_raw = self.alg_meas.performMeasurement()
         result = self._convert_result(algorithm_raw[1])
         return result
    
     def _calc_thetas(self):
-        theta_y = np.zeros((len(self.x), self._n_layers), dtype=np.longdouble)
-        theta_z = np.zeros(self._n_layers, dtype=np.longdouble)
+        theta_y = np.zeros((len(self.x), self._n_layers), dtype=np.float64)
+        theta_z = np.zeros(self._n_layers, dtype=np.float64)
 
         for i, x_i in enumerate(self.x):
             for layer in range(self._n_layers):
@@ -167,7 +167,7 @@ class UniversalApproximant():
         self.theta_z = theta_z 
 
     def _calc_amplitudes(self):
-        ampl = np.zeros((len(self.x), self._n_layers), dtype=np.longdouble)
+        ampl = np.zeros((len(self.x), self._n_layers), dtype=np.float64)
         for i in range(len(self.x)):
             for j in range(self._n_layers):
                 ampl[i][j] = self._get_amplitude_for_angle(\
