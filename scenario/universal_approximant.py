@@ -135,6 +135,7 @@ class UniversalApproximant():
             self._create_function_value()
 
     def run(self):
+        self._reset_scenario()
         self._calc_thetas()
         self._calc_amplitudes()
 
@@ -226,7 +227,9 @@ class UniversalApproximant():
         P0 = ( raw_result - (self._c - self._A) ) / (2 * self._A)
         return P0
 
-
+    def _reset_scenario(self):
+        self.scn_mng.remove_steps()
+        self.scn_mng.reset_phase()
 
 
 

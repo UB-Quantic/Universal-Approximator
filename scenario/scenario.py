@@ -302,3 +302,8 @@ class ScenarioManager():
                 signal.values["Noise Ampltiude"] = features["sim_noise"] * 20e6
 
 
+    def remove_steps(self):
+        scn = self._scn_dict[ALG]
+        for step_name in scn.step_names():
+            if step_name.startswith("Control Pulse - Amplitude #"):
+                scn.remove_step(step_name)
