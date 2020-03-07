@@ -139,7 +139,6 @@ class UniversalApproximant():
         self._calc_thetas()
         self._calc_amplitudes()
 
-        self._generate_default_pulses()
         self._add_lookup_tables()
         self._add_virtual_z()
 
@@ -178,10 +177,10 @@ class UniversalApproximant():
         """
         Get the amplitude necessary for the desired rotation
         """
-        # while angle < - np.pi:
-        #     angle += 2.0*np.pi
-        # while angle >=  np.pi:
-        #     angle -= 2.0*np.pi
+        while angle < - np.pi:
+            angle += 2.0*np.pi
+        while angle >=  np.pi:
+            angle -= 2.0*np.pi
 
         # while angle < 0:
         #     angle += 2*np.pi
@@ -190,9 +189,6 @@ class UniversalApproximant():
 
         amplitude = angle / self._w
         return amplitude
-
-    def _generate_default_pulses(self):
-        self.scn_mng.generate_default_pulses(self._n_layers)
 
     def _add_lookup_tables(self):
         self.scn_mng.add_lookup_tables(self._n_layers, self.ampl)
