@@ -1,0 +1,45 @@
+\begin{thebibliography}{1}
+
+\bibitem{maths-arfken1999}
+George~B Arfken and Hans~J Weber.
+\newblock Mathematical methods for physicists, 1999.
+
+\bibitem{uat-hornik1991}
+Kurt Hornik.
+\newblock Approximation capabilities of multilayer feedforward networks.
+\newblock {\em Neural Networks}, 4:251--257, 1991.
+
+\bibitem{uat-cybenko1989}
+George Cybenko.
+\newblock Approximations by superpositions of a sigmoidal function.
+\newblock {\em Mathematics of Control, Signals and Systems}, 2:183--192, 1989.
+
+\bibitem{analysis-hahn1927}
+Hans Hahn.
+\newblock {\"U}ber lineare gleichungssysteme in linearen r{\"a}umen.
+\newblock {\em Journal f{\"u}r die reine und angewandte Mathematik},
+  157:214--229, 1927.
+
+\bibitem{analysis-banach1929}
+Stefan Banach.
+\newblock Sur les fonctionnelles lin{\'e}aires ii.
+\newblock {\em Studia Mathematica}, 1:223--239, 1929.
+
+\bibitem{analysis-riesz1914}
+Fr{\'e}d{\'e}ric Riesz.
+\newblock D{\'e}monstration nouvelle d'un th{\'e}or{\`e}me concernant les
+  op{\'e}rations fonctionnelles lin{\'e}aires.
+\newblock In {\em Annales scientifiques de l'{\'E}cole Normale Sup{\'e}rieure},
+  volume~31, pages 9--14, 1914.
+
+\bibitem{analysis-weir1974}
+Alan~J Weir, Alan~J Weir, et~al.
+\newblock {\em General integration and measure}, volume~2.
+\newblock CUP Archive, 1974.
+
+\bibitem{analysis-ash1972}
+RB~Ash.
+\newblock Real analysis and probability academic press.
+\newblock {\em New York}, 1972.
+
+\end{thebibliography}

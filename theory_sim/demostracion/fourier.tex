@@ -1,0 +1,169 @@
+\documentclass[aps,amssymb,amsmath,amsfonts,pra,superscriptaddress,onecolumn]{revtex4}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{babel}
+\usepackage{qcircuit}
+
+\newcommand{\ket}[1]{| #1 \rangle}
+
+\begin{document}
+\title{One qubit is an universal approximator of any complex function}
+\author{Adrián Pérez-Salinas}
+\affiliation{Departament de F\'isica Qu\`antica i Astrof\'isica and Institut de Ci\`encies del Cosmos (ICCUB), Universitat de Barcelona, Mart\'i i Franqu\`es 1, 08028 Barcelona, Spain.}
+\affiliation{Barcelona Supercomputing Center (BSC).}
+
+\begin{abstract}
+    In these notes we will show that one qubit has got sufficient computational power as to approximate any complex function, restricted to the limitations of quantum mechanics. We show that there is a basic unitary parameterized operation such that, when applied many times, can be used as a universal approximator. Each unitary operation is equivalent to one term of the Fourier series. 
+\end{abstract}
+\maketitle
+
+\section{Introduction}
+In these notes we show that there is a manner, using quantum circuits, to approximate any complex function. In addition, only one qubit will be enough to perform this operation. The complex function we want to approximate will be encoded in the amplitudes, while the argument of this function is given as an input. For doing so, we need a key concept known as re-uploading [citarme]. If we re-introduce classical data several times into a circuit, this circuit serves as a universal approximator. 
+
+The desired quantum circuit has got only one qubit, and single-qubit gates, and the strategy to get to it is very simple. The qubit must be initialized in an arbitrary state. It does not have to be any particular state, but it must be known. Typically, one of the states of the computational basis suffices. Then a single-qubit parameterized gate is applied to the qubit. The parameters of this gate are splited in two species: the input of the function, and inner parameters of the gate. These inner parameters must be adjusted to get a proper approximator. Thus, the circuit belongs to the class of variational quantum circuits.
+
+This concatenation of parameterized single-qubit gate is equivalent to get the Fourier series of a function. Applying $N$ gates in a row is, at least, an approximation as accurate as the first $N$ terms of the Fourier series. As we will see later, the inner parameters of the gates can be adjusted to correspond to the Fourier coefficients. These parameters are obtained variationally, so they could take values that are different to the Fourier series. However, as the Fourier coefficients can be constructed with these inner parameters, this approximation is not worse than the Fourier series. 
+
+This method is relevant as it allows to encode complicated and arbitrary functions into one qubit with a small number of gates. Thus, it may be a useful method for implementing numerical functions into quantum computers. The only restrictions imposed to the functions are given by the Fourier series theorem. 
+
+\section{Fourier series}
+As the quantum circuit links with the Fourier series theorem, we state this mathematical result first. 
+
+Let us consider a real-valued function $f(x)$. This function is integrable on an interval of length $P$. This $P$ will be the period of the Fourier series. Then $f(x)$ can be approximated by
+\begin{equation}\label{eq:fourier_cos_sin}
+    f_N(x) = \frac{a_0}{2} + \sum_{n = 1}^N \left(a_n \cos\left(\frac{2\pi n x}{P}\right) + b_n \sin\left(\frac{2\pi n x}{P}\right)\right), 
+\end{equation}
+where
+\begin{eqnarray}
+    a_n = \frac{2}{P}\int_P f(x) \cos\left(\frac{2\pi n x}{P}\right) dx, \\
+    b_n = \frac{2}{P}\int_P f(x) \sin\left(\frac{2\pi n x}{P}\right) dx . \\
+\end{eqnarray}
+Notice that if $f(x)$ is $P-$periodic, this representation is sufficient to approximate the function in all its domain.
+
+The expression in \ref{eq:fourier_cos_sin} can be rewritten as an exponential form
+\begin{equation}\label{eq:fourier_exp}
+    f_N(X) = \sum_{n = -N}^N c_n e^{i \frac{2\pi n x}{P}},
+\end{equation}
+where $c_n$ is related to the previous coefficients by 
+\begin{eqnarray}
+    c_n = \frac{a_n + i b_n}{2} \\
+    c_{-n} = \frac{a_n - i b_n}{2} \\.
+\end{eqnarray}
+
+Once we have the Fourier series for a real-valued function, it can be extended to a complex-valued function. If $z(x)$ is complex valued and both real and imaginary components are real-valued and can be represented by a Fourier series, then
+\begin{equation}\label{eq:fourier_exp_complex}
+    z_N(X) = \sum_{n = -N}^N c_n e^{i \frac{2\pi n x}{P}},
+\end{equation}
+which is identical to Eq. \eqref{eq:fourier_exp_complex}, but this time $c_n$ and $c_{-n}$ are no longer complex conjugates.
+The coefficients are given by
+\begin{eqnarray}
+    \mathrm{Re}(c_n) = \frac{1}{P} \int_P \mathrm{Re}(z(x)) e^{-i\frac{2\pi n x}{P}} \\
+    \mathrm{Im}(c_n) = \frac{1}{P} \int_P \mathrm{Im}(z(x)) e^{-i\frac{2\pi n x}{P}} \\
+    c_n = \frac{1}{P} \int_P z(x) e^{-i\frac{2\pi n x}{P}}
+\end{eqnarray}
+
+\section{The quantum circuit}
+We want to get a quantum state $\ket{\psi(x)}$. We design a unitary gate $U(x; \omega, a, b, \varphi, \lambda)$ such that 
+\begin{equation}
+    \ket{\psi_N(x)} = \prod_{i=0}^N U(x; \omega_i, a_i, b_i, \varphi_i, \lambda_i) \ket{\psi_0}.
+\end{equation}
+The form of the unitary gate we choose is
+\begin{equation}\label{eq:unitary_1}
+    U(x; \omega, a, b, \varphi, \lambda) = 
+    \begin{pmatrix}
+    e^{i\lambda}\left(\cos\varphi \cos(\omega x + a) + i \sin\varphi \cos(\omega x + b)\right) & 
+    e^{i\lambda}\left(-\cos\varphi \sin(\omega x + a) - i \sin\varphi \sin(\omega x + b)\right) \\
+    e^{-i\lambda}\left(\cos\varphi \sin(\omega x + a) - i \sin\varphi \sin(\omega x + b)\right) & 
+    e^{-i\lambda}\left( \cos\varphi \cos(\omega x + a) - i \sin\varphi \cos(\omega x + b)\right)
+    \end{pmatrix}.
+\end{equation}
+This unitary gate seems to be arbitrary and complicated, but it can be implemented with five elementary rotations. 
+\begin{equation}\label{eq:unitary_elementary}
+    U(x; \omega, a, b, \varphi, \lambda) = R_z(\lambda) R_y\left(\frac{a - b}{2}\right) R_z(\varphi) R_y\left(\frac{a + b}{2}\right) R_y(\omega x)
+\end{equation}
+
+\begin{figure}
+\[
+\Qcircuit @C=0.85em @R=.9em  @!R{
+\lstick{\ket 0} & \gate{U(x; \omega_1, a_1, b_1, \varphi_1, \lambda_1)} & \gate{U(x; \omega_2, a_2, b_2, \varphi_2, \lambda_2)} & \qw & \cdots & & \gate{U(x; \omega_N, a_N, b_N, \varphi_N, \lambda_N)} & \qw & \rstick{\ket{\psi_N(x)}}
+}
+\]
+\caption{Single-qubit quantum circuit applied for transforming the state $\ket 0$ into an arbitrary state $\ket{\psi_N(x)}$ encoding an arbitrary complex function $z(x)$ with modulus $|z(x)| \leq 1$. This arbitrary $z(x)$ must be one of the two coefficients of the state $\ket{\psi(x)}$.}
+\end{figure}
+
+\section{The unitary gate in Fourier form}
+We show now that the unitary gate we propose works as a one-term Fourier series. In order to do so, the matrix will be rearranged as Eq. \eqref{eq:fourier_exp_complex}. As there is only one term, then there are two complex numbers, four parameters, and exponential phases with a given frequency $\omega$.
+\begin{equation}\label{eq:unitary_2}
+    U(x; \omega, a, b, \varphi, \lambda) = 
+    \begin{pmatrix}
+    a_+ e^{i\omega x} + a_- e^{- i \omega x} & b_+ e^{i\omega x} + b_- e^{- i \omega x} \\
+    c_+ e^{i\omega x} + c_- e^{- i \omega x} & d_+ e^{i\omega x} + d_- e^{- i \omega x}
+    \end{pmatrix},
+\end{equation}
+where
+\begin{eqnarray}
+    a_\pm = \frac{e^{i\lambda}}{2} \left(\cos\varphi e^{\pm ia} + i \sin\varphi e^{\pm ib}\right), \\
+    b_\pm = \frac{e^{i\lambda}}{2} \left(\pm i \cos\varphi e^{\pm ia} \mp \sin\varphi e^{\pm ib}\right), \\
+    c_\pm = \frac{e^{i\lambda}}{2} \left(\mp i \cos\varphi e^{\pm ia} \mp \sin\varphi e^{\pm ib}\right), \\
+    d_\pm = \frac{e^{i\lambda}}{2} \left(\cos\varphi e^{\pm ia} - i \sin\varphi e^{\pm ib}\right). \\
+\end{eqnarray}
+
+Thus, if $\ket{\psi(x)}$ is $P-$periodic, we just need to adjust $\omega = \omega_0 = \frac{2\pi n}{P}$ to get the n-term of the Fourier series. The coefficients $c_{\pm n}$ can be obtained by adjusting the parameters $\lbrace a, b, \varphi, \lambda\rbrace$. 
+
+Notice that there are four free parameters, ergo four degrees of freedom. One term of the Fourier series needs exactly four parameters. Thus, we can only adjust one element of the matrix $U(x; \omega, a, b, \varphi, \lambda)$, and the rest of them are automatically fixed. Although this is a limitation, it is sufficient to transform a given state $\ket{\psi_0}$ into a functional $\ket{\psi(x)}$. Imagine $\ket{\psi_0} = \ket{0}$. Adjusting the $(1,1)$ entry of the matrix is enough to transform the state $\ket 0$ into any desired $\ket{\psi(x)}$ as the state has got only two degrees of freedom: amplitude and relative phase.
+
+With this we showed that one gate is equivalent to one term of the Fourier series.
+
+\section{Adding one gate implies adding one Fourier term: proof by induction}
+
+Let us suppose now that we have applied $N$ gates, and the resulting matrix is a Fourier series. We want to show that if we add another gate, the resulting matrix remains a matrix of Fourier series. 
+
+We start with the matrix
+\begin{equation}
+    U_N = \begin{pmatrix}
+    \sum_{n = -N}^N A_n e^{i n \omega_0 x} & \sum_{n = -N}^N B_n e^{i n \omega_0 x} \\
+    \sum_{n = -N}^N C_n e^{i n \omega_0 x} & \sum_{n = -N}^N D_n e^{i n \omega_0 x}
+    \end{pmatrix},
+\end{equation}
+where the elements of this matrix are Fourier series. The newt step is computing the Left Multiplication $U(x; \omega, a, b, \varphi, \lambda) U_N$. For simplicity, now it is worth to focus only in one element of the matrix series. The arguments of this element hold for the whole matrix for symmetry. Analogous reasoning is applied if Right Multiplication is considered. The first element of $U(x; \omega, a, b, \varphi, \lambda) U_N$ is
+\begin{equation}
+\begin{split}
+  [U(x; \omega, a, b, \varphi, \lambda) U_N] (1,1) =  \sum_{n = -N}^N (A_n a_+ + C_n b_+) e^{i(n\omega_0 + \omega) x} + (A_n a_- + C_n b_-) e^{i(n\omega_0 - \omega) x} + \\
+   (A_{-n} a_+ + C_{-n} b_+) e^{i(-n\omega_0 + \omega) x} + (A_{-n} a_- + C_{-n} b_-) e^{i(n\omega_0 - \omega) x} \\
+    = \sum_{n = -N - 1}^{N + 1} \tilde{A}_n.
+\end{split}
+\end{equation}
+
+We need first to let the frequencies of the given series free. This can be done as the quantum circuit is variational. Instead of $n\omega_0$ we let them to be $\omega_n$. The frequency we add with this last gate will be $\omega = \omega_0 / 2$. Now we fix $\omega_n$ to be
+\begin{equation}
+    \begin{matrix}
+    \omega_1 = \frac{3}{2}\omega_0 \\
+    \omega_2 = \frac{5}{2}\omega_0 \\
+    \vdots \\
+    \omega_n = \frac{2n + 1}{2}\omega_0 \\
+    \end{matrix}.
+\end{equation}
+and thus
+\begin{equation}
+    \begin{matrix}
+    \omega_1 \pm \omega = \frac{3 \pm 1}{2}\omega_0 \\
+    \omega_2 \pm \omega = \frac{5 \pm 1}{2}\omega_0 \\
+    \vdots \\
+    \omega_2 \pm \omega = \frac{2n + 1 \pm 1}{2}\omega_0 \\
+    \end{matrix}
+\end{equation}
+
+Then we can re-arrange terms. 
+\begin{eqnarray}
+    \tilde{A}_{\pm 1} = A_{\pm 1} a_- + C_{\pm 1} b_- \\
+    \tilde{A}_n = A_{\pm n} a_- + C_{\pm n} b_- +  A_{\pm (n-1)} a_+ + C_{\pm (n-1)} b_+ \\
+    \tilde{A}_{\pm (N + 1)} = A_{\pm N} a_+ + C_{\pm N} b_+
+\end{eqnarray}
+
+In the $\tilde{A}_{\pm 1}$ term there are 8 degrees of freedom available. Only 4 are needed, thus 4 remain free. For every term until the last one, 4 more degrees of freedom are available, and 4 remain, but only 4 are needed. Then there are 4 degrees of freedom free after every coefficient $\tilde{A}_n$. For $\tilde{A}_{N + 1}$ there are no new degrees of freedom, but there are 4 that still remain, and they can be used for fixing this new coefficient. 
+
+A total amount of 5 degrees of freedom are added with every gate. One of these degrees of freedom, the frequency, is used to free another exponential term in the Fourier series. The other four degrees of freedom are used to allow arbitrary complex values of the coefficients in the Fourier series.  $\blacksquare$
+
+This is the complete proof for the statement in the title of this document.
+\end{document}

@@ -1,0 +1,66 @@
+RELU
+
+layers 1
+noisy =  False
+Cost function Quantum = 0.005368479662870558
+Cost function NN = 0.021660933171165162
+
+noisy =  True
+samples =  100
+Cost function Quantum = 0.005364448979591837
+Cost function NN = 0.021658547431880507
+
+samples =  1000
+Cost function Quantum = 0.005407342448979589
+Cost function NN = 0.09651184479429151
+
+samples =  10000
+Cost function Quantum = 0.005441416412244898
+Cost function NN = 0.09651184482882089
+
+layers 2
+noisy =  False
+Cost function Quantum = 0.005368479683236612
+Cost function NN = 0.0002939767555314322
+noisy =  True
+samples =  100
+Cost function Quantum = 0.006007591836734693
+Cost function NN = 0.00029370588306794966
+samples =  1000
+Cost function Quantum = 0.00530252448979592
+Cost function NN = 0.00026645432679252046
+samples =  10000
+Cost function Quantum = 0.00530916266122449
+Cost function NN = 0.00029265648775542565
+
+layers 3
+noisy =  False
+Cost function Quantum = 0.0003221139096632325
+Cost function NN = 0.0002696776574379209
+noisy =  True
+samples =  100
+Cost function Quantum = 0.003628897959183674
+Cost function NN = 0.0002922841756293602
+samples =  1000
+Cost function Quantum = 0.005327544081632654
+Cost function NN = 0.0002937724942384853
+samples =  10000
+Cost function Quantum = 0.1648655753265306
+Cost function NN = 0.0002678849467887702
+
+layers 4
+noisy =  False
+Cost function Quantum = 5.1536117725290205e-05
+Cost function NN = 0.00026003478145894375
+noisy =  True
+samples =  100
+Cost function Quantum = 0.005996857142857141
+Cost function NN = 0.0002890719495572009
+samples =  1000
+Cost function Quantum = 0.0003888608163265303
+Cost function NN = 0.0002700346473629845
+samples =  10000
+Cost function Quantum = 0.005242720346938775
+Cost function NN = 0.0002802080172764024
+
+

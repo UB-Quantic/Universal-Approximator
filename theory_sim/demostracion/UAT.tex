@@ -1,0 +1,172 @@
+\documentclass[aps,amssymb,amsmath,amsfonts,pra,superscriptaddress,twocolumn]{revtex4}
+%\documentclass[aps,amssymb,amsmath,amsfonts,pra,superscriptaddress,twocolumn]{article}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{qcircuit}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\bra}[1]{\langle #1 |}
+
+\newcommand{\beqa}{\begin{eqnarray}}
+\newcommand{\eeqa}{\end{eqnarray}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+\title{Extension of the Universal Approximation Theorem to Complex Functions}
+\author{Adrián Pérez-Salinas}
+\affiliation{Barcelona Supercomputing Center}
+\begin{abstract}
+    In this document we will extend the universal approximation theorem from Ref. \cite{uat-cybenko1989} to complex functions. For doing so, we must beware that the UAT is an existence theorem, and not a constructive one. The proof of this theorem is based on topology and functional analysis, and does not provide any tool for knowing how fine must be the tuning of our approximations for getting close to a given function.
+\end{abstract}
+\maketitle
+
+\section{Statement of the Universal Approximation Theorem}
+In its original form, the Universal Approximation Theorem (UAT from now) is written as follows
+\begin{theorem}
+Let $I_n$ denote the n-dimensional cube $[0, 1]^n$. The space of continuous functions on $I_n$ is denoted by $C(I_n)$, and we use $|\cdot|$ to denote the uniform norm of any function in $C(I_n)$. 
+Let $\sigma$ be a discriminatory and sigmoidal function. 
+Given a function $f \in C(I_n)$ there exists a function 
+\begin{equation}\label{eq:UAT}
+    G(\vec x) = \sum_j \alpha_j \sigma(\vec w_j \cdot \vec x + b_j)
+\end{equation}
+such that 
+\begin{equation}
+    |G(\vec x) - f(\vec x)| < \varepsilon \qquad \forall \vec x \in I_n
+\end{equation}
+for $w_j\in \mathbf{R}^n$ and $b_j \in \mathbf{R}$
+\end{theorem}
+
+We also need to define the assumptions of this theorem
+
+\begin{definition}
+A function $\sigma$ is sigmoidal if
+\begin{equation}
+    \sigma(t) \rightarrow \left\lbrace \begin{matrix}
+    1 \;{\rm as}\; t\rightarrow +\infty \\
+    0 \;{\rm as}\; t\rightarrow -\infty 
+    \end{matrix} \right.
+\end{equation}
+\end{definition}{}
+
+\begin{definition}
+A function $\sigma$ is discriminatory if for a measure $\mu \in M(I_n)$, 
+\begin{equation}
+    \int_{I_n} \sigma(\vec w_j \cdot \vec x + b_j) d\mu(x) = 0 \leftrightarrow \mu = 0, 
+\end{equation}
+where $M(I_n)$ is the space of signed regular Borel measures on $I_n$.
+\end{definition}
+
+This theorem is an existence theorem, and thus there is no contribution on how many terms from Eq. \eqref{eq:UAT} are needed for reaching a level precision $\varepsilon$. This theorem can be proved by means of topology and some previous results from functional analysis. The assumptions of the UAT are given for matching the assumptions of the results supporting it. 
+
+The extension made in Ref. \cite{uat-hornik1991} extends the UAT to any bounded nonconstant and nonlinear function. This generalization is important from a mathematical and practical point of view, but most common functions can be constructed my means of sigmoidal functions. For instance, a sine (cosine) function can be understood as a sum of sigmoidal functions with the proper shape. Two sigmoids can cancel each other properly and the result would be one cycle of the sine (cosine) function. In principle, this can be repeated periodically. As sine (cosine) functions are a sum of sigmoids, then every function can be represented as a sum of sines (cosines).
+
+\section{Extension to complex variable}
+We will follow the steps of the demonstration of this UAT as in Ref. \cite{uat-cybenko1989} for complex variables. Let us assume that this time the quantities $\alpha_j$ are allowed to be complex variables. The norm $|\cdot|$ implies now the modulus of a complex quantity. Thus, the set $C(I_n)$ is defined on the body of complex, although $I_n$ is still real. The UAT still holds under these conditions. 
+
+Let $S \subset C(I_n)$ be the set of functions 
+\begin{equation}
+S = \lbrace G(x) : G(x) = \sum_j^N \alpha_j \sigma (\vec w_j \cdot \vec x + b_j)\rbrace, 
+\end{equation}
+where $\alpha_j \in \mathbf{C}$, $\vec w_j \in \mathbf{R}^n$, $b_j \in \mathbf{R}$ and $\vec x \in I_n$. We claim that the closure of $S$, namely $\bar S$ is the whole space $C(I_n)$. 
+
+Let us proceed by contradiction, as in Ref. \cite{uat-cybenko1989}. Let us suppose that $\bar S \subset C(I_n)$, but $\bar S \neq C(I_n)$. By the Hahn-Banach theorem there is a linear functional $L$ acting on $C(I_n)$ such that
+\begin{equation}
+L(S) = L(\bar S) = 0 , \qquad L \neq 0.
+\end{equation} 
+
+\begin{theorem}
+{\bf: Hahn-Banach} \cite{analysis-hahn1927, analysis-banach1929}\\
+
+Set $\mathbf{K} = \mathbf{R} {\;\rm or\;} \mathbf{C}$. Let $V$ be a $\mathbf{K}-$ vector space with a seminorm $p: V \rightarrow \mathbf{R}$. If $\varphi : U \rightarrow \mathbf{K}$ is a $\mathbf{K}-$linear functional on a $\mathbf{K}-$linear subspace $U\subset V$ such that
+\begin{equation}
+|\varphi(x)| \leq p(x) \qquad \forall x \in U,
+\end{equation}
+then there exist a linear extension $\psi : V \rightarrow \mathbf{K}$ of $\varphi$ to the whole space $V$ such that
+\begin{eqnarray}
+\psi(x) = \varphi(x) \qquad \forall x\in U \\
+|\psi(x)| \leq p(x) \qquad \forall x\in V
+\end{eqnarray}
+\end{theorem}
+This theorem is also used in the original paper. As our assumptions add no additional constraints, then the theorem can be used here too. 
+
+At this point the derivation is analogous to the one in Ref. \cite{uat-cybenko1989}. 
+
+Using the Riesz Representation theorem we may write $L$ as
+\begin{equation}
+L(h) = \int_{I_n} h(x) d\mu(x)
+\end{equation}
+for $\mu\in M(I_n)$ and $\forall h \in C(I_n)$. 
+\begin{theorem}
+{\bf: Riesz Representation} \cite{analysis-riesz1914}\\
+
+Let $X$ be a locally compact Hausdorff space. For any positive linear functional $\psi$ on $C(X)$, there exists a uniruq regular Borel measure $\mu$ such that
+\begin{equation}
+\forall f \in C_c(X): \qquad \psi(f) = \int_X f(x) d\mu(x)
+\end{equation}
+\end{theorem}
+
+In particular, $\sigma$ is valid as the only imaginary quantities are given by the coefficients $\alpha_k$, then
+\begin{equation}
+\int_{I_n} \sigma(\vec w_j \cdot \vec x + b_j) d\mu(x) = 0
+\end{equation}
+always. 
+
+It is also assumed that $\sigma$ is discriminatory, and thus $\mu=0$, which contradicts the assumptions. Thus $\bar S = C(I_n)$, the set $S$ is dense within $C(I_n)$ and the theorem is demonstrated. We still have to show that sigmoid functions are discriminatory.
+
+\begin{lemma}
+Continuous sigmoidal functions are discriminatory.
+\end{lemma}
+Let us take $\sigma\left(\lambda(\vec w_j \cdot \vec x + b_j) + c)\right)$. As $\lambda \rightarrow \infty$ it is equivalent to the function
+\begin{equation}
+\gamma(x) = \left\lbrace \begin{matrix}
+= 1 \qquad {\rm for \,} \vec w \cdot \vec x + b > 0 \\
+= 0 \qquad {\rm for \,} \vec w \cdot \vec x + b < 0 \\
+= \sigma(c) \qquad {\rm for \,} \vec w \cdot \vec x + b = 0. 
+\end{matrix}\right.
+\end{equation}
+If we call the Lebesgue Bounded Convergence Theorem we have
+\begin{equation}
+0 = \int_{I_n} \sigma_\lambda(x) d\mu(x) = \int_{I_n} \gamma(x) d\mu(x) = \sigma(c) \mu(\Pi_{\vec w, b}) + \mu(H_{\vec w, b})
+\end{equation}
+where $\Pi_{\vec w, b} = \lbrace x : \vec w \cdot \vec x + b = 0\rbrace$, and \\$H_{\vec w, b} = \lbrace x : \vec w \cdot \vec x + b > 0\rbrace$. 
+
+\begin{theorem}
+{\bf: Lebesgue Bounded Convergence} \cite{analysis-weir1974}\\
+Let $\lbrace f_n\rbrace$ be a sequence of complex-valued measurable functions on a measure space $(S, \Sigma, \mu)$. Suppose that $\lbrace f_n \rbrace$ converges pointwise to a function $f$ and is dominated by some integrable function $g(x)$ in the sense
+\begin{equation}
+|f_n(x)| \leq g(x), \qquad \int_S |g|d\mu < \infty
+\end{equation}
+then
+\begin{equation}
+\lim_{n\rightarrow \infty} \int_S f_n d\mu = \int_S f d\mu
+\end{equation}
+\end{theorem}
+
+The measure of all half-planes being 0 implies that $\mu = 0$. Let us fix $\vec w$, and for a bounded measurabe function $h$ we define the linear functional
+\begin{equation}
+F(h) = \int_{I_n} h(\vec w \cdot \vec x) d\mu(x),
+\end{equation}
+which is bounded on $L^\infty(\mathbf{R})$ since $\mu$ is a finite signed measure. Let $h$ be an indicator of the half planes $h(u) = 1$ if $u\geq -b$ and $h(u) = 0$ otherwise, then
+\begin{equation}
+F(h) = \int_{I_n} h(\vec w \cdot \vec x) d\mu(x) =  \mu(\Pi_{\vec w, b}) + \mu(H_{\vec w, b}) = 0.
+\end{equation}
+By linearity, $F(h) = 0$ for any simple function, such as sum of indicator functions of intervales \cite{analysis-ash1972}. 
+
+In particular, for the bounded measurable functions $s(u) = \sin(\vec w \cdot \vec x), c(u) = \cos(\vec w \cdot \vec x)$ we can write
+\begin{equation}
+F(c + is) = \int_{I_n} \exp{i \vec w \cdot x} d\mu(x) = 0.
+\end{equation}
+The Fourier Transform of this $F$ is null, thus $\mu = 0$.
+
+\section{Link to Quantum Computing}
+$$
+R_z(\phi) R_y(\vec w \cdot \vec x + a)
+$$
+\bibliographystyle{unsrt}
+\bibliography{/media/adrianps/Files/Archivos/Trabajos/Citations}
+\end{document}
