@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.integrate import trapz
-from opt_algorithms import adam_optimizer_noisy, adam_optimizer, _evol, _cma, adam_spsa_optimizer
+from opt_algorithms import adam_optimizer_noisy, adam_optimizer, _evol, _cma, adam_spsa_optimizer, adam_spsa_optimizer_noisy
 import json
 from scipy.optimize import minimize, basinhopping, differential_evolution
 import os
@@ -99,12 +99,10 @@ class Approximant_NN:
     def update_parameters(self, new_parameters):
         self.params = new_parameters
 
-    def run(self, noisy=False, samples=10000, batch=1):
-        if batch != 1:
-            num_x = int(batch * len(self.domain))
-            X = np.random.choice(self.domain, num_x, replace=False)
-        else:
+    def run(self, noisy=False, X=None, samples=10000):
+        if X is None:
             X = self.domain
+
         if not noisy:
             for i, x in enumerate(X):
                 self.final_states[i] = state(x, self.params).flatten()
@@ -116,7 +114,7 @@ class Approximant_NN:
             self.outcomes = sampling
 
 
-    def find_optimal_parameters(self, init_point=None, noisy=False, samples=10000, batch=1, gens=100, tol=1e-8, verbose=True):
+    def find_optimal_parameters(self, init_point=None, noisy=False, samples=10000, batch=1, gens=100, ftol=1e-8, gtol=1e-3, verbose=True):
         if init_point is None:
             init_point = self.params.flatten()
 
@@ -125,7 +123,7 @@ class Approximant_NN:
             # result = _cma('nn', self._minim_function, init_point, self.layers, gens, tol=tol, verbose=verbose)
             # result = minimize(self._minim_function, init_point, method='bfgs', options={"disp":verbose})
             # result = adam_optimizer(self._minim_function, init_point, gens=gens)
-            result = adam_spsa_optimizer(self._minim_function, init_point, batch, tol=tol)
+            result = adam_spsa_optimizer(self._minim_function, init_point, batch, ftol=ftol, gtol=gtol)
             # result = basinhopping(self._minim_function, init_point, disp=verbose, minimizer_kwargs={'method':'cobyla'}, niter_success=3)
             # result = differential_evolution(self._minim_function, [(-np.pi, np.pi)] * len(init_point), disp=verbose)
             print(result)
@@ -145,7 +143,8 @@ class Approximant_NN:
         else:
             # result = _cma_nn(self._minim_function_noisy, init_point, samples, self.layers, gens, tol=tol, verbose=verbose)
             # result = minimize(self._minim_function_noisy, init_point, method='powell', options={'disp':verbose, 'ftol':1 / np.sqrt(samples) / len(self.domain)})
-            result = adam_optimizer_noisy(self._minim_function_noisy, init_point, samples)
+            # result = adam_optimizer_noisy(self._minim_function_noisy, init_point, samples)
+            result = adam_spsa_optimizer_noisy(self._minim_function_noisy, init_point, batch, samples)
             # result = basinhopping(self._minim_function_noisy, init_point, niter_success=3, minimizer_kwargs={'args':(samples), 'method':'powell', 'options':{'ftol':1 / np.sqrt(samples) / len(self.domain)}}, disp=verbose)
             print(result)
             result['x'] = list(result['x'])
@@ -158,15 +157,15 @@ class Approximant_NN:
         params = np.asarray(params)
         params = params.reshape((self.layers, 3))
         self.update_parameters(params)
-        self.run()
+        self.run(batch=batch)
         chi = np.mean((np.abs(self.final_states[:, 1])**2 - self.function) ** 2)
         return chi
 
-    def _minim_function_noisy(self, params, samples=10000):
+    def _minim_function_noisy(self, params, batch=1, samples=10000):
         params = np.asarray(params)
         params = params.reshape((self.layers, 3))
         self.update_parameters(params)
-        self.run()
+        self.run(batch=batch, samples=samples)
         probs = np.abs(self.final_states[:, 1])**2
         sampling = np.random.binomial(n=1, p=probs, size=(samples, len(probs)))
         sampling = np.sum(sampling, axis=0) / samples

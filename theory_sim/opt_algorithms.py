@@ -333,24 +333,27 @@ def est_grad_2_noisy(function, theta, h, samples, batch):
     return gradient, c
 
 
-def adam_spsa_optimizer(function, init_point, batch, a=0.005, b1=0.9, b2=0.999, c=1, gamma=0.101, fmin=0, tol=1e-8, gens=None):
+def adam_spsa_optimizer(function, init_point, batch, a=0.5, b1=0.9, b2=0.999, c=1, gamma=0.5, fmin=0, ftol=1e-8, gtol=1e-3, gens=None):
     # añadir un máximo de gens si llega el caso
     # añadir opción de verbose
+    # Hay un bug en el batch, al principio del gradient
     t = 1
     m = np.zeros_like(init_point)
     v = np.zeros_like(init_point)
     best_theta = init_point.copy()
     theta = init_point.copy()
     best_cost = 1
-    while best_cost > fmin + tol:
-        theta, m, v, cost = adam_spsa_step(function, theta, batch, a, b1, b2, c, gamma, m, v, t)
-        t+= 1
-        if t%20 == 0: print(t, cost)
+    while best_cost > fmin + ftol:
+        theta, m, v, cost, conv_rate = adam_spsa_step(function, theta, batch, a, b1, b2, c, gamma, m, v, t)
+        t += 1
+        if t%20 == 0:
+            print(t, cost, np.max(np.abs(conv_rate)))
+            print(np.max(np.abs(conv_rate)) < gtol)
         if cost < best_cost:
             best_theta = theta
             best_cost = cost
-        if best_cost < fmin:
-            best_theta = theta
+        if np.max(np.abs(conv_rate)) < gtol:
+
             break  # checkear condiciones de parada
 
 
@@ -373,13 +376,68 @@ def adam_spsa_step(function, theta, batch, a, b1, b2, c, gamma, m, v, t, epsi=1e
     v_ = v / (1 - b2 ** t)
 
     theta_new = theta - a * m_ / (np.sqrt(v_) + epsi)
-    return theta_new, m, v, cost
+    conv_rate = a * m_ / np.sqrt(v_)
+    return theta_new, m, v, cost, conv_rate
 
 def adam_spsa_gradient(function, theta, batch, c_t):
-    cost = function(theta, batch)
+    cost = function(theta)
     displacement = np.random.binomial(1, 0.5, size=theta.shape)
     theta_plus = theta.copy() + c_t * displacement
     theta_minus = theta.copy() - c_t * displacement
     gradient = 1 / 2 / c_t * (function(theta_plus, batch=batch) - function(theta_minus, batch=batch)) * displacement
+
+    return gradient, cost
+
+def adam_spsa_optimizer_noisy(function, init_point, batch, samples, a=0.5, b1=0.9, b2=0.999, c=.1, gamma=0.51, fmin=0, ftol=1e-8, gtol=1e-3, gens=None):
+    # añadir un máximo de gens si llega el caso
+    # añadir opción de verbose
+    t = 1
+    m = np.zeros_like(init_point)
+    v = np.zeros_like(init_point)
+    best_theta = init_point.copy()
+    theta = init_point.copy()
+    best_cost = 1
+    while best_cost > fmin + ftol:
+        theta, m, v, cost, conv_rate = adam_spsa_step_noisy(function, theta, batch, samples, a, b1, b2, c, gamma, m, v, t)
+        t += 1
+        if t%20 == 0:
+            print(t, cost, np.max(np.abs(conv_rate)))
+            print(np.max(np.abs(conv_rate)) < gtol)
+        if cost < best_cost:
+            best_theta = theta
+            best_cost = cost
+        if np.max(np.abs(conv_rate)) < gtol:
+
+            break  # checkear condiciones de parada
+
+
+    data = {}
+    data['x'] = best_theta
+    data['fun'] = best_cost
+    data['error'] = 'Unknown'
+    data['ngen'] = t
+    data['success'] = 'Unknown'
+
+    return data
+
+def adam_spsa_step_noisy(function, theta, batch, samples, a, b1, b2, c, gamma, m, v, t, epsi=1e-6):
+    c_t = c / t ** gamma
+    g, cost = adam_spsa_gradient_noisy(function, theta, batch, samples, c_t)  # En el paper original de ADAM no hay ninguna referencia a cómo se calcula el gradiente, puede usarse SPSA
+    m = b1 * m + (1 - b1) * g
+    v = b2 * v + (1 - b2) * g ** 2
+
+    m_ = m / (1 - b1 ** t)
+    v_ = v / (1 - b2 ** t)
+
+    theta_new = theta - a * m_ / (np.sqrt(v_) + epsi)
+    conv_rate = a * m_ / np.sqrt(v_)
+    return theta_new, m, v, cost, conv_rate
+
+def adam_spsa_gradient_noisy(function, theta, batch, samples, c_t):
+    cost = function(theta, batch, samples)
+    displacement = np.random.binomial(1, 0.5, size=theta.shape)
+    theta_plus = theta.copy() + c_t * displacement
+    theta_minus = theta.copy() - c_t * displacement
+    gradient = 1 / 2 / c_t * (function(theta_plus, batch=batch, samples=samples) - function(theta_minus, batch=batch, samples=samples)) * displacement
 
     return gradient, cost
