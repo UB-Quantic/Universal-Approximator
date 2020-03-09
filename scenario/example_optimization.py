@@ -1,7 +1,7 @@
 # Basic imports
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize, basinhopping
+from scipy.optimize import minimize, basinhopping, differential_evolution
 
 # Own code imports
 import universal_approximant as ua
@@ -16,7 +16,8 @@ def tanh(x):
 def relu(x):
     return np.clip(x, 0, np.max(x))
 
-layers=1
+layers=3
+
 # The program starts here
 if __name__ == "__main__":
 
@@ -33,11 +34,12 @@ if __name__ == "__main__":
     # Prepare Universal Approximant class
     univ_app.update_param(p)
     univ_app.define_range(x)
-    univ_app.define_function(tanh)
+    univ_app.define_function(relu)
 
     # Mimimize!
-    #results = minimize(univ_app.chi_square, p, method='l-bfgs-b', options={"disp": True})
-    results = basinhopping(univ_app.chi_square, p, niter=2, disp=True)
+    results = minimize(univ_app.chi_square, p, method='powell', options={"disp": True})
+    # results = basinhopping(univ_app.chi_square, p, niter=2, disp=True)
+    # results = differential_evolution()
     print(results)
 
     univ_app.update_param(results['x'])
@@ -47,5 +49,5 @@ if __name__ == "__main__":
     pe = [1 - x for x in res]
 
     plt.plot(x, pe)
-    plt.plot(x, tanh(x))
+    plt.plot(x, relu(x))
     plt.show()
