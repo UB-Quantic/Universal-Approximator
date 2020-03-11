@@ -7,29 +7,25 @@ layers = 4
 x = np.linspace(-1, 1, 31)
 f = relu
 s = 10000
-#params = np.array([-0.9239235180266095, -0.8103263939122924, 0.00034424080300026697, 1.7694393927681662, 1.743440044322635, 0.05274748286820163, 0.7562270690836563, -0.14785030405003585, -1.2641893649988525])
+
+# Commented lines allow to represent a relu function already optimized. chi^2 for this case: 0.0004033703020408161
+
+#params = np.array([0.5970777159072729, 1.7116080076339248, 2.3028667710500477,
+#                   -1.5029590504901817, 2.0778930042466928, -1.080997255171014,
+#                   1.4329789087566507, -0.7683578380074971, -1.639806210924101,
+#                   0.41769829214180415, 0.3339189700737939, -12.543618534153861])
+
 #params = params.reshape((layers, 3))
+
 q_nn = Approximant_NN(layers, x, f)
+
 #q_nn.update_parameters(params)
 
-'''chi = q_nn._minim_function(params, batch=x)
-a=[]
-print(chi)
-for i in range(1000):
-    batch = np.random.choice(x, 20, replace=False)
-    chi = q_nn._minim_function(params, batch=batch)
-    a.append(chi)
-a = np.array(a)
-print(np.mean(a))
-print(np.var(a))'''
-q_nn.find_optimal_parameters(batch_size=1)
+q_nn.find_optimal_parameters(batch_size=.5)
 
 q_nn.run_complete()
 plt.plot(x, np.abs(q_nn.final_states[:, 1])**2)
 plt.plot(x, f(x))
 plt.show()
-# plt.ion()
-# plt.show()
-# plt.draw()
-# plt.pause(5)
+
 

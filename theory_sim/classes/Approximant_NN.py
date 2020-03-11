@@ -51,11 +51,14 @@ class Approximant_NN:
             init_point = self.params.flatten()
         print(init_point)
         if not noisy:
+            result = adam_spsa_optimizer(self._minim_function, init_point, batch_size, ftol=ftol, gtol=gtol)
+            # result = minimize(self._minim_function, init_point, args=batch_size, method='powell', options={"disp":verbose})
+
+
             # result = _evol('nn', self._minim_function, self.layers, gens, N=100, tol=tol, verbose=verbose)
             # result = _cma('nn', self._minim_function, init_point, self.layers, gens, tol=tol, verbose=verbose)
-            result = minimize(self._minim_function, init_point, args=batch_size, method='powell', options={"disp":verbose})
+            # result = minimize(self._minim_function, init_point, args=batch_size, method='powell', options={"disp":verbose})
             # result = adam_optimizer(self._minim_function, init_point, gens=gens)
-            # result = adam_spsa_optimizer(self._minim_function, init_point, batch_size, self.domain, ftol=ftol, gtol=gtol)
             #result = basinhopping(self._minim_function, init_point, disp=verbose, minimizer_kwargs={'method':'cobyla', 'args':(batch_size)}, niter_success=3)
             # result = differential_evolution(self._minim_function, [(-np.pi, np.pi)] * len(init_point), disp=verbose)
             print(result)
