@@ -3,12 +3,12 @@ from classes import Approximant_NN
 import numpy as np
 import matplotlib.pyplot as plt
 
-layers = 3
-x = np.linspace(-1, 1, 101)
+layers = 4
+x = np.linspace(-1, 1, 31)
 f = relu
 s = 10000
-params = np.array([-0.9239235180266095, -0.8103263939122924, 0.00034424080300026697, 1.7694393927681662, 1.743440044322635, 0.05274748286820163, 0.7562270690836563, -0.14785030405003585, -1.2641893649988525])
-params = params.reshape((layers, 3))
+#params = np.array([-0.9239235180266095, -0.8103263939122924, 0.00034424080300026697, 1.7694393927681662, 1.743440044322635, 0.05274748286820163, 0.7562270690836563, -0.14785030405003585, -1.2641893649988525])
+#params = params.reshape((layers, 3))
 q_nn = Approximant_NN(layers, x, f)
 #q_nn.update_parameters(params)
 
@@ -22,7 +22,12 @@ for i in range(1000):
 a = np.array(a)
 print(np.mean(a))
 print(np.var(a))'''
-q_nn.find_optimal_parameters(batch_size=.1)
+q_nn.find_optimal_parameters(batch_size=1)
+
+q_nn.run_complete()
+plt.plot(x, np.abs(q_nn.final_states[:, 1])**2)
+plt.plot(x, f(x))
+plt.show()
 # plt.ion()
 # plt.show()
 # plt.draw()
