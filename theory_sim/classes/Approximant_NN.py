@@ -46,13 +46,13 @@ class Approximant_NN:
             return sampling
 
 
-    def find_optimal_parameters(self, init_point=None, noisy=False, samples=10000, batch_size=1, gens=100, ftol=1e-8, gtol=5e-4, verbose=True):
+    def find_optimal_parameters(self, init_point=None, noisy=False, samples=10000, batch_size=1, gens=100, ftol=1e-8, gtol=5e-4, verbose=False):
         if init_point is None:
             init_point = self.params.flatten()
         print(init_point)
         if not noisy:
-            result = adam_spsa_optimizer(self._minim_function, init_point, batch_size, ftol=ftol, gtol=gtol)
-            # result = minimize(self._minim_function, init_point, args=batch_size, method='powell', options={"disp":verbose})
+            # result = adam_spsa_optimizer(self._minim_function, init_point, batch_size, ftol=ftol, gtol=gtol)
+            result = minimize(self._minim_function, init_point, args=batch_size, method='powell', options={"disp":verbose})
 
 
             # result = _evol('nn', self._minim_function, self.layers, gens, N=100, tol=tol, verbose=verbose)
@@ -62,16 +62,20 @@ class Approximant_NN:
             #result = basinhopping(self._minim_function, init_point, disp=verbose, minimizer_kwargs={'method':'cobyla', 'args':(batch_size)}, niter_success=3)
             # result = differential_evolution(self._minim_function, [(-np.pi, np.pi)] * len(init_point), disp=verbose)
             print(result)
+            print('\n')
             result['x'] = list(result['x'])
             try:
                 result['jac'] = list(result['jac'])
                 del result['message']
                 del result['hess_inv']
+
             except: pass
+            del result['direc']
+            print(result)
 
             folder = fold_name(self.name, self.f)
             filename = folder + '/%s_exact.txt' % self.layers
-            #save_dict(result, folder, filename)
+            save_dict(result, folder, filename)
             return result
 
 
