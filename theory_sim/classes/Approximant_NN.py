@@ -51,8 +51,8 @@ class Approximant_NN:
             init_point = self.params.flatten()
         print(init_point)
         if not noisy:
-            # result = adam_spsa_optimizer(self._minim_function, init_point, batch_size, ftol=ftol, gtol=gtol)
-            result = minimize(self._minim_function, init_point, args=batch_size, method='powell', options={"disp":verbose})
+            result = adam_spsa_optimizer(self._minim_function, init_point, batch_size, ftol=ftol, gtol=gtol)
+            # result = minimize(self._minim_function, init_point, args=batch_size, method='powell', options={"disp":verbose})
 
 
             # result = _evol('nn', self._minim_function, self.layers, gens, N=100, tol=tol, verbose=verbose)
@@ -70,12 +70,15 @@ class Approximant_NN:
                 del result['hess_inv']
 
             except: pass
-            del result['direc']
+            try:
+                del result['direc']
+            except:
+                pass
             print(result)
 
             folder = fold_name(self.name, self.f)
             filename = folder + '/%s_exact.txt' % self.layers
-            save_dict(result, folder, filename)
+            # save_dict(result, folder, filename)
             return result
 
 
