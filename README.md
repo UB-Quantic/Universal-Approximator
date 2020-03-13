@@ -21,4 +21,4 @@ There are three main files
     - Right now the only working algorithm is adam_spsa_optimizer (and auxiliary functions)
 
 - opt:
-    -Example file
+    - Example file, contains example for minimization and testing of parameters
