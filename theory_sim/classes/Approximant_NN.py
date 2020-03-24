@@ -2,6 +2,7 @@ from theory_sim.opt_algorithms import *
 import numpy as np
 from .aux_functions import *
 from scipy.optimize import minimize, differential_evolution, basinhopping
+from theory_sim.opt_algorithms import _evol
 
 
 
@@ -15,10 +16,19 @@ class Approximant_NN:
         self.f = f
         self.name = 'q_NN'
         self.samples=10000
+        self.batch_label = 0
+        self.batch_size = 1
+        self.len_partial = int(np.floor(len(self.domain) * self.batch_size))
+        self.max_batches = int(np.floor(self.batch_size ** (-1)))
 
 
     def update_parameters(self, new_parameters):
         self.params = new_parameters
+
+    def update_batch_size(self, batch_size):
+        self.batch_size = 1
+        self.len_partial = int(np.floor(len(self.domain) * self.batch_size))
+        self.max_batches = int(np.floor(self.batch_size ** (-1)))
 
     def run_complete(self, noisy=False, samples=10000):
         if not noisy:
@@ -49,16 +59,16 @@ class Approximant_NN:
         if init_point is None:
             init_point = self.params.flatten()
         self.batch_label=0
-        self.batch_size=batch_size
-        self.len_partial = int(np.floor(len(self.domain) * batch_size))
-        self.max_batches = int(np.floor(batch_size**(-1)))
+        self.update_batch_size(batch_size)
         self.samples = samples
 
         # result = self._adam_spsa_optimizer(init_point, ftol=ftol, gtol=gtol, noisy=noisy)
-        result = minimize(self._minim_function, init_point, args=noisy, method='powell', options={"disp":verbose})
+        # result = minimize(self._minim_function, init_point, args=noisy, method='powell', options={"disp":verbose})
+        result = _evol('nn', self._minim_function, self.layers, gens, N=100, tol=ftol, verbose=verbose)
+
+
         # result = basinhopping(self._minim_function, init_point, minimizer_kwargs={'args':noisy, 'options':{'disp':verbose}})
         # result = differential_evolution(self._minim_function, [(-np.pi, np.pi)] * len(init_point), disp=verbose)
-        # result = _evol('nn', self._minim_function, self.layers, gens, N=100, tol=tol, verbose=verbose)
         # result = _cma('nn', self._minim_function, init_point, self.layers, gens, tol=tol, verbose=verbose)
         # result = adam_optimizer(self._minim_function, init_point, gens=gens)
         #result = basinhopping(self._minim_function, init_point, disp=verbose, minimizer_kwargs={'method':'cobyla', 'args':(batch_size)}, niter_success=3)
@@ -122,8 +132,8 @@ class Approximant_NN:
         if self.batch_label >= self.max_batches:
             self.batch_label = 0
         outcomes = self.run(batch, noisy)
-
-        return np.mean(np.abs(outcomes - batch_function) ** 2)
+        chi = np.mean(np.abs(outcomes - batch_function) ** 2)
+        return chi
 
     def _minim_function_by_layers(self, params, layer, noisy=False):
         p = self.params.copy()

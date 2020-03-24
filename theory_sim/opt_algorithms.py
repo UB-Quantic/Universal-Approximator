@@ -15,6 +15,7 @@ from deap import benchmarks
 from deap import cma
 from deap import creator
 from deap import tools
+from deap import gp
 
 def _cma(approximation, function, centroid, layers, gens, N=20, lambda_ = 10, tol=1e-8, verbose=1):
     if 'nn' in approximation.lower():
@@ -96,9 +97,36 @@ def _evol(approximation, function, layers, gens, N=100, lambda_ = 10, tol=1e-8, 
     toolbox.register("evaluate", evalOneMax)
 
     np.random.seed(128)
-    toolbox.register("mate", tools.cxTwoPoint)
-    toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=2.0 / N)
-    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("select", tools.selTournament, tournsize=7)
+    toolbox.register("mate", gp.cxOnePoint)
+    toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
+    toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+
+    toolbox = base.Toolbox()
+
+    # Attribute generator
+    toolbox.register("expr_init", gp.genFull, pset=pset, min_=1, max_=2)
+
+    # Structure initializers
+    toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr_init)
+    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+
+    def evalArtificialAnt(individual):
+        # Transform the tree expression to functionnal Python code
+        routine = gp.compile(individual, pset)
+        # Run the generated routine
+        ant.run(routine)
+        return ant.eaten,
+
+    toolbox.register("evaluate", evalArtificialAnt)
+    toolbox.register("select", tools.selTournament, tournsize=7)
+    toolbox.register("mate", gp.cxOnePoint)
+    toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
+    toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
+    '''toolbox.register("mate", tools.cxTwoPoint)
+    toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
+    toolbox.register("mutate", gp.mutUniform, )
+    toolbox.register("select", tools.selTournament, tournsize=3)'''
 
     hof = tools.HallOfFame(1)
     pop = toolbox.population(N)

@@ -11,6 +11,7 @@ s = 10000
 np.random.seed(4)
 
 q_nn = Approximant_NN(layers, x, f)
+q_nn.find_optimal_parameters(noisy=False, batch_size=.1, verbose=True, gens=1000)
 '''
 # Commented lines allow to represent a relu function already optimized. chi^2 for this case: 0.0004033703020408161
 params = np.array([0.5970777159072729, 1.7116080076339248, 2.3028667710500477,
@@ -34,7 +35,7 @@ l = np.array(l)
 print(np.mean(l))
 print(np.var(l))
 '''
-
+'''
 # Minimization
 res_x = [1.4862289268771531, 0.9107912924265824, -1.8082938018165655, 2.471978757945043, -1.3455317863570297, -0.5501353837798082, -0.9274441952315735, 0.8454546419610717, 0.10354646297101461, -1.5803741376439935, 0.5673877733148988, 8.505480693741665]
 q_nn.find_optimal_parameters(init_point=res_x, noisy=True, batch_size=.25, verbose=True)
@@ -91,4 +92,4 @@ for l in range(1, 1 + layers):
     h = ax.scatter(grid[:, 0], grid[:, 1], grid[:, 2], c = chis)
     fig.colorbar(h)
 
-plt.show()
+plt.show()'''
