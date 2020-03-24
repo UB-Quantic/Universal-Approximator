@@ -1,4 +1,6 @@
-# Finding the global minimum of a given function
+# This file is not currently used, but it contains some previously used functions
+
+
 import numpy as np
 
 def f(x):
@@ -333,7 +335,7 @@ def est_grad_2_noisy(function, theta, h, samples, batch):
     return gradient, c
 
 
-def adam_spsa_optimizer(function, init_point, batch_size, a=0.2, b1=0.9, b2=0.999, c=.5, gamma=0.5, fmin=0, ftol=1e-8, gtol=1e-3, gens=None):
+def adam_spsa_optimizer(function, init_point, batch_size, domain, a=0.1, b1=0.9, b2=0.999, c=.5, gamma=0.1, fmin=0, ftol=1e-8, gtol=1e-3, gens=None, noisy=False):
     # añadir un máximo de gens si llega el caso
     # añadir opción de verbose
     # Hay un bug en el batch, al principio del gradient
@@ -344,7 +346,7 @@ def adam_spsa_optimizer(function, init_point, batch_size, a=0.2, b1=0.9, b2=0.99
     theta = init_point.copy()
     best_cost = 1
     while best_cost > fmin + ftol:
-        theta, m, v, cost, conv_rate = adam_spsa_step(function, theta, batch_size, a, b1, b2, c, gamma, m, v, t)
+        theta, m, v, cost, conv_rate = adam_spsa_step(function, theta, batch_size, domain, a, b1, b2, c, gamma, m, v, t, noisy)
         t += 1
         if t%100 == 0:
             print(t, cost, np.max(np.abs(conv_rate)))
@@ -366,10 +368,10 @@ def adam_spsa_optimizer(function, init_point, batch_size, a=0.2, b1=0.9, b2=0.99
 
     return data
 
-def adam_spsa_step(function, theta, batch_size, a, b1, b2, c, gamma, m, v, t, epsi=1e-6):
+def adam_spsa_step(function, theta, batch_size, domain, a, b1, b2, c, gamma, m, v, t, noisy, epsi=1e-6):
     c_t = c / t ** gamma
-    # batch = np.random.choice(domain, int(np.round(batch_size * len(domain))), replace=False)
-    g, cost = adam_spsa_gradient(function, theta, batch_size, c_t)  # En el paper original de ADAM no hay ninguna referencia a cómo se calcula el gradiente, puede usarse SPSA
+    batch = np.random.choice(domain, int(np.round(batch_size * len(domain))), replace=False)
+    g, cost = adam_spsa_gradient(function, theta, batch_label, c_t, noisy)  # En el paper original de ADAM no hay ninguna referencia a cómo se calcula el gradiente, puede usarse SPSA
 
     m = b1 * m + (1 - b1) * g
     v = b2 * v + (1 - b2) * g ** 2
@@ -381,16 +383,16 @@ def adam_spsa_step(function, theta, batch_size, a, b1, b2, c, gamma, m, v, t, ep
     conv_rate = a * m_ / (np.sqrt(v_) + epsi)
     return theta_new, m, v, cost, conv_rate
 
-def adam_spsa_gradient(function, theta, batch_size, c_t):
-    cost = function(theta, batch_size)
+def adam_spsa_gradient(function, theta, batch_label, c_t, noisy):
+    cost = function(theta, noisy=noisy, batch_label=batch_label)
     displacement = np.random.binomial(1, 0.5, size=theta.shape)
     theta_plus = theta.copy() + c_t * displacement
     theta_minus = theta.copy() - c_t * displacement
-    gradient = 1 / 2 / c_t * (function(theta_plus, batch_size) - function(theta_minus, batch_size)) * displacement
+    gradient = 1 / 2 / c_t * (function(theta_plus, noisy=noisy, batch_label=batch_label) - function(theta_minus, noisy=noisy, batch_label=batch_label)) * displacement
 
     return gradient, cost
 
-def adam_spsa_optimizer_noisy(function, init_point, batch, samples, a=0.1, b1=0.9, b2=0.999, c=.05, gamma=0.31, fmin=0, ftol=1e-8, gtol=1e-3, gens=None):
+def adam_spsa_optimizer_noisy(function, init_point, batch, samples, a=0.5, b1=0.9, b2=0.999, c=.5, gamma=0.101, fmin=0, ftol=1e-8, gtol=1e-3, gens=None):
     # añadir un máximo de gens si llega el caso
     # añadir opción de verbose
     t = 1
