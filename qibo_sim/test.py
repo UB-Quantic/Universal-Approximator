@@ -1,6 +1,6 @@
-from qibo_sim.classes import ApproximantNN as aNN
+from classes import ApproximantNN as aNN
 import numpy as np
-import qibo_sim.classes.aux_functions as aux
+import classes.aux_functions as aux
 import tensorflow as tf
 from time import time
 from itertools import product
@@ -13,7 +13,7 @@ data = np.array(x).reshape((31, 1))
 #data = tf.constant(data)
 functs = aux.operators_from_ampl_phase(aux.poly, aux.angulator)
 
-C = aNN.ApproximantNN(1, 11, data, [aux.relu])
+C = aNN.ApproximantNN(1, 1, data, [aux.relu])
 
 '''params = [ 5.77922035e-05, -3.06826727e-03, -1.57597920e+00, -1.57462077e+00,
         2.76438643e+00, -1.94780543e-01,  1.62045627e+00, -1.65300718e-02,
