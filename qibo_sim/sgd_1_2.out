@@ -1,0 +1,15 @@
+ite 0 : loss 0.899099
+ite 1000 : loss 0.022664
+ite 2000 : loss 0.022664
+ite 3000 : loss 0.022664
+ite 4000 : loss 0.022664
+ite 5000 : loss 0.022664
+ite 6000 : loss 0.022664
+ite 7000 : loss 0.022664
+ite 8000 : loss 0.022664
+ite 9000 : loss 0.022664
+ite 10000 : loss 0.022664
+sgd
+{'nepochs': 10001, 'nmessage': 1000, 'optimizer': 'Adamax', 'learning_rate': 0.1}
+(0.02266413043105857, array([ 3.04562874e-09, -2.48549102e-09,  1.57294633e+00,  1.59877471e+00,
+        7.89943779e-01]))
