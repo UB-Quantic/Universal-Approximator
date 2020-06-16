@@ -1,7 +1,7 @@
 from qibo.models import Circuit
 from qibo import gates
 import numpy as np
-import qibo_sim.classes.aux_functions as aux
+import classes.aux_functions as aux
 from qibo.hamiltonians import Hamiltonian
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -190,6 +190,7 @@ class ApproximantNN:
             # n = self.hamiltonian.nqubits
             m = minimize(lambda p: self.cost_function(p).numpy(), self.params,
                          method=method, options=options)
+            print(m)
             result = m.fun
             parameters = m.x
 
