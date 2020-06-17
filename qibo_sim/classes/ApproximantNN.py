@@ -5,6 +5,7 @@ import classes.aux_functions as aux
 from qibo.hamiltonians import Hamiltonian
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import tensorflow_probability as tfp
 
 np.random.seed(0)
 
@@ -127,7 +128,6 @@ class ApproximantNN:
         cf = 0
         for x, t in zip(self.domain, self.target):
             cf += self.cost_function_one_point(x, t)
-        # cf += a * np.linalg.norm(params)
         cf /= len(self.domain)
         return cf
 
@@ -139,8 +139,7 @@ class ApproximantNN:
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 
-        elif method == 'sgd': # Para implementar sgd necesito cambiar los productos en el aragumento de las puertas para que funcionen con tensorflow
-            # check if gates are using the MatmulEinsum backend
+        elif method == 'sgd':
             from qibo.tensorflow.gates import TensorflowGate
             circuit = self.circuit(self.domain[0])
             for gate in circuit.queue:
@@ -179,6 +178,31 @@ class ApproximantNN:
                     l_optimal, params_optimal = l, vparams
                 if e % sgd_options["nmessage"] == 0:
                     print('ite %d : loss %f' % (e, l.numpy()))
+
+            result = self.cost_function(params_optimal).numpy()
+            parameters = params_optimal.numpy()
+
+        elif method=='bfgs_tf':
+            from qibo.tensorflow.gates import TensorflowGate
+            circuit = self.circuit(self.domain[0])
+            for gate in circuit.queue:
+                if not isinstance(gate, TensorflowGate):
+                    raise RuntimeError('SGD VQE requires native Tensorflow '
+                                       'gates because gradients are not '
+                                       'supported in the custom kernels.')
+
+            # proceed with the training
+            from qibo.config import K
+            vparams = K.Variable(self.params)
+
+            def loss_gradient(x):
+                return tfp.math.value_and_gradient(lambda x: self.cost_function(x), x)
+
+            if compile:
+                loss_gradient = K.function(loss_gradient)
+
+            params_optimal = tfp.optimizer.bfgs_minimize(
+                loss_gradient, vparams)
 
             result = self.cost_function(params_optimal).numpy()
             parameters = params_optimal.numpy()

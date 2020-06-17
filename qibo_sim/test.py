@@ -24,19 +24,18 @@ C = aNN.ApproximantNN(1, 1, data, [aux.relu])
        -1.06128005e+00, -8.11115535e-01,  1.47861263e+00, -5.64043336e-01,
        -2.24479869e-01,  1.98540546e-01, -1.39545443e+00, -1.55371996e+00,
         2.76451854e-01,  8.33551092e-01, -1.01756138e+00,  1.57346336e-01,
-        3.78594867e-01, -1.45046113e+00, -6.18417562e-02]
-params = np.array(params)
-print(len(params))
-C.set_parameters(params)'''
+        3.78594867e-01, -1.45046113e+00, -6.18417562e-02]'''
+#params = np.array(params)
+#print(len(params))
+#C.set_parameters(params)
 #print(C.dimension)
 #print(C.cost_function(C.params))
 # C.paint_representation_1D()
-meth='l-bfgs-b'
-sgd_options = {"nepochs": 10001,
-                           "nmessage": 1000,
+meth='cobyla'
+sgd_options = {"nepochs": 1001,
+                           "nmessage": 100,
                            "optimizer": "Adamax",
-                           "learning_rate": 0.1}
+                           "learning_rate": 0.5}
 r = C.minimize(method=meth, options=sgd_options)
 print(meth)
 print(r)
-C.paint_representation_1D()
