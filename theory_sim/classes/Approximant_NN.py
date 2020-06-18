@@ -2,9 +2,6 @@ from theory_sim.opt_algorithms import *
 import numpy as np
 from .aux_functions import *
 from scipy.optimize import minimize, differential_evolution, basinhopping
-from theory_sim.opt_algorithms import _evol
-
-
 
 class Approximant_NN:
     def __init__(self, layers, domain, f):
@@ -26,74 +23,134 @@ class Approximant_NN:
         self.params = new_parameters
 
     def update_batch_size(self, batch_size):
-        self.batch_size = 1
+        self.batch_size = batch_size
         self.len_partial = int(np.floor(len(self.domain) * self.batch_size))
         self.max_batches = int(np.floor(self.batch_size ** (-1)))
 
-    def run_complete(self, noisy=False, samples=10000):
-        if not noisy:
+    def run_complete(self, samples, noise_sigma):
+        if samples==0:
             for i, x in enumerate(self.domain):
                 self.final_states[i] = state(x, self.params).flatten()
         else:
             self.run_complete()
             probs = np.abs(self.final_states[:, 1]) ** 2
-            sampling = np.random.binomial(n=1, p=probs, size=(samples, len(probs)))
-            sampling = np.sum(sampling, axis=0) / samples
+            sampling = np.random.binomial(n=1, p=probs, size=(self.samples, len(probs)))
+            sampling = np.sum(sampling, axis=0) / self.samples
+            if noise_sigma != 0:
+                sampling += np.random.normal(0, np.sqrt(noise_sigma), size=res.shape)
+                sampling = np.clip(sampling, 0, 1)
+
             self.outcomes = sampling
 
-    def run(self, batch, noisy=False):
-        if not noisy:
+
+    def run(self, batch, samples, noise_sigma):
+        if samples == 0:
             final_states = np.zeros((len(batch), 2), dtype=complex)
             for i, x in enumerate(batch):
                 final_states[i] = state(x, self.params).flatten()
 
-            return np.abs(final_states[:, 1]) ** 2
+            res = np.abs(final_states[:, 1]) ** 2
         else:
             probs = self.run(batch)
             sampling = np.random.binomial(n=1, p=probs, size=(self.samples, len(probs)))
-            sampling = np.sum(sampling, axis=0) / self.samples
-            return sampling
+            res = np.sum(sampling, axis=0) / self.samples
 
+        if noise_sigma != 0:
+            res += np.random.normal(0, noise_sigma, size=res.shape)
+            res = np.clip(res, 0, 1)
 
-    def find_optimal_parameters(self, init_point=None, noisy=False, samples=10000, batch_size=1, gens=100, ftol=1e-8, gtol=5e-4, verbose=False):
+        return res
+
+    def find_optimal_parameters(self, init_point=None, method='cma', args=None, opt_options=None, batch_size=0.5): # noisy=False, samples=10000, batch_size=1, gens=100, ftol=1e-8, gtol=5e-4, verbose=False):
         if init_point is None:
-            init_point = self.params.flatten()
-        self.batch_label=0
+            init_point = self.params.flatten()[:-1]
+        print(init_point)
+
+        self.batch_label = 0
         self.update_batch_size(batch_size)
-        self.samples = samples
 
-        # result = self._adam_spsa_optimizer(init_point, ftol=ftol, gtol=gtol, noisy=noisy)
-        # result = minimize(self._minim_function, init_point, args=noisy, method='powell', options={"disp":verbose})
-        result = _evol('nn', self._minim_function, self.layers, gens, N=100, tol=ftol, verbose=verbose)
+        if args is None:
+            args = (0, 0.0, 1) # Samples, noise_sigma, scale
+
+        self.samples = args[0]
+        if method == 'cma':
+            from cma import fmin
+            if opt_options is None:
+                opt_options = {'sigma':.5,
+                               'seed':1234} # need more CMAoptions --> keys
+            if 'sigma' not in opt_options.keys():
+                opt_options['sigma'] = 0.5
 
 
-        # result = basinhopping(self._minim_function, init_point, minimizer_kwargs={'args':noisy, 'options':{'disp':verbose}})
-        # result = differential_evolution(self._minim_function, [(-np.pi, np.pi)] * len(init_point), disp=verbose)
-        # result = _cma('nn', self._minim_function, init_point, self.layers, gens, tol=tol, verbose=verbose)
-        # result = adam_optimizer(self._minim_function, init_point, gens=gens)
-        #result = basinhopping(self._minim_function, init_point, disp=verbose, minimizer_kwargs={'method':'cobyla', 'args':(batch_size)}, niter_success=3)
-        # result = differential_evolution(self._minim_function, [(-np.pi, np.pi)] * len(init_point), disp=verbose)
-        print(result)
-        print('\n')
-        result['x'] = list(result['x'])
-        try:
-            result['jac'] = list(result['jac'])
-            del result['message']
-            del result['hess_inv']
+            sigma = opt_options['sigma']
+            del opt_options['sigma']
 
-        except: pass
-        try:
-            del result['direc']
-        except:
-            pass
-        print(result)
+            result = fmin(self._minim_function, init_point, sigma, opt_options, args=args)
+            return result
+
+        elif method == 'spsa':
+            if opt_options is None:
+                opt_options = {'a':0.1, 'b1':0.9, 'b2':0.999, 'c':.5, 'gamma':0.1, 'fmin':0,
+                            'ftol':1e-8, 'gtol':1e-3, 'gens':1000}
+
+            print(opt_options)
+            result = self._adam_spsa_optimizer(init_point, args, opt_options)
+            return result
+
+        else:
+            if opt_options is None:
+                opt_options = {}
+
+            result = minimize(self._minim_function, init_point, args=args, method=method, options=opt_options)
+            return result
+
+
+
 
         '''folder = fold_name(self.name, self.f)
         filename = folder + '/%s_exact.txt' % self.layers
         # save_dict(result, folder, filename)'''
-        return result
+        # return result
 
-    def find_optimal_parameters_by_layers(self, init_point=None, noisy=False, samples=10000, batch_size=1, gens=100, ftol=1e-8, gtol=5e-4, verbose=False):
+    def find_optimal_parameters_layer(self, layer, init_point=None, method='cma', args=None, opt_options=None, batch_size=0.5):
+        if init_point is None:
+            init_point = self.params.flatten()
+
+        if args is None:
+            args = (layer, 0, 0.0, 1) # Samples, noise_sigma, scale
+        self.batch_label=0
+        self.batch_size=batch_size
+        self.len_partial = int(np.floor(len(self.domain) * batch_size))
+        self.max_batches = int(np.floor(batch_size**(-1)))
+        self.samples = args[1]
+        x = init_point
+        self.update_parameters(x.reshape((self.layers, 3)))
+        self.samples = args[0]
+
+
+        if method == 'cma':
+            from cma import fmin
+            if opt_options is None:
+                opt_options = {'sigma': .5,
+                               'seed': 1234}  # need more CMAoptions --> keys
+            if 'sigma' not in opt_options.keys():
+                opt_options['sigma'] = 0.5
+
+            sigma = opt_options['sigma']
+            del opt_options['sigma']
+
+            result = fmin(self._minim_function_layer, x[3 * layer:3 * (layer + 1)], sigma, opt_options, args=args)
+            return result
+
+        else:
+            if opt_options is None:
+                opt_options = {}
+
+            result = minimize(self._minim_function_layer, x[3 * layer:3 * (layer + 1)], args=args, method=method, options=opt_options)
+            return result
+
+
+    def find_optimal_parameters_by_layers(self, init_point=None, layer=0, noisy=False, samples=10000, batch_size=1):
         if init_point is None:
             init_point = self.params.flatten()
         self.batch_label=0
@@ -105,7 +162,7 @@ class Approximant_NN:
         print(x)
         for i in range(10):
             for l in range(self.layers - 1, -1, -1):
-                result = minimize(self._minim_function_by_layers, x[3*l:3*(l + 1)], args=(l, noisy), method='bfgs')
+                result = minimize(self._minim_function_layer, x[3*l:3*(l + 1)], args=(l, noisy), method='bfgs')
                 print(result)
                 p = self.params.copy()
                 p[l] = result.x
@@ -113,9 +170,35 @@ class Approximant_NN:
                 print(self.params)
 
 
+    def find_optimal_parameters_from_previous(self, previous_params, init_point=None, args=None, opt_options=None, batch_size=0.5):
+        if self.layers == 1:
+            raise ValueError('There is no previous case')
 
-    def _minim_function(self, params, noisy=False):
+        if args is None:
+            args = (0, 0, 0.0, 1) # layer, Samples, noise_sigma, scale
+
+        if len(previous_params) == (self.layers - 1) * 3 - 1:
+            new_previous_params = np.zeros(len(previous_params) + 1)
+            new_previous_params[:(self.layers - 1) * 3  - 1], new_previous_params[-1] = previous_params, 0
+            previous_params = new_previous_params
+        elif len(previous_params) == (self.layers - 1) * 3:
+            previous_params = np.array(previous_params)
+        else:
+            raise ValueError('Dimension mismatch')
+
+        if init_point is None:
+            init_point = np.zeros(3)
+
+        init_point = np.hstack((init_point, previous_params))
+        result = self.find_optimal_parameters_layer(0, init_point=init_point, args=args)
+        print(result)
+        self.params[0] = result[0] # línea a modificar cuando se junten partes por formato de los diferentes paquetes
+        result = self.find_optimal_parameters(init_point=self.params.flatten()[:-1])
+        return result
+
+    def _minim_function(self, params, samples, noise_sigma, scale):
         params = np.asarray(params)
+        params = np.concatenate((params, np.zeros(1)))
         params = params.reshape((self.layers, 3))
         self.update_parameters(params)
         # print(self.batch_label)
@@ -131,18 +214,18 @@ class Approximant_NN:
         self.batch_label += 1
         if self.batch_label >= self.max_batches:
             self.batch_label = 0
-        outcomes = self.run(batch, noisy)
-        chi = np.mean(np.abs(outcomes - batch_function) ** 2)
+        outcomes = self.run(batch, samples, noise_sigma)
+        chi = np.mean(np.abs(outcomes - scale * batch_function) ** 2)
         return chi
 
-    def _minim_function_by_layers(self, params, layer, noisy=False):
+    def _minim_function_layer(self, params, layer, samples, noise_sigma, scale):
         p = self.params.copy()
-        p[3 * layer : 3 * (layer + 1)] = params
-        chi = self._minim_function(self.params, noisy=noisy)
+        p[layer] = params
+        chi = self._minim_function(p.flatten()[:-1], samples, noise_sigma, scale)
 
         return chi
 
-    def _minim_function_spsa(self, params, batch_label, noisy=False, mixing=False):
+    def _minim_function_spsa(self, params, samples, noise_sigma, batch_label, mixing=False):
         params = np.asarray(params)
         params = params.reshape((self.layers, 3))
         self.update_parameters(params)
@@ -156,11 +239,9 @@ class Approximant_NN:
             # print(self.function)
         batch = self.domain[batch_label * self.len_partial: (batch_label + 1) * self.len_partial]
         batch_function = self.function[batch_label * self.len_partial: (batch_label + 1) * self.len_partial]
-        outcomes = self.run(batch, noisy)
+        outcomes = self.run(batch, samples, noise_sigma)
 
         return np.mean(np.abs(outcomes - batch_function) ** 2)
-
-
 
 
         '''
@@ -205,8 +286,17 @@ class Approximant_NN:
         sampling = np.sum(sampling, axis=0) / samples
         return sampling
 
-    def _adam_spsa_optimizer(self, init_point, a=0.1, b1=0.9, b2=0.999, c=.5, gamma=0.1, fmin=0,
-                            ftol=1e-8, gtol=1e-3, gens=None, noisy=False):
+    def _adam_spsa_optimizer(self, init_point, args, opt_options):
+        samples, noise_sigma, scale = args
+        a = opt_options['a']
+        b1 = opt_options['b1']
+        b2 = opt_options['b2']
+        c = opt_options['c']
+        gamma = opt_options['gamma']
+        ftol = opt_options['ftol']
+        gtol = opt_options['gtol']
+        fmin = opt_options['fmin']
+        gens = opt_options['gens']
         # añadir un máximo de gens si llega el caso
         # añadir opción de verbose
         # Hay un bug en el batch, al principio del gradient
@@ -219,7 +309,7 @@ class Approximant_NN:
         batch_label=0
         while best_cost > fmin + ftol:
             theta, m, v, cost, conv_rate = self._adam_spsa_step(theta, batch_label, a, b1, b2, c, gamma, m,
-                                                          v, t, noisy)
+                                                          v, t, samples, noise_sigma)
             t += 1
             batch_label = (batch_label + 1) % self.max_batches
             if t % 100 == 0:
@@ -230,6 +320,8 @@ class Approximant_NN:
                 best_cost = cost
             if np.max(np.abs(conv_rate)) < gtol:
                 break  # checkear condiciones de parada
+            if t == gens:
+                break  #
 
         data = {}
         data['x'] = best_theta
@@ -240,9 +332,9 @@ class Approximant_NN:
 
         return data
 
-    def _adam_spsa_step(self, theta, batch_label, a, b1, b2, c, gamma, m, v, t, noisy, epsi=1e-6):
+    def _adam_spsa_step(self, theta, batch_label, a, b1, b2, c, gamma, m, v, t, samples, noise_sigma, epsi=1e-6):
         c_t = c / t ** gamma
-        g, cost = self._adam_spsa_gradient(theta, batch_label, c_t, noisy)  # En el paper original de ADAM no hay ninguna referencia a cómo se calcula el gradiente, puede usarse SPSA
+        g, cost = self._adam_spsa_gradient(theta, batch_label, c_t, samples, noise_sigma)  # En el paper original de ADAM no hay ninguna referencia a cómo se calcula el gradiente, puede usarse SPSA
 
         m = b1 * m + (1 - b1) * g
         v = b2 * v + (1 - b2) * g ** 2
@@ -254,18 +346,18 @@ class Approximant_NN:
         conv_rate = a * m_ / (np.sqrt(v_) + epsi)
         return theta_new, m, v, cost, conv_rate
 
-    def _adam_spsa_gradient(self, theta, batch_label, c_t, noisy):
+    def _adam_spsa_gradient(self, theta, batch_label, c_t, samples, noise_sigma):
         if batch_label == 0:
             mix=True
         else:
             mix=False
-        cost = self._minim_function_spsa(theta, batch_label, noisy=noisy, mixing=mix)
+        cost = self._minim_function_spsa(theta, samples, noise_sigma, batch_label, mixing=mix)
         displacement = np.random.binomial(1, 0.5, size=theta.shape)
         theta_plus = theta.copy() + c_t * displacement
         theta_minus = theta.copy() - c_t * displacement
         gradient = 1 / 2 / c_t * (
-                    self._minim_function_spsa(theta_plus, noisy=noisy, batch_label=batch_label) -
-                    self._minim_function_spsa(theta_minus, noisy=noisy,batch_label=batch_label)) * displacement
+                    self._minim_function_spsa(theta_plus, samples, noise_sigma, batch_label) -
+                    self._minim_function_spsa(theta_minus, samples, noise_sigma, batch_label)) * displacement
 
 
 

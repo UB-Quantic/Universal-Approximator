@@ -1,42 +1,54 @@
 import numpy as np
 import random
 
-from deap import algorithms
-from deap import base
-from deap import benchmarks
-from deap import cma
-from deap import creator
-from deap import tools
-from deap import gp
+from deap import algorithms, base, benchmarks, creator, tools, gp, cma
+
 
 from theory_sim.classes.Approximant_NN import Approximant_NN
 from theory_sim.classes.aux_functions import *
+from theory_sim.opt_algorithms import eaGenerateUpdate, eaGenerateUpdate_small
+import matplotlib.pyplot as plt
 
-layers = 4
+np.random.seed(2)
+
 x = np.linspace(-1,1,101)
 f = relu
+batch_size=1
+ngen = 200
+sigma=np.pi
+layers=4
+
 q_nn = Approximant_NN(layers, x, f)
 
 creator.create("Fitness", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.Fitness)
 
 
-
 toolbox = base.Toolbox()
 toolbox.register("attribute", random.random)
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n=layers * 3)
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-q_nn.update_batch_size(0.1)
-q_nn.max_batches = int(np.floor(q_nn.batch_size ** (-1)))
-def evaluate(individual):
-    chi = q_nn._minim_function(individual, noisy=False)
+q_nn.update_batch_size(batch_size)
+
+
+# lamb = 4 + 3 * int(np.log(3 * layers))
+lamb = 3 * layers * 2
+
+def evaluate(individual, scale=1):
+    print(q_nn.layers)
+    chi = q_nn._minim_function(individual, sampling=False, noise_sigma=0)
+    return chi,
+
+def evaluate_small(individual_small, previous_individual, scale=1):
+    chi = q_nn._minim_function(individual_small + previous_individual, sampling=False, noise_sigma=0)
     return chi,
 
 toolbox.register("mate", tools.cxTwoPoint)
-toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=.5)
-toolbox.register("select", tools.selTournament, tournsize=3)
+toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=.5, indpb=1 / (3 * layers))
+toolbox.register("select", tools.selTournament, tournsize=5)
 toolbox.register("evaluate", evaluate)
+toolbox.register("evaluate_small", evaluate_small)
 
 
 def main_1():
@@ -97,10 +109,14 @@ def main_2():
 
     return pop, logbook, hof
 
-def main():
-    random.seed(2)
-    MU, LAMBDA = 5, 10
-    strategy = cma.Strategy(centroid=[0.0] * 3 * layers, sigma=10.0)
+def main_3():
+    # LAMBDA = 4 + 3 * int(np.log(3 * layers))
+    LAMBDA = lamb
+    MU = LAMBDA // 2
+    #LAMBDA = 3 * layers * 2
+    #MU = LAMBDA // 2
+    strategy = cma.Strategy([0.0] * 3 * layers, sigma, weights="linear", lambda_=LAMBDA, mu=MU)
+    # CMA incluye las mutaciones cada vez más pequeñas
     toolbox.register("generate", strategy.generate, creator.Individual)
     toolbox.register("update", strategy.update)
     pop = toolbox.population(n=MU)
@@ -111,22 +127,70 @@ def main():
     stats.register("min", np.min)
     stats.register("max", np.max)
 
-    '''pop, logbook = algorithms.eaGenerateUpdate(# pop,
-                                               toolbox, #mu=MU, lambda_=LAMBDA,
-                                                ngen=1000,
-                                               # cxpb=.4, mutpb=.4, ngen=500,
-                                               stats=stats, halloffame=hof)'''
+    pop, logbook = eaGenerateUpdate(toolbox, ngen=ngen, stats=stats, halloffame=hof)
+    # pop, logbook = eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.1, ngen=ngen, stats=stats, halloffame=hof)
+    # pop, logbook = eaMuPlusLambda(pop, toolbox, mu=MU, lambda_=LAMBDA, cxpb=.6, mutpb=.3, ngen=ngen, stats=stats, halloffame=hof)
 
-    pop, logbook = algorithms.eaMuPlusLambda(pop, toolbox, mu=MU, lambda_=LAMBDA,
-                                             cxpb=.4, mutpb=.5, ngen=1000, stats=stats, halloffame=hof)
-
+    # Next steps: graduar el landscape
     # Next steps: Regular las probabilidades de mutación y crossover
 
-    return pop, logbook, hof
+    return pop, logbook, hof	
+
+def main_4():
+    q_nn = Approximant_NN(1, x, f)
+    LAMBDA = 4 + 3 * int(np.log(3))
+    MU = LAMBDA // 2
+    #LAMBDA = 3 * layers * 2
+    #MU = LAMBDA // 2
+    q_nn = Approximant_NN(1, x, f)
+    # LAMBDA = 3 * layers * 2
+    # MU = LAMBDA // 2
+    strategy = cma.Strategy([0.0] * 3, sigma, weights="linear", lambda_=LAMBDA, mu=MU)
+    # CMA incluye las mutaciones cada vez más pequeñas
+    toolbox.register("generate", strategy.generate, creator.Individual)
+    toolbox.register("update", strategy.update)
+    pop = toolbox.population(n=MU)
+    hof = tools.HallOfFame(1)
+    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean)
+    stats.register("std", np.std)
+    stats.register("min", np.min)
+    stats.register("max", np.max)
+
+    pop, logbook = eaGenerateUpdate(toolbox, ngen=ngen, stats=stats, halloffame=hof)
+    for layers in range(2, 6):
+        q_nn = Approximant_NN(layers, x, f)
+        strategy_small = cma.Strategy([0.0] * 3, sigma, weights="linear", lambda_=LAMBDA_small, mu=MU)
+        # CMA incluye las mutaciones cada vez más pequeñas
+        toolbox.register("generate", strategy_small.generate, creator.Individual)
+        toolbox.register("update", strategy_small.update)
+        pop_small = toolbox.population(n=MU)
+        hof_small = tools.HallOfFame(1)
+        stats_small = tools.Statistics(lambda ind: ind.fitness.values)
+        stats_small.register("avg", np.mean)
+        stats_small.register("std", np.std)
+        stats_small.register("min", np.min)
+        stats_small.register("max", np.max)
+        pop_small, logbook = eaGenerateUpdate_small(toolbox, ngen=ngen, stats=stats_small, halloffame=hof_small)
 
 
-if __name__ == '__main__':
-    pop, logbook, hof = main()
-    print(hof[0].fitness.values[0])
-    print(evaluate(hof[0]))
+
+
+# TESTING GENETIC ALGORITHMS WITH CMA
+
+
+# if __name__ == '__main__':
+pop, logbook, hof = main_4()
+best = pop[0]
+print(layers, ' layers')
+print(batch_size, ' batch size')
+print(hof[0].fitness.values)
+params = np.array(hof[0]).reshape((layers, 3))
+q_nn.update_parameters(params)
+out = q_nn.run(x)
+print(np.mean((out - f(x))**2))
+plt.plot(x, out)
+plt.plot(x, f(x))
+plt.show()
+'''
 

@@ -13,7 +13,7 @@ data = np.array(x).reshape((31, 1))
 #data = tf.constant(data)
 functs = aux.operators_from_ampl_phase(aux.poly, aux.angulator)
 
-C = aNN.ApproximantNN(1, 1, data, [aux.relu])
+C = aNN.ApproximantNN(1, 4, data, [aux.relu])
 
 '''params = [ 5.77922035e-05, -3.06826727e-03, -1.57597920e+00, -1.57462077e+00,
         2.76438643e+00, -1.94780543e-01,  1.62045627e+00, -1.65300718e-02,
@@ -31,11 +31,11 @@ C = aNN.ApproximantNN(1, 1, data, [aux.relu])
 #print(C.dimension)
 #print(C.cost_function(C.params))
 # C.paint_representation_1D()
-meth='cobyla'
+meth='diff_evo_tf'
 sgd_options = {"nepochs": 1001,
                            "nmessage": 100,
                            "optimizer": "Adamax",
                            "learning_rate": 0.5}
-r = C.minimize(method=meth, options=sgd_options)
 print(meth)
+r = C.minimize(method=meth, options=sgd_options)
 print(r)

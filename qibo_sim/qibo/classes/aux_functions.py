@@ -48,7 +48,7 @@ def tanh_2(x):
 
 def relu(x):
     relu.name = 'relu'
-    return np.clip(x, 0, np.max(x))
+    return 1 - 2 * x * (x > 0)
 
 def poly(x):
     poly.name= 'poly'
