@@ -129,6 +129,7 @@ class ApproximantNN:
         for x, t in zip(self.domain, self.target):
             cf += self.cost_function_one_point(x, t)
         cf /= len(self.domain)
+        print(cf)
         return cf
 
     def minimize(self, method='BFGS', options=None, compile=True):
@@ -182,7 +183,7 @@ class ApproximantNN:
             result = self.cost_function(params_optimal).numpy()
             parameters = params_optimal.numpy()
 
-        elif method=='bfgs_tf':
+        elif 'tf' in method:
             from qibo.tensorflow.gates import TensorflowGate
             circuit = self.circuit(self.domain[0])
             for gate in circuit.queue:
@@ -201,11 +202,49 @@ class ApproximantNN:
             if compile:
                 loss_gradient = K.function(loss_gradient)
 
-            params_optimal = tfp.optimizer.bfgs_minimize(
-                loss_gradient, vparams)
+            if 'bfgs' in method:
+                def loss_gradient(x):
+                    return tfp.math.value_and_gradient(lambda x: self.cost_function(x), x)
+                if compile:
+                    loss_gradient = K.function(loss_gradient)
+                params_optimal = tfp.optimizer.bfgs_minimize(
+                    loss_gradient, vparams)
+            elif 'lbfgs' in method:
+                def loss_gradient(x):
+                    return tfp.math.value_and_gradient(lambda x: self.cost_function(x), x)
+                if compile:
+                    loss_gradient = K.function(loss_gradient)
+                params_optimal = tfp.optimizer.lbfgs_minimize(
+                    loss_gradient, vparams)
+            elif 'nelder_mead' in method:
+                params_optimal = tfp.optimizer.nelder_mead_minimize(
+                    self.cost_function, initial_vertex=vparams)
+            result = params_optimal.objective_value.numpy()
+            parameters = params_optimal.position.numpy()
 
-            result = self.cost_function(params_optimal).numpy()
-            parameters = params_optimal.numpy()
+        elif method=='lbfgs_tf':
+            from qibo.tensorflow.gates import TensorflowGate
+            circuit = self.circuit(self.domain[0])
+            for gate in circuit.queue:
+                if not isinstance(gate, TensorflowGate):
+                    raise RuntimeError('SGD VQE requires native Tensorflow '
+                                       'gates because gradients are not '
+                                       'supported in the custom kernels.')
+
+            # proceed with the training
+            from qibo.config import K
+            vparams = K.Variable(self.params)
+
+            def loss_gradient(x):
+                return tfp.math.value_and_gradient(lambda x: self.cost_function(x), x)
+
+            if compile:
+                loss_gradient = K.function(loss_gradient)
+
+            params_optimal = tfp.optimizer.lbfgs_minimize(
+                loss_gradient, vparams)
+            result = params_optimal.objective_value.numpy()
+            parameters = params_optimal.position.numpy()
 
         else:
             # Newtonian approaches
@@ -214,7 +253,6 @@ class ApproximantNN:
             # n = self.hamiltonian.nqubits
             m = minimize(lambda p: self.cost_function(p).numpy(), self.params,
                          method=method, options=options)
-            print(m)
             result = m.fun
             parameters = m.x
 

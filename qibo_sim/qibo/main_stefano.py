@@ -8,7 +8,7 @@ data = np.array(x).reshape((31, 1))
 
 C = aNN.ApproximantNN(1, 5, data, [aux.relu])
 
-meth='nelder-mead'
+meth='bfgs'
 sgd_options = {"nepochs": 1001,
                            "nmessage": 100,
                            "optimizer": "Adamax",

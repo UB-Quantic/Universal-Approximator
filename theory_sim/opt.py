@@ -4,14 +4,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-layers = 4
-x = np.linspace(-1, 1, 101)
+layers = 2
+prev_x = [1.5912030789744092, 0.7551195607633057]
+x = np.linspace(-1, 1, 31)
 f = relu
 s = 10000
 np.random.seed(4)
 
 q_nn = Approximant_NN(layers, x, f)
-q_nn.find_optimal_parameters(noisy=False, batch_size=.1, verbose=True, gens=1000)
+
+res = q_nn.find_optimal_parameters_from_previous(prev_x)
+res = q_nn.find_optimal_parameters(method='cma', batch_size=1, args=(0, 0.05, 1))
+
+
 '''
 # Commented lines allow to represent a relu function already optimized. chi^2 for this case: 0.0004033703020408161
 params = np.array([0.5970777159072729, 1.7116080076339248, 2.3028667710500477,

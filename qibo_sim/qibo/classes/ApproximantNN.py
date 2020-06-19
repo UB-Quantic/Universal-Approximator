@@ -5,6 +5,10 @@ import classes.aux_functions as aux
 from qibo.hamiltonians import Hamiltonian
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import tensorflow_probability as tfp
+
+np.random.seed(0)
+
 class ApproximantNN:
     def __init__(self, nqubits, layers, domain, functions, measurable_qubits = 1, measurements=None):
         #Circuit.__init__(self, nqubits)
@@ -115,7 +119,6 @@ class ApproximantNN:
         state = C.execute()
         outcomes = ([h.expectation(state) for h in self.hamiltonian])
         cf = 0
-
         for o, f in zip(outcomes, target):
             cf += (o - f) ** 2
         return cf
@@ -125,7 +128,6 @@ class ApproximantNN:
         cf = 0
         for x, t in zip(self.domain, self.target):
             cf += self.cost_function_one_point(x, t)
-        # cf += a * np.linalg.norm(params)
         cf /= len(self.domain)
         return cf
 
@@ -137,8 +139,7 @@ class ApproximantNN:
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 
-        elif method == 'sgd': # Para implementar sgd necesito cambiar los productos en el aragumento de las puertas para que funcionen con tensorflow
-            # check if gates are using the MatmulEinsum backend
+        elif method == 'sgd':
             from qibo.tensorflow.gates import TensorflowGate
             circuit = self.circuit(self.domain[0])
             for gate in circuit.queue:
@@ -181,6 +182,31 @@ class ApproximantNN:
             result = self.cost_function(params_optimal).numpy()
             parameters = params_optimal.numpy()
 
+        elif method=='bfgs_tf':
+            from qibo.tensorflow.gates import TensorflowGate
+            circuit = self.circuit(self.domain[0])
+            for gate in circuit.queue:
+                if not isinstance(gate, TensorflowGate):
+                    raise RuntimeError('SGD VQE requires native Tensorflow '
+                                       'gates because gradients are not '
+                                       'supported in the custom kernels.')
+
+            # proceed with the training
+            from qibo.config import K
+            vparams = K.Variable(self.params)
+
+            def loss_gradient(x):
+                return tfp.math.value_and_gradient(lambda x: self.cost_function(x), x)
+
+            if compile:
+                loss_gradient = K.function(loss_gradient)
+
+            params_optimal = tfp.optimizer.bfgs_minimize(
+                loss_gradient, vparams)
+
+            result = self.cost_function(params_optimal).numpy()
+            parameters = params_optimal.numpy()
+
         else:
             # Newtonian approaches
             import numpy as np
@@ -188,6 +214,7 @@ class ApproximantNN:
             # n = self.hamiltonian.nqubits
             m = minimize(lambda p: self.cost_function(p).numpy(), self.params,
                          method=method, options=options)
+            print(m)
             result = m.fun
             parameters = m.x
 
@@ -238,10 +265,6 @@ class ApproximantNN:
                 state = C.execute()
                 outcomes[j] = self.hamiltonian[0].expectation(state)
 
-            print(self.domain[:, 0])
-            print(self.domain[:, 1])
-            print(outcomes)
-            print('hasta q')
             ax.plot_trisurf(self.domain[:, 0], self.domain[:, 1], outcomes[:, 0] + 0.1,label='Approximation',  linewidth=0.2, antialiased=True)
             #ax.legend()
         else:
