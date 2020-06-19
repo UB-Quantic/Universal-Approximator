@@ -1,0 +1,18 @@
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:216: OptimizeWarning: Unknown solver options: nepochs, nmessage, optimizer, learning_rate
+  method=method, options=options)
+   direc: array([[1., 0., 0., 0., 0.],
+       [0., 1., 0., 0., 0.],
+       [0., 0., 1., 0., 0.],
+       [0., 0., 0., 1., 0.],
+       [0., 0., 0., 0., 1.]])
+     fun: 0.022664130979705766
+ message: 'Optimization terminated successfully.'
+    nfev: 159
+     nit: 3
+  status: 0
+ success: True
+       x: array([ 6.05040165e-01, -9.98406635e-01,  1.78863416e-10,  9.93678950e-01,
+        1.78836393e+00])
+powell
+(0.022664130979705766, array([ 6.05040165e-01, -9.98406635e-01,  1.78863416e-10,  9.93678950e-01,
+        1.78836393e+00]))

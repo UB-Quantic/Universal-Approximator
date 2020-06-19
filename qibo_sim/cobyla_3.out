@@ -1,0 +1,13 @@
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:216: OptimizeWarning: Unknown solver options: nepochs, nmessage, optimizer, learning_rate
+  method=method, options=options)
+     fun: 0.017864538124133283
+   maxcv: 0.0
+ message: 'Maximum number of function evaluations has been exceeded.'
+    nfev: 1000
+  status: 2
+ success: False
+       x: array([ 1.34669932,  1.81007592,  2.70240788,  2.93971181,  2.81989658,
+       -0.93018264,  0.1343358 , -0.32230629])
+cobyla
+(0.017864538124133283, array([ 1.34669932,  1.81007592,  2.70240788,  2.93971181,  2.81989658,
+       -0.93018264,  0.1343358 , -0.32230629]))
