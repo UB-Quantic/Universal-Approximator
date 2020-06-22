@@ -6,14 +6,17 @@ files = os.listdir()
 values = []
 success = []
 evals = []
-#Scipy
-for file in ['lbfgsb_%s.out'%l for l in range(1, 21)]:
+name = 'cobyla'
+for file in [name + '_%s.out'%l for l in range(1, 21)]:
     with open(file, 'r') as f:
         lines = f.readlines()
     for line in lines:
         if 'fun' in line:
             line = line.split(':')
-            values.append(np.float(line[1][:-1]))
+            print(line)
+            try: values.append(np.float(line[1][:-1]))
+            except:
+                values.append(values[-1])
         elif 'nfev' in line:
             line = line.split(':')
             evals.append(int(line[1][:-2]))
@@ -26,11 +29,12 @@ for file in ['lbfgsb_%s.out'%l for l in range(1, 21)]:
 
 
 fig, axs = plt.subplots(nrows=2)
+print(values)
 axs[0].scatter(np.arange(1, 21), values, c=success)
 axs[0].set(yscale='log', ylim = [0.000001,1])
 axs[1].scatter(np.arange(1, 21), evals, c=success)
 axs[1].set(yscale='log')
-plt.show()
+fig.savefig(name + '.pdf')
 '''
 
 #SGD
