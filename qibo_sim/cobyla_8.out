@@ -1,4 +1,4 @@
-/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:216: OptimizeWarning: Unknown solver options: nepochs, nmessage, optimizer, learning_rate
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:254: OptimizeWarning: Unknown solver options: maxfun
   method=method, options=options)
      fun: 0.0015268879236535523
    maxcv: 0.0
@@ -11,7 +11,7 @@
        -0.27140185,  1.75506766,  0.70262689,  1.04643193,  0.78930549,
         0.37701007,  1.55687004,  0.21864302,  0.2715392 , -1.19940545,
        -2.59840773,  0.49586673,  0.75937466])
-cobyla
+in qibo_sim
 (0.0015268879236535523, array([ 1.62713321,  2.19815717,  2.19337603,  1.79002226,  2.46203487,
        -0.08328466,  0.70287352, -0.29531236,  0.15465986, -0.1706056 ,
        -0.27140185,  1.75506766,  0.70262689,  1.04643193,  0.78930549,
