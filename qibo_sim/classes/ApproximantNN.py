@@ -129,7 +129,6 @@ class ApproximantNN:
         for x, t in zip(self.domain, self.target):
             cf += self.cost_function_one_point(x, t)
         cf /= len(self.domain)
-        print(cf)
         return cf
 
     def minimize(self, method='BFGS', options=None, compile=True):
@@ -253,6 +252,8 @@ class ApproximantNN:
             # n = self.hamiltonian.nqubits
             m = minimize(lambda p: self.cost_function(p).numpy(), self.params,
                          method=method, options=options)
+
+            print(m)
             result = m.fun
             parameters = m.x
 
