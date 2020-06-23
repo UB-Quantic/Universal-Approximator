@@ -11,16 +11,15 @@ for file in [name + '_%s.out'%l for l in range(1, 21)]:
     with open(file, 'r') as f:
         lines = f.readlines()
     for line in lines:
-        if 'fun' in line:
+        if 'fun:' in line:
             line = line.split(':')
-            print(line)
             try: values.append(np.float(line[1][:-1]))
             except:
                 values.append(values[-1])
-        elif 'nfev' in line:
+        elif 'nfev:' in line:
             line = line.split(':')
             evals.append(int(line[1][:-2]))
-        elif 'success' in line:
+        elif 'success:' in line:
             line = line.split(':')
             if 'True' in line[1][1:-1]:
                 success.append(1)
