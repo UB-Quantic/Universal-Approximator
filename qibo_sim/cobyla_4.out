@@ -1,15 +1,12 @@
-/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:254: OptimizeWarning: Unknown solver options: maxfun
-  method=method, options=options)
-     fun: 0.001723341522247337
+     fun: 0.0014780373916240188
    maxcv: 0.0
- message: 'Maximum number of function evaluations has been exceeded.'
-    nfev: 1000
-  status: 2
- success: False
-       x: array([1.99749421, 2.16606435, 2.4377337 , 1.85105836, 2.16875989,
-       0.71871415, 0.95788737, 0.1466729 , 0.65515879, 0.27863404,
-       0.91704113])
-in qibo_sim
-(0.001723341522247337, array([1.99749421, 2.16606435, 2.4377337 , 1.85105836, 2.16875989,
-       0.71871415, 0.95788737, 0.1466729 , 0.65515879, 0.27863404,
-       0.91704113]))
+ message: 'Optimization terminated successfully.'
+    nfev: 5661
+  status: 1
+ success: True
+       x: array([1.8317678 , 2.17158954, 2.25542175, 1.57792605, 2.13692479,
+       0.90543638, 0.86442174, 0.19476794, 0.65285852, 0.20175427,
+       1.00498277])
+(0.0014780373916240188, array([1.8317678 , 2.17158954, 2.25542175, 1.57792605, 2.13692479,
+       0.90543638, 0.86442174, 0.19476794, 0.65285852, 0.20175427,
+       1.00498277]))
