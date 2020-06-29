@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time as t
-import os
+import os,glob
 import json
 # Own code imports
 import universal_approximant as ua
@@ -20,7 +20,6 @@ def relu(x):
 
 # The program starts here
 if __name__ == "__main__":
-
     # Define the features
     # sim_features = { "sim_noise" : 0 } 
     exp_features = {
@@ -42,11 +41,11 @@ if __name__ == "__main__":
     with open(name_file, 'r') as f:
         param_dict = json.load(f)
     # p = param_dict["tanh"]["2L"]["x"][:-1]
-    p = param_dict["tanh"]["10k 7n 15p chi Powell"]["2L"]["x"]
+    p = param_dict["tanh"]["10k 7n 41p log Powell"]["4L"]["x"]
 
 
     # Create the Universal Approximant class
-    univ_app = ua.UniversalApproximant( ua.EXPERIMENT, 2, exp_features )    
+    univ_app = ua.UniversalApproximant( ua.EXPERIMENT, 4, exp_features )    
     x = np.linspace( -10, 10, num=31 )
     univ_app.define_range(x)
 
@@ -72,8 +71,12 @@ if __name__ == "__main__":
     plt.ylabel("Pe")
     plt.show()
 
-    log_name = "Exp_Tanh_2L 10k 7n 15p chi Powell.txt"
+    log_name = "Exp_Tanh_4L 10k 7n 41p log Powell.txt"
     np.savetxt(log_name, np.stack((x, pe)) )
     # np.savetxt(log_name, np.stack((x, pe_exp, pe_the)) )
     # np.savetxt(log_name, np.stack((x, pe, simple_sinusodial_function(x))) )
+
+    # Delete result files
+    for filename in glob.glob("./res*.hdf5"):
+        os.remove(filename) 
 

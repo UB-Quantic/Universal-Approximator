@@ -275,7 +275,7 @@ class ScenarioManager():
             feat("FPGA Hardware",2),
             # feat("Number of samples",4e3),
             feat("Number of records",1),
-            feat("Number of averages",20e3),
+            feat("Number of averages",10e3),
             # Trigger
             feat("Trig I/O",0),
             feat("Trig Sync Mode",0),
