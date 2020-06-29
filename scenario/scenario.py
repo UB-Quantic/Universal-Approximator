@@ -62,12 +62,19 @@ class ScenarioManager():
         }
 
         self._instruments = {}
+        
+        if meas_type == SIMULATION:
+            self._prepare_sim_calibration()
+            self._prepare_sim_algorithm()
 
-        self._prepare_sim_calibration()
-        self._prepare_sim_algorithm()
+            self.add_features(features)
+            self._finish_sim_calibration()
+        elif meas_type == EXPERIMENT:
+            self._prepare_exp_calibration()
+            self._prepare_exp_algorithm()
 
-        self.add_features(features)
-        self._finish_sim_calibration()
+            self.add_features(features)
+            self._finish_exp_calibration()
 
         self._accum_z_phase = 0
 
@@ -78,10 +85,15 @@ class ScenarioManager():
     def set_x_range(self, x):
         self.x = x
         self.alg_scn.add_step( "Manual - Value 1", x )
+        self.alg_scn.add_step( "HVI Trigger - Output", [1] )
 
     def add_lookup_tables(self, n_layers, A):
         for layer in range(n_layers):
             self._add_lookup_table(layer, [ x[layer] for x in A] )
+        
+        # self.alg_scn.settings.arm_trig_mode = True
+        # self.alg_scn.settings.trig_channel = "HVI Trigger - Output"
+        # self.alg_scn.settings.hardware_loop = True
 
     def add_virtual_zs(self, n_layers, theta):
         for layer in range(n_layers - 1):
@@ -98,6 +110,12 @@ class ScenarioManager():
                 signal = self._instruments[ (scn, "Signal") ]
                 qubit_sim.values["Noise, Delta 1"] = features["sim_noise"] * 20e6
                 signal.values["Noise Ampltiude"] = features["sim_noise"] * 20e6
+        
+        if features["drag"]["isEnabled"]:
+            for scn in self._scn_dict:
+                sqpg = self._instruments[ (scn, "Control Pulse")]
+                sqpg.values["Use DRAG"] = True
+                sqpg.values["DRAG scaling"] = features["drag"]["drag_scaling"]
 
     def remove_steps(self):
         scn = self._scn_dict[ALG]
@@ -108,6 +126,9 @@ class ScenarioManager():
     def reset_phase(self):
         self._accum_z_phase = 0
 
+    def add_measurement(self):
+        scn = ALG
+        self._add_measurement_pulse(scn)
 ########################################################;
 #				---INSTRUMENTS---;
 ########################################################;
@@ -118,9 +139,9 @@ class ScenarioManager():
             # Waveform features
             feat("Sequence",3),
             feat("Sample rate",1e9),
-            feat("Number of points",1e3),
+            feat("Number of points",3e3),
             feat("First Pulse Delay",30e-9),
-            feat("Trim waveform to sequence",True),
+            feat("Trim waveform to sequence",False),
             feat("Buffer start to restore size",False),
             feat("Number of outputs",0),
             feat("# of pulses",1),
@@ -233,14 +254,14 @@ class ScenarioManager():
             feat("Ch3 - Marker Mode",0),
             feat("Ch4 - Marker Mode",0)
         ]
-        awg_info = instr_info( "Keysight PXI AWG", "Keysight PXI AWG", awg_features )
+        awg_info = instr_info( "Keysight PXI AWG", "AWG", awg_features )
         self._add_instrument( scn, awg_info )
 
     def _add_hvi_trigger(self, scn):
         # Add and configure HVI trigger:
         hvi_features = [
             feat("Output",True),
-            feat("Trig period",200e-6),
+            feat("Trig period",20e-6),
             feat("Digitizer delay",0),
             feat("Auto-detect",True),
         ]
@@ -251,10 +272,10 @@ class ScenarioManager():
         # Add and configure Keysight PXI Digitizer:
         dig_features = [
             # Acquisition
-            feat("FPGA output configuration",1),
-            feat("Number of samples",4e3),
+            feat("FPGA Hardware",2),
+            # feat("Number of samples",4e3),
             feat("Number of records",1),
-            feat("Number of averages",5e3),
+            feat("Number of averages",20e3),
             # Trigger
             feat("Trig I/O",0),
             feat("Trig Sync Mode",0),
@@ -281,7 +302,7 @@ class ScenarioManager():
             feat("Integration time",2e-6),
             feat("Use phase reference signal",False),
             feat("Hide I/Q/REF values",False),
-            feat("LO freq 1",70e-6)
+            feat("LO freq 1",70e6)
         ]
         dig_info = instr_info( "Keysight PXI Digitizer FPGA Demod", "Digitizer", dig_features )
         self._add_instrument( scn, dig_info )
@@ -298,14 +319,14 @@ class ScenarioManager():
             feat("Ref Source",1),
             feat("Output Reference Source",0)##
         ]
-        qs_rf_info = instr_info( "QuickSyn Signal Generator", "QS RF Soruce", qs_rf_features )
+        qs_rf_info = instr_info( "QuickSyn Signal Generator", "QS RF Source", qs_rf_features )
         self._add_instrument( scn, qs_rf_info )
 
     def _add_rs_iq_source(self, scn):
         # Add and configure Rohde&Schwarz RF Source:
         rs_rf_features = [
             # Settings
-            feat("Frequency", 4.8948e9),
+            feat("Frequency", 4.895e9),
             feat("Power",15),
             feat("Phase", 0),
             feat("Mode",0),
@@ -420,10 +441,9 @@ class ScenarioManager():
         self._add_exp_log_channel(scn)
 
     def _finish_exp_calibration(self):
-        pass
-        # scn = CAL
-        # self._set_log_name(scn, "Calibration")
-        # self._save_log(scn, "Calibration")
+        scn = CAL        
+        self._set_log_name(scn, "Calibration")
+        self._save_log(scn, "Calibration")
 
     def _prepare_exp_algorithm(self):
         scn = ALG
@@ -451,13 +471,13 @@ class ScenarioManager():
         # add signal connections between qubit simulator and other instruments
         current_scn = self._scn_dict[scn]
         current_scn.add_connection( \
-            "Control Pulse - Trace - I", "Keysight PXI AWG - Ch1 - Waveform"  )
+            "Control Pulse - Trace - I", "AWG - Ch1 - Waveform"  )
         current_scn.add_connection( \
-            "Control Pulse - Trace - Q", "Keysight PXI AWG - Ch2 - Waveform"  )
+            "Control Pulse - Trace - Q", "AWG - Ch2 - Waveform"  )
         current_scn.add_connection( \
-            "Control Pulse - Trace - I2", "Keysight PXI AWG - Ch3 - Waveform"  )
+            "Control Pulse - Trace - I2", "AWG - Ch3 - Waveform"  )
         current_scn.add_connection( \
-            "Control Pulse - Trace - Q2", "Keysight PXI AWG - Ch4 - Waveform"  )
+            "Control Pulse - Trace - Q2", "AWG - Ch4 - Waveform"  )
 
     def _prepare_exp_outputs(self, scn):
         self._n_pulses = self._n_layers + 1 # extra measurement one
@@ -465,7 +485,7 @@ class ScenarioManager():
         if self._features["reset"]["isEnabled"]:
             self._n_pulses += 2
         sqpg_pulse_feat =[
-            feat("Number of outputs", 2),
+            feat("Number of outputs", 1),
             feat("# of pulses", self._n_pulses)
         ]
         self._update_instrument( scn, "Control Pulse", sqpg_pulse_feat)
@@ -502,18 +522,39 @@ class ScenarioManager():
         
     def _add_measurement_pulse(self, scn):
         
+        meas_pulse = 1
+        if self._features["reset"]["isEnabled"]:
+            meas_pulse += 2
+        
+        if scn == CAL:
+            meas_pulse += 1
+        elif scn == ALG:
+            meas_pulse += self._n_layers
+
+
+        # Update nr of points in Pulse
+        n_points = 1e9 * (self._sequence_time + 2.2e-6)
+
+        # Add pulse and nr points
         sqpg_pulse_feat = [
-            feat("Amplitude #"+str(self._current_pulse), .175),
-            feat("Width #"+str(self._current_pulse), 10e-9),
-            feat("Plateau #"+str(self._current_pulse), 2e-6),
-            feat("Spacing #"+str(self._current_pulse), 0),
-            feat("Phase #"+str(self._current_pulse), 0),
-            feat("Mod. frequency #"+str(self._current_pulse), 70e6),
-            feat("Ratio I/Q #"+str(self._current_pulse), 1),
-            feat("Phase diff. #"+str(self._current_pulse), 0),
-            feat("Output #"+str(self._current_pulse), 1)
+            feat("Number of points",n_points),
+            feat("Amplitude #"+str(meas_pulse), .175),
+            feat("Width #"+str(meas_pulse), 10e-9),
+            feat("Plateau #"+str(meas_pulse), 2e-6),
+            feat("Spacing #"+str(meas_pulse), 0),
+            feat("Phase #"+str(meas_pulse), 0),
+            feat("Mod. frequency #"+str(meas_pulse), 70e6),
+            feat("Ratio I/Q #"+str(meas_pulse), 1),
+            feat("Phase diff. #"+str(meas_pulse), 0),
+            feat("Output #"+str(meas_pulse), 1)
         ]
         self._update_instrument( scn, "Control Pulse", sqpg_pulse_feat) 
+
+        # Update skip time
+        dig_feat = [
+            feat("Skip time", self._sequence_time + 1e-6)
+        ]
+        self._update_instrument( scn, "Digitizer", dig_feat)
 
     def _add_exp_cal_step(self, scn):
         pass
@@ -524,16 +565,7 @@ class ScenarioManager():
     def _add_exp_log_channel(self, scn):
         self._scn_dict[scn].add_log("Digitizer - FPGA Voltage, QB1")
         # Commented or not depending on debugging intentions
-        self._scn_dict[scn].add_log("Digitizer - Ch1 - Signal")
-
-        hvi_trig_feat = [
-            feat("Digitizer delay", self._sequence_time)
-        ]
-        self._update_instrument(scn, "HVI Trigger", hvi_trig_feat)
-        dig_feat = [
-            feat( "Skip time", 1e-6)
-        ]
-        self._update_instrument(scn, "Digitizer", dig_feat)
+        # self._scn_dict[scn].add_log("Digitizer - Ch1 - Signal")
 
 ########################################################;
 #				---COMMON---;
@@ -548,9 +580,9 @@ class ScenarioManager():
     def _add_cal_pulses(self, scn):
         # add the first pulse sequence
         sqpg_pulse_feat = [
-            feat("Width #" + str(self._current_pulse), 5e-9),
+            feat("Width #" + str(self._current_pulse), 7e-9),
             feat("Plateau #" + str(self._current_pulse), 0),
-            feat("Spacing #" + str(self._current_pulse), 10e-9),
+            feat("Spacing #" + str(self._current_pulse), 15e-9),
             feat("Phase #" + str(self._current_pulse), 0),
             feat("Mod. frequency #" + str(self._current_pulse), 70e6),
             feat("Ratio I/Q #" + str(self._current_pulse), 1),
@@ -559,7 +591,7 @@ class ScenarioManager():
         ]
         self._update_instrument( scn, "Control Pulse", sqpg_pulse_feat)
         self._current_pulse += 1
-        self._sequence_time += 5e-9 + 10e-9 # width + spacing
+        self._sequence_time += 7e-9 + 15e-9 # width + spacing
 
     def _add_cal_step(self, scn):
         cal_pulse_nr = 1
@@ -568,7 +600,7 @@ class ScenarioManager():
             cal_pulse_nr += 2
 
         # now add step
-        step_range = np.linspace(-.5, .5, 501)
+        step_range = np.linspace(-.5, .5, 51)
         self._scn_dict[scn].add_step( \
             "Control Pulse - Amplitude #" + str(cal_pulse_nr), step_range )
 
@@ -576,9 +608,9 @@ class ScenarioManager():
         start_pulse_nr = self._current_pulse
         for i in range(n_pulses):
             sqpg_pulse_feat = [
-                feat("Width #" + str(i+start_pulse_nr), 5e-9),
+                feat("Width #" + str(i+start_pulse_nr), 7e-9),
                 feat("Plateau #" + str(i+start_pulse_nr), 0),
-                feat("Spacing #" + str(i+start_pulse_nr), 15e-9),
+                feat("Spacing #" + str(i+start_pulse_nr), 11e-9),
                 feat("Phase #" + str(i+start_pulse_nr), 90),
                 feat("Mod. frequency #" + str(i+start_pulse_nr), 70e6),
                 feat("Ratio I/Q #" + str(i+start_pulse_nr), 1),
@@ -586,10 +618,8 @@ class ScenarioManager():
                 feat("Output #" + str(i+start_pulse_nr), 0)
             ]
             self._update_instrument( ALG, "Control Pulse", sqpg_pulse_feat)
-        number_of_pulses = [feat("# of pulses", n_pulses)]
-        self._update_instrument(ALG, "Control Pulse", number_of_pulses)
-        self._current_pulse += 5
-        self._sequence_time += ( 5e-9 + 15e-9) * 5
+        self._current_pulse += n_pulses
+        self._sequence_time += ( 7e-9 + 15e-9) * n_pulses
 
     def _add_lookup_table(self, layer, A):
         start_pulse_nr = 1
@@ -605,6 +635,7 @@ class ScenarioManager():
 
         param = config.step.RelationParameter()
         param.variable = 'p1'
+        param.channel_name = 'Control Pulse - Readout delay'
         param.channel_name = 'Manual - Value 1'
         param.use_lookup = True
         param.lookup = lookup
@@ -620,7 +651,7 @@ class ScenarioManager():
             start_pulse_nr += 2
 
         self._calc_accumulated_phase(theta)
-        acc_phase = [ feat("Phase #" + str(layer+ start_pulse_nr), 90 + self._accum_z_phase) ]
+        acc_phase = [ feat("Phase #" + str(layer + start_pulse_nr + 1), 90 + self._accum_z_phase) ]
         self._update_instrument( ALG, "Control Pulse", acc_phase)
 
     def _calc_accumulated_phase(self, theta):

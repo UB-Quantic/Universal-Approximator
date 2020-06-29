@@ -21,7 +21,7 @@ _RELPATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Calibration functions
 def calib_cosinus(t, w, A, c):
-    return A * np.cos(w * t) + c
+    return A * np.cos(w * t)**2 + c
 
 def general_cosinus(t, w, phi, A, c):
     return A * np.cos(w * t + phi) + c
@@ -54,22 +54,19 @@ class UniversalApproximant():
         self.f = None
         self.x = None
 
+        self.runs_wout_cal = 0
+        self.cal_rate = 0
+
         self.scn_mng =  scn.ScenarioManager( meas_type, n_layers, features)
 
         self.cal_meas = ScriptTools.MeasurementObject(
                 os.path.join( _RELPATH, "calibration.labber"), # Here we should write the name parametrically
                 os.path.join( _RELPATH, "res_cal.hdf5" ) )
-        calibration_raw = self.cal_meas.performMeasurement()
-        self.calibrate(calibration_raw, plot=False)
+        self.calibrate(plot=False)
 
     def _check_meas_type(self, meas_type):
         if meas_type not in [SIMULATION, EXPERIMENT]:
             print("Measurement type not supported")
-            exit()
-        
-        # TO BE DELETED WHEN IMPLEMENTED
-        if meas_type == EXPERIMENT:
-            print("Experiment not yet implemented")
             exit()
     
     def _check_n_layers(self, n_layers):
@@ -81,20 +78,16 @@ class UniversalApproximant():
         # TO BE DONE PROPERLY
         print("Features checking still no supported. You should be doing well")
 
-    def calibrate(self, calibration_data, plot=False):
+    def calibrate(self, plot=False):
+        
+        calibration_data = self.cal_meas.performMeasurement()
 
-        param = self._fit_calib_cosinus(calibration_data)
+        param = self._fit_calib_cosinus(calibration_data, plot)
         self._w = param[0]
         self._A = param[1]  
         self._c = param[2]
 
-        if plot == True:
-            plt.plot(calibration_data[0], calibration_data[1])
-            sim = calib_cosinus(calibration_data[0], self._w, self._A, self._c)
-            plt.plot(calibration_data[0], sim)
-            plt.show()
-
-    def _fit_calib_cosinus(self, data):
+    def _fit_calib_cosinus(self, data, plot):
         x_cal = data[0]
         y_cal = data[1]
         # First some trials are obtained so that the fit is succesful
@@ -108,6 +101,13 @@ class UniversalApproximant():
         w_trial = 2 * np.pi # TO BE DONE PROPERLY, NOT BY HAND
         param_ini = [w_trial, A_trial, c_trial]
         param, param_errors = curve_fit( calib_cosinus, x_cal, y_cal, param_ini)
+
+        if plot == True:
+            np.savetxt("calib.txt", np.stack((x_cal, y_cal)))
+            plt.plot(x_cal, y_cal)
+            sim = calib_cosinus(x_cal, *param)
+            plt.plot(x_cal, sim)
+            plt.show()
 
         return param
 
@@ -134,7 +134,16 @@ class UniversalApproximant():
         if self.f is not None:
             self._create_function_value()
 
+    def define_cal_rate(self,cal_rate):
+        self.cal_rate = cal_rate
+
     def run(self):
+
+        self.runs_wout_cal += 1
+        if self.cal_rate != 0:
+            if self.runs_wout_cal % self.cal_rate == 0:
+                self.calibrate()
+
         self._reset_scenario()
         self._calc_thetas()
         self._calc_amplitudes()
@@ -142,6 +151,7 @@ class UniversalApproximant():
         self._add_lookup_tables()
         self._add_virtual_z()
 
+        self._add_measurement()
         self._save_algorithm()
 
         self.alg_meas = ScriptTools.MeasurementObject(
@@ -187,7 +197,7 @@ class UniversalApproximant():
         # while angle >=  2*np.pi:
         #     angle -= 2*np.pi
 
-        amplitude = angle / self._w
+        amplitude = angle / (self._w * 2)
         return amplitude
 
     def _add_lookup_tables(self):
@@ -214,18 +224,35 @@ class UniversalApproximant():
         P_0 = self.run()
         P_1 = [1 - x for x in P_0 ]
         result = ( 0.5 / len(self.x) ) * np.sum( ( P_1 - self._fx )**2 )
-        plt.plot(self.x,P_1)
-        plt.plot(self.x,self._fx)
-        plt.show()
+        # plt.plot(self.x,P_1)
+        # plt.plot(self.x,self._fx)
+        # plt.show()
         return result
 
+    def log_diff(self, p):
+        self.update_param(p)
+        P_1 = []
+        P_0 = self.run()
+        P_1 = [1 - x for x in P_0 ]
+        result = ( 0.5 / len(self.x) ) * np.sum( ( P_1 - self._fx )**2 )
+        log_result = np.log(result)
+        # plt.plot(self.x,P_1)
+        # plt.plot(self.x,self._fx)
+        # plt.show()
+        return log_result
+
+
     def _convert_result(self, raw_result):
-        P0 = ( raw_result - (self._c - self._A) ) / (2 * self._A)
+        if isinstance(raw_result[0], complex):
+            raw_result = np.absolute(raw_result)
+        P0 = ( raw_result - (self._c ) ) / (self._A)
         return P0
 
     def _reset_scenario(self):
         self.scn_mng.remove_steps()
         self.scn_mng.reset_phase()
 
+    def _add_measurement(self):
+        self.scn_mng.add_measurement()
 
 
