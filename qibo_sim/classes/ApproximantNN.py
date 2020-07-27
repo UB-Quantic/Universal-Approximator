@@ -5,7 +5,7 @@ import classes.aux_functions as aux
 from qibo.hamiltonians import Hamiltonian
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import tensorflow_probability as tfp
+# import tensorflow_probability as tfp
 
 np.random.seed(0)
 
@@ -135,7 +135,7 @@ class ApproximantNN:
         if method == 'cma':
             # Genetic optimizer
             import cma
-            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 2)
+            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 2, options=options)
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 

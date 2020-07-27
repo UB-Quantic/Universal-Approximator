@@ -104,13 +104,13 @@ def _label_to_hamiltonian(labels):
     mats = [[]]*len(labels)
     for j, label in enumerate(labels):
         if label == 'I':
-            mats[j] = matrices._npI()
+            mats[j] = matrices._I
         if label == 'X':
-            mats[j] = matrices._npX()
+            mats[j] = matrices._X
         if label == 'Y':
-            mats[j] = matrices._npY()
+            mats[j] = matrices._Y
         if label == 'Z':
-            mats[j] = matrices._npZ()
+            mats[j] = matrices._Z
 
     return mats
 
