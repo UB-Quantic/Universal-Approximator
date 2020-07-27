@@ -135,7 +135,7 @@ class ApproximantNN:
         if method == 'cma':
             # Genetic optimizer
             import cma
-            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1.6, options=options)
+            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, options=options)
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 
