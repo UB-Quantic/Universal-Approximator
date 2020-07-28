@@ -156,7 +156,7 @@ class ApproximantNN:
             myBopt2D = BayesianOptimization(loss, domain=bounds, acquisition_weight=2,
                                             model_type='GP', acquisition_type='EI', normalize_Y=False)
 
-            myBopt2D.run_optimization(50, 100000000, verbosity=True)
+            myBopt2D.run_optimization(5000, 100000000, verbosity=True)
 
             result = myBopt2D.fx_opt
             parameters = myBopt2D.x_opt
