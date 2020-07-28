@@ -139,28 +139,27 @@ class ApproximantNN:
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 
-        elif method == 'bayesian':
+        elif method == 'bayes':
             # Bayesian Optimizer
             from GPyOpt.methods import BayesianOptimization
             import GPyOpt
             from numpy import ones, pi
 
-            f_true = GPyOpt.objective_examples.experiments2d.sixhumpcamel()
-            f_sim = GPyOpt.objective_examples.experiments2d.sixhumpcamel(sd=0.1)
             bounds = []
             for i in range(len(self.params)):
                 bounds.append({'name': 'var_%s'%i, 'type': 'continuous', 'domain': (-3*pi, 3*pi)})
 
-            f_true.plot()
             def loss(p):
                 f = self.cost_function(p).numpy()
                 return f
 
-            myBopt2D = BayesianOptimization(loss, domain=bounds)#, model_type='GP', acquisition_type='EI', normalize_Y=True, acquisition_weight=2)
+            myBopt2D = BayesianOptimization(loss, domain=bounds, acquisition_weight=2,
+                                            model_type='GP', acquisition_type='EI', normalize_Y=False)
 
-            myBopt2D.run_optimization(1000, 3600, verbosity=True)
-            print(help(myBopt2D))
+            myBopt2D.run_optimization(50, 100000000, verbosity=True)
 
+            result = myBopt2D.fx_opt
+            parameters = myBopt2D.x_opt
             myBopt2D.plot_convergence()
 
 

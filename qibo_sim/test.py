@@ -6,15 +6,15 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--layers", default=5, help="Number of random states.", type=int)
+parser.add_argument("--method", default='cma', help="Optimization method", type=str)
 
-def main(layers):
+def main(layers, method):
     x = np.linspace(-1, 1, 31)
     data = np.array(x).reshape((31, 1))
 
 
     C = aNN.ApproximantNN(1, layers, data, [aux.relu])
 
-    meth='cma'
 
     cma_options = {'maxfevals': 1e4}
 
@@ -23,7 +23,7 @@ def main(layers):
                                "optimizer": "Adamax",
                                "learning_rate": 0.5}'''
     # scipy_options = {'maxfun':int(1e8)}
-    r = C.minimize(method=meth, options=cma_options)
+    r = C.minimize(method=method, options=cma_options)
     print(r)
     #C.paint_representation_1D()
 
