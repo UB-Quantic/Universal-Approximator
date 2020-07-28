@@ -65,6 +65,7 @@ class ApproximantNN:
         return H
 
     def circuit(self, x):
+        self.params = self.params.flatten()
         if self.dimension == 1:
             C = Circuit(self.nqubits)
             # x = x.transpose()
@@ -81,7 +82,6 @@ class ApproximantNN:
 
             for qubit in range(self.nqubits):
                 C.add(gates.RY(qubit, self.params[index: index + self.dimension] * x + self.params[index + self.dimension]))
-                # @ no funciona bien con una dimensión para tensores
                 index += self.dimension + 1
                 if self.nqubits != 1:
                     C.add(gates.RZ(qubit, self.params[index]))
@@ -138,6 +138,32 @@ class ApproximantNN:
             r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, options=options)
             result = r[1].result.fbest
             parameters = r[1].result.xbest
+
+        elif method == 'bayesian':
+            # Bayesian Optimizer
+            from GPyOpt.methods import BayesianOptimization
+            import GPyOpt
+            from numpy import ones, pi
+
+            f_true = GPyOpt.objective_examples.experiments2d.sixhumpcamel()
+            f_sim = GPyOpt.objective_examples.experiments2d.sixhumpcamel(sd=0.1)
+            bounds = []
+            for i in range(len(self.params)):
+                bounds.append({'name': 'var_%s'%i, 'type': 'continuous', 'domain': (-3*pi, 3*pi)})
+
+            f_true.plot()
+            def loss(p):
+                f = self.cost_function(p).numpy()
+                return f
+
+            myBopt2D = BayesianOptimization(loss, domain=bounds)#, model_type='GP', acquisition_type='EI', normalize_Y=True, acquisition_weight=2)
+
+            myBopt2D.run_optimization(1000, 3600, verbosity=True)
+            print(help(myBopt2D))
+
+            myBopt2D.plot_convergence()
+
+
 
         elif method == 'sgd':
             from qibo.tensorflow.gates import TensorflowGate
