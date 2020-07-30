@@ -1,0 +1,12 @@
+num acquisition: 1, time elapsed: 1.54s
+num acquisition: 2, time elapsed: 3.50s
+num acquisition: 3, time elapsed: 5.24s
+num acquisition: 4, time elapsed: 45.11s
+num acquisition: 5, time elapsed: 51.88s
+num acquisition: 6, time elapsed: 59.21s
+num acquisition: 7, time elapsed: 64.29s
+num acquisition: 8, time elapsed: 71.27s
+num acquisition: 9, time elapsed: 78.96s
+num acquisition: 10, time elapsed: 143.77s
+num acquisition: 11, time elapsed: 232.98s
+(0.5571316071520148, array([ 7.76003238, -2.62258233,  9.29750923,  7.61188078, -7.73004421]))

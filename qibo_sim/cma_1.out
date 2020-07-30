@@ -1,0 +1,19 @@
+Unable to init server: Could not connect: Connection refused
+Unable to init server: Could not connect: Connection refused
+
+(test.py:10105): Gdk-CRITICAL **: 13:42:03.262: gdk_cursor_new_for_display: assertion 'GDK_IS_DISPLAY (display)' failed
+(3_w,6)-aCMA-ES (mu_w=2.0,w_1=63%) in dimension 2 (seed=987847, Tue Jul 28 13:42:03 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1      6 7.837858933506729e-02 1.0e+00 8.02e-01  7e-01  7e-01 0:00.4
+    2     12 3.876941509790228e-02 1.1e+00 7.37e-01  6e-01  7e-01 0:00.8
+    3     18 2.310230122081787e-02 1.2e+00 5.49e-01  4e-01  4e-01 0:01.1
+   10     60 2.294172307986985e-02 1.5e+00 1.42e-01  4e-02  6e-02 0:04.4
+   21    126 2.266425470764055e-02 1.5e+00 1.83e-02  2e-03  2e-03 0:08.7
+   36    216 2.266416273333864e-02 2.6e+00 5.13e-03  2e-04  3e-04 0:13.8
+   51    306 2.266413043155898e-02 1.9e+00 3.26e-04  3e-06  3e-06 0:20.0
+   65    390 2.266413043105887e-02 1.8e+00 3.47e-05  7e-08  8e-08 0:25.8
+termination on tolfun=1e-11 (Tue Jul 28 13:42:29 2020)
+final/bestever f-value = 2.266413e-02 2.266413e-02
+incumbent solution: [1.5987747414465088, 0.7899437833274382]
+std deviation: [8.370182234122408e-08, 6.738875911358215e-08]
+(0.02266413043105876, array([1.59877474, 0.78994378]))
