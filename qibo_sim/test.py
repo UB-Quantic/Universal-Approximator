@@ -18,6 +18,10 @@ from classes import ApproximantNN as aNN
 import numpy as np
 import classes.aux_functions as aux
 
+# Hay algún problema en el código. Cosas que no funcionan:
+# 1) El cronómetro de cma cuenta menos tiempo del real
+# 2) El cma no llega al mismo mínimo, es mucho peor. Por supuesto, los parámetros son totalmente distintos -> Mala codificación
+
 def main(layers, method):
     x = np.linspace(-1, 1, 31)
     data = np.array(x).reshape((31, 1))

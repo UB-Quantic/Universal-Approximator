@@ -158,9 +158,6 @@ class ApproximantNN:
 
     def cost_function_one_point(self, x, target):
         state = self.get_state(x)
-        print(self.hamiltonian[0].hamiltonian)
-        print(self.hamiltonian[0].expectation(state))
-        print(help(self.hamiltonian[0]))
         outcomes = ([h.expectation(state) for h in self.hamiltonian])
         cf = 0
         for o, f in zip(outcomes, target):
