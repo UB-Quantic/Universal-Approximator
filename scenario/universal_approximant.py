@@ -51,6 +51,8 @@ class UniversalApproximant():
         self._features = features
 
         self.p = []
+        self.historic_p = []
+        self.historic_res = []
         self.f = None
         self.x = None
 
@@ -219,11 +221,13 @@ class UniversalApproximant():
 
     def chi_square(self, p):
 
+        self.historic_p.append(p)
         self.update_param(p)
         P_1 = []
         P_0 = self.run()
         P_1 = [1 - x for x in P_0 ]
         result = ( 0.5 / len(self.x) ) * np.sum( ( P_1 - self._fx )**2 )
+        self.historic_res.append(result)
         # plt.plot(self.x,P_1)
         # plt.plot(self.x,self._fx)
         # plt.show()
@@ -240,7 +244,6 @@ class UniversalApproximant():
         # plt.plot(self.x,self._fx)
         # plt.show()
         return log_result
-
 
     def _convert_result(self, raw_result):
         if isinstance(raw_result[0], complex):

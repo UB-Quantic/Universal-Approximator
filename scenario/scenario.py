@@ -62,7 +62,7 @@ class ScenarioManager():
         }
 
         self._instruments = {}
-        
+
         if meas_type == SIMULATION:
             self._prepare_sim_calibration()
             self._prepare_sim_algorithm()
@@ -84,16 +84,17 @@ class ScenarioManager():
 
     def set_x_range(self, x):
         self.x = x
-        self.alg_scn.add_step( "Manual - Value 1", x )
+        # self.alg_scn.add_step( "Manual - Value 1", x )
+        self.alg_scn.add_step( "Control Pulse - Readout delay", x )
         self.alg_scn.add_step( "HVI Trigger - Output", [1] )
 
     def add_lookup_tables(self, n_layers, A):
         for layer in range(n_layers):
             self._add_lookup_table(layer, [ x[layer] for x in A] )
-        
-        # self.alg_scn.settings.arm_trig_mode = True
+
+        self.alg_scn.settings.arm_trig_mode = False
         # self.alg_scn.settings.trig_channel = "HVI Trigger - Output"
-        # self.alg_scn.settings.hardware_loop = True
+        self.alg_scn.settings.hardware_loop = False
 
     def add_virtual_zs(self, n_layers, theta):
         for layer in range(n_layers - 1):
@@ -110,7 +111,7 @@ class ScenarioManager():
                 signal = self._instruments[ (scn, "Signal") ]
                 qubit_sim.values["Noise, Delta 1"] = features["sim_noise"] * 20e6
                 signal.values["Noise Ampltiude"] = features["sim_noise"] * 20e6
-        
+
         if features["drag"]["isEnabled"]:
             for scn in self._scn_dict:
                 sqpg = self._instruments[ (scn, "Control Pulse")]
@@ -381,7 +382,7 @@ class ScenarioManager():
         self._add_sim_log_channel(scn)
 
     def _finish_sim_calibration(self):
-        scn = CAL        
+        scn = CAL
         self._set_log_name(scn, "Calibration")
         self._save_log(scn, "Calibration")
 
@@ -441,7 +442,7 @@ class ScenarioManager():
         self._add_exp_log_channel(scn)
 
     def _finish_exp_calibration(self):
-        scn = CAL        
+        scn = CAL
         self._set_log_name(scn, "Calibration")
         self._save_log(scn, "Calibration")
 
@@ -516,16 +517,16 @@ class ScenarioManager():
             feat("Phase diff. #2", 0),
             feat("Output #2", 1)
         ]
-        self._update_instrument( scn, "Control Pulse", sqpg_pulse_feat) 
+        self._update_instrument( scn, "Control Pulse", sqpg_pulse_feat)
         self._current_pulse = 3
-        self._sequence_time = 2e-6 + 2e-6 + 10e-9 # spacing + plateau + width    
-        
+        self._sequence_time = 2e-6 + 2e-6 + 10e-9 # spacing + plateau + width
+
     def _add_measurement_pulse(self, scn):
-        
+
         meas_pulse = 1
         if self._features["reset"]["isEnabled"]:
             meas_pulse += 2
-        
+
         if scn == CAL:
             meas_pulse += 1
         elif scn == ALG:
@@ -533,7 +534,7 @@ class ScenarioManager():
 
 
         # Update nr of points in Pulse
-        n_points = 1e9 * (self._sequence_time + 2.2e-6)
+        n_points = 1e9 * (self._sequence_time + 2.2e-6 + 0.01e-6) # reset time plus some extra time
 
         # Add pulse and nr points
         sqpg_pulse_feat = [
@@ -548,7 +549,7 @@ class ScenarioManager():
             feat("Phase diff. #"+str(meas_pulse), 0),
             feat("Output #"+str(meas_pulse), 1)
         ]
-        self._update_instrument( scn, "Control Pulse", sqpg_pulse_feat) 
+        self._update_instrument( scn, "Control Pulse", sqpg_pulse_feat)
 
         # Update skip time
         dig_feat = [
@@ -636,7 +637,7 @@ class ScenarioManager():
         param = config.step.RelationParameter()
         param.variable = 'p1'
         param.channel_name = 'Control Pulse - Readout delay'
-        param.channel_name = 'Manual - Value 1'
+        # param.channel_name = 'Manual - Value 1'
         param.use_lookup = True
         param.lookup = lookup
 

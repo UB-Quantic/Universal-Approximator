@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 import time as t
+import os, glob
 
 # Own code imports
 import universal_approximant as ua
@@ -38,42 +39,74 @@ if __name__ == "__main__":
         }
     }
     # Create the Universal Approximant class
-    univ_app = ua.UniversalApproximant( ua.EXPERIMENT, 4, exp_features )
-    
-    # Introduce initial parameters if wanted
-    p = [0, 0, 0, 0, 0,0,0,0,0,0,0]
+    n_layers_range = [2,3]
+    function_range = [relu,tanh]
+    p0 = []
+    for n_layers in n_layers_range:
+        for function in function_range:
+            if function == relu:
+                x = np.linspace( -1,1,num=41 )
+                function_name = "relu"
+            elif function == tanh:
+                x = np.linspace( -10,10,num=41 )
+                function_name = "tanh"
+            for trial in range(5):
+                univ_app = ua.UniversalApproximant( ua.EXPERIMENT, n_layers, exp_features )
+            
+                n_param = 3*n_layers - 1
+                # Introduce initial parameters if wanted
+                # p = np.zeros(n_param)
+                p = np.random.rand((n_param))
+                p = [2*np.pi*x - np.pi for x in p]
+                # for i,p0i in enumerate(p0):
+                #     p[i+3] = p0i
+                # Prepare Universal Approximant class
+                univ_app.update_param(p)
+                univ_app.define_range(x)
+                univ_app.define_function(function)
+                univ_app.define_cal_rate(cal_rate)
 
-    # Prepare Universal Approximant class
-    univ_app.update_param(p)
-    univ_app.define_range(x)
-    univ_app.define_function(relu)
-    univ_app.define_cal_rate(cal_rate)
+                time_start = t.perf_counter()
 
-    time_start = t.perf_counter()
+                # Mimimize!
+                results = minimize(univ_app.chi_square, p, method='Powell', options={"disp": True})
 
-    # Mimimize!
-    results = minimize(univ_app.chi_square, p, method='Powell', options={"disp": True})
+                time_elapsed = (t.perf_counter() - time_start)
+                print("Function is ",function_name)
+                print("N layers are ",n_layers)
+                print("Trial is ", trial)
+                print("Initial p are", p)
+                print("\"time\": ", time_elapsed,",")
+                print("\"fun\": ", results.fun,",")
+                print("\"message\": \"", results.message,"\",")
+                print("\"nfev\": ", results.nfev,",")
+                print("\"nit\":", results.nit,",")
+                print("\"success\":", results.success,",")
+                print("\"x\":", results.x)
 
-    time_elapsed = (t.perf_counter() - time_start)
-    print("\"time\": ", time_elapsed)
-    print("\"fun\": ", results.fun)
-    print("\"message\": ", results.message)
-    print("\"nfev\": ", results.nfev)
-    print("\"nit\":", results.nit)
-    print("\"success\":", results.success)
-    print("\"x\":", results.x)
+                p0 = results.x
+                log_name = "p" + str(n_layers) + function_name + str(trial) + ".txt"
+                np.savetxt(log_name, univ_app.historic_p )
+                log_name = "init_p" + str(n_layers) + function_name + str(trial) + ".txt"
+                np.savetxt(log_name, p )
+                log_name = "res" + str(n_layers) + function_name + str(trial) + ".txt"
+                np.savetxt(log_name, univ_app.historic_res )
 
 
-    univ_app.update_param(results.x)
-    data = univ_app.run()
-    pe = [1-x for x in data]
+    # univ_app.update_param(results.x)
+    # data = univ_app.run()
+    # pe = [1-x for x in data]
 
-    plt.plot( x, pe)
-    plt.plot( x, tanh(x))
+    # plt.figure(1)
+    # plt.plot( x, pe)
+    # plt.plot( x, relu(x))
 
-    plt.show()
-    log_name = "Optimization.txt"
-    np.savetxt(log_name, np.stack((x, data)) )
+    # plt.figure(2)
+    # plt.plot(univ_app.historic_p)
+
+    # plt.show()
+    # log_name = "Optimization.txt"
+    # np.savetxt(log_name, np.stack((x, data)) )
 
     # Delete result files
     for filename in glob.glob("./res*.hdf5"):

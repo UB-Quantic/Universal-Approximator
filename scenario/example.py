@@ -37,44 +37,60 @@ if __name__ == "__main__":
 
     # Introduce parameters
 
-    name_file = _RELPATH_PARENT+"\\New Results\\experimental_results.json"
+    # name_file = _RELPATH_PARENT+"\\New Results\\experimental_results.json"
+    name_file = _RELPATH_PARENT+"\\New Results\\theoretical_results.json"
     with open(name_file, 'r') as f:
         param_dict = json.load(f)
     # p = param_dict["tanh"]["2L"]["x"][:-1]
-    p = param_dict["tanh"]["10k 7n 41p log Powell"]["4L"]["x"]
 
+    n_layers_range = [4]
+    functions_range = [relu]
 
-    # Create the Universal Approximant class
-    univ_app = ua.UniversalApproximant( ua.EXPERIMENT, 4, exp_features )    
-    x = np.linspace( -10, 10, num=31 )
-    univ_app.define_range(x)
+    for function in functions_range:
+        if function == relu:
+            f_name = "relu"
+            x = np.linspace( -1, 1, num=41 )
+        else:
+            f_name = "tanh"
+            x = np.linspace( -10, 10, num=41 )
 
-    univ_app.update_param(p)
-    # t0 = t.perf_counter()
-    res = univ_app.run() # returns P0
-    # t1 = t.perf_counter()
-    pe = [1-x for x in res]
+        for n_layers in n_layers_range:
+            NL = str(n_layers) + "L" 
+            # p = param_dict[f_name]["10k 7n 41p log Powell"][NL]["x"]
+            p = param_dict[f_name][NL]["x"][:-1]
+            p = [2.09231546,   0.77120458, -15.40389215,   0.34309537,   0.06610264,
+                -0.23606795,   0.0220145,   -0.07638291,  -1.32583386,   0.2280512,
+                0.05306048]
 
-    # time = str(t1-t0)
-    # print("Time used has been ", time[:5], "s")
-    # univ_app.update_param(p_the)
-    # res = univ_app.run() # returns P0
-    # pe_the = [1-x for x in res]
+            # Create the Universal Approximant class
+            univ_app = ua.UniversalApproximant( ua.EXPERIMENT, n_layers, exp_features )
+            univ_app.define_range(x)
+            univ_app.update_param(p)
+            # t0 = t.perf_counter()
+            res = univ_app.run() # returns P0
+            # t1 = t.perf_counter()
+            pe = [1-x for x in res]
 
+            # time = str(t1-t0)
+            # print("Time used has been ", time[:5], "s")
+            # univ_app.update_param(p_the)
+            # res = univ_app.run() # returns P0
+            # pe_the = [1-x for x in res]
 
+            plt.plot(x, pe, label="Exp." )
+            # # plt.plot(x, pe_the, label="The." )
+            plt.plot(x, relu(x), label="tanh")
+            # plt.legend()
+            # plt.xlabel("x")
+            # plt.ylabel("Pe")
+            plt.show()
 
-    plt.plot(x, pe, label="Exp." )
-    # plt.plot(x, pe_the, label="The." )
-    plt.plot(x, tanh(x), label="tanh")
-    plt.legend()
-    plt.xlabel("x")
-    plt.ylabel("Pe")
-    plt.show()
-
-    log_name = "Exp_Tanh_4L 10k 7n 41p log Powell.txt"
-    np.savetxt(log_name, np.stack((x, pe)) )
-    # np.savetxt(log_name, np.stack((x, pe_exp, pe_the)) )
-    # np.savetxt(log_name, np.stack((x, pe, simple_sinusodial_function(x))) )
+            # log_name = "Exp_" + f_name + "_" + str(n_layers) + "L 10k 7n 41p chi Powell p0prev.txt"
+            # log_name = "The_" + f_name + "_" + str(n_layers) + "L.txt"
+            # log_name = "Exp_Tanh_4L 10k 7n 31p chi cal25 Powell.txt"
+            # np.savetxt(log_name, np.stack((x, pe)) )
+            # np.savetxt(log_name, np.stack((x, pe_exp, pe_the)) )
+            # np.savetxt(log_name, np.stack((x, pe, simple_sinusodial_function(x))) )
 
     # Delete result files
     for filename in glob.glob("./res*.hdf5"):
