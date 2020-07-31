@@ -30,7 +30,7 @@ def main(layers, method):
     C = aNN.ApproximantNN(1, layers, data, [aux.relu])
 
 
-    cma_options = {'maxfevals': 1e4}
+    cma_options = {'maxfevals': 1e3, 'seed':1112172}
 
     '''sgd_options = {"nepochs": 1001,
                                "nmessage": 100,

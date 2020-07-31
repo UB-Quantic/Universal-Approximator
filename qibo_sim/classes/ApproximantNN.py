@@ -74,7 +74,7 @@ class ApproximantNN:
         if self.dimension == 1:
             for l in range(self.layers - 1):
                 for qubit in range(self.nqubits):
-                    self.cir_params[ch_index] = self.params[index : index + self.dimension] * x
+                    self.cir_params[ch_index] = self.params[index : index + self.dimension] * x + self.params[index + self.dimension]
                     index += self.dimension + 1
                     ch_index += 1
                     self.cir_params[ch_index] = self.params[index]
@@ -92,8 +92,8 @@ class ApproximantNN:
         else:
             for l in range(self.layers - 1):
                 for qubit in range(self.nqubits):
-                    self.cir_params[ch_index] = tf.reduce_sum(self.params[index: index + self.dimension] * x) + self.params[
-                        index + self.dimension]
+                    self.cir_params[ch_index] = tf.reduce_sum(self.params[index: index + self.dimension] * x) + \
+                                                self.params[index + self.dimension]
                     index += self.dimension + 1
                     ch_index += 1
                     self.cir_params[ch_index] = self.params[index]
@@ -176,7 +176,7 @@ class ApproximantNN:
         if method == 'cma':
             # Genetic optimizer
             import cma
-            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, options=options)
+            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, restarts=5, bipop=True, options=options)
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 
