@@ -176,7 +176,7 @@ class ApproximantNN:
         if method == 'cma':
             # Genetic optimizer
             import cma
-            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, restarts=5, bipop=True, options=options)
+            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, options=options)
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 
@@ -203,11 +203,9 @@ class ApproximantNN:
             parameters = myBopt2D.x_opt
             myBopt2D.plot_convergence()
 
-
-
         elif method == 'sgd':
             from qibo.tensorflow.gates import TensorflowGate
-            circuit = self.circuit(self.domain[0])
+            circuit=self.C
             for gate in circuit.queue:
                 if not isinstance(gate, TensorflowGate):
                     raise RuntimeError('SGD VQE requires native Tensorflow '

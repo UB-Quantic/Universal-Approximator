@@ -1,10 +1,14 @@
 import argparse
+
+#Aparece un error común en este proyecto y el
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--layers", default=5, help="Number of random states.", type=int)
-parser.add_argument("--method", default='cma', help="Optimization method", type=str)
+parser.add_argument("--method", default='sgd', help="Optimization method", type=str)
 import tensorflow as tf
 tf.config.threading.set_inter_op_parallelism_threads(1)
 import qibo
+qibo.set_backend('matmuleinsum')
 qibo.set_device("/CPU:0")
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
