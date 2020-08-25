@@ -50,17 +50,16 @@ class ApproximantNN:
         self.params = new_params
 
     def create_hamiltonian(self):
-        H = [Hamiltonian(self.q)] * len(self.measurements)
+        H = [[]] * len(self.measurements)
         for n, measur in enumerate(self.measurements):
-            h_ = Hamiltonian(self.q)
             measur = aux._label_to_hamiltonian(measur)
             if self.nqubits == 1:
-                h_.hamiltonian = measur[-1]
+                h_ = measur[-1]
             elif self.nqubits >= 2:
-                h_.hamiltonian = np.kron(measur[-2], measur[-1])
+                h_ = np.kron(measur[-2], measur[-1])
                 for m in measur[-3::-1]:
-                    h_.hamiltonian = np.kron(m, h_.hamiltonian)
-            H[n] = h_
+                    h_ = np.kron(m, h_.hamiltonian)
+            H[n] = Hamiltonian(self.q, h_)
 
         return H
 
