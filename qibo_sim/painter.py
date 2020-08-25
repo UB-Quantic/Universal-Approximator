@@ -6,7 +6,7 @@ files = os.listdir()
 values = []
 success = []
 evals = []
-name = 'cobyla'
+name = 'TNC'
 for file in [name + '_%s.out'%l for l in range(1, 21)]:
     with open(file, 'r') as f:
         lines = f.readlines()
