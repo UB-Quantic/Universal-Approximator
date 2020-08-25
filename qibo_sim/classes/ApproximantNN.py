@@ -334,8 +334,7 @@ class ApproximantNN:
                 axs.plot(self.domain, self.functions[0](self.domain), color='black', label='Target Function')
                 outcomes = np.zeros_like(self.domain)
                 for j, x in enumerate(self.domain):
-                    C = self.circuit(x)
-                    state = C.execute()
+                    state = self.get_state(x)
                     outcomes[j] = self.hamiltonian[0].expectation(state)
 
                 axs.plot(self.domain, outcomes, color='C0',label='Approximation')
@@ -345,8 +344,8 @@ class ApproximantNN:
                 axs[i].plot(self.domain, self.functions[i](self.domain).flatten(), color='black')
                 outcomes = np.zeros_like(self.domain)
                 for j, x in enumerate(self.domain):
-                    C = self.circuit(x)
-                    state = C.execute()
+                    state = self.get_state(x)
+                    #state = C.execute()
                     outcomes[j] = self.hamiltonian[i].expectation(state)
 
                 axs[i].plot(self.domain, outcomes, label=self.measurements[i])

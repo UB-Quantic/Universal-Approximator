@@ -30,7 +30,7 @@ def main(layers, method):
     C = aNN.ApproximantNN(1, layers, data, [aux.relu])
 
 
-    cma_options = {'maxfevals': 1e3, 'seed':1112172}
+    cma_options = {'maxfevals': 1e4, 'seed':1112172}
 
     '''sgd_options = {"nepochs": 1001,
                                "nmessage": 100,
@@ -38,8 +38,7 @@ def main(layers, method):
                                "learning_rate": 0.5}'''
     # scipy_options = {'maxfun':int(1e8)}
     r = C.minimize(method=method, options=cma_options)
-    print(r)
-    #C.paint_representation_1D()
+    C.paint_representation_1D()
 
 if __name__ == "__main__":
     args = vars(parser.parse_args())
