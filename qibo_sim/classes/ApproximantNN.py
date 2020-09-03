@@ -348,7 +348,7 @@ class ApproximantNN:
                 'layers': [self.layers],
                 'trial':[trial],
                 'seed':[seed],
-                'chi2':[result['fun']]}
+                'chi2':[result['fun'][0]]}
 
         import pandas as pd
         df = pd.DataFrame(data)

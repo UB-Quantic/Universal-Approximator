@@ -20,7 +20,6 @@ import numpy as np
 import classes.aux_functions as aux
 
 def main(layers, method, save):
-    np.random.seed(1)
     x = np.linspace(-1, 1, 31)
     data = np.array(x).reshape((31, 1))
 
