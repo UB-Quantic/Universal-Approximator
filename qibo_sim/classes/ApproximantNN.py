@@ -101,13 +101,21 @@ class ApproximantNN:
         for x, t in zip(self.domain, self.target):
             cf += self.cost_function_one_point(x, t)
         cf /= len(self.domain)
+        if self.save:
+            self.hist_chi.append(cf)
+            self.hist_params.append(params)
         return cf
 
-    def minimize(self, method='L-BFGS-B', options=None, compile=True):
+    def minimize(self, method='L-BFGS-B', options=None, compile=True, save=False):
+        #### WARNING: only scipy is fully functional
+        self.save = save
+        if save:
+            self.hist_params = []
+            self.hist_chi = []
         if method == 'cma':
             # Genetic optimizer
             import cma
-            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, restarts=5, bipop=True, options=options)
+            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, restarts=5, options=options)
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 
@@ -250,40 +258,26 @@ class ApproximantNN:
             m = minimize(lambda p: self.cost_function(p).numpy(), self.params,
                          method=method, options=options)
 
-            print(m)
-            result = m.fun
-            parameters = m.x
+            return m
 
-        return result, parameters
+        # return result, parameters
 
     # La minimización puede ser como en el VQE de qibo, la misma estructura es válida, y todos los minimizadores deberían funcionar bien
     # Otro cantar será saber cuál es el minimizador bueno
 
-    def paint_representation_1D(self):
-        fig, axs = plt.subplots(nrows=self.num_functions)
+    def paint_representation_1D(self, name):
+        fig, axs = plt.subplots()
 
-        if self.num_functions == 1:
-                axs.plot(self.domain, self.functions[0](self.domain), color='black', label='Target Function')
-                outcomes = np.zeros_like(self.domain)
-                for j, x in enumerate(self.domain):
-                    state = self.get_state(x)
-                    outcomes[j] = self.hamiltonian[0].expectation(state)
+        axs.plot(self.domain, self.function(self.domain), color='black', label='Target Function')
+        outcomes = np.zeros_like(self.domain)
+        for j, x in enumerate(self.domain):
+            state = self.get_state(x)
+            outcomes[j] = .5 * (1 - self.H.expectation(state))
 
-                axs.plot(self.domain, outcomes, color='C0',label='Approximation')
-                axs.legend()
-        else:
-            for i in range(self.num_functions):
-                axs[i].plot(self.domain, self.functions[i](self.domain).flatten(), color='black')
-                outcomes = np.zeros_like(self.domain)
-                for j, x in enumerate(self.domain):
-                    state = self.get_state(x)
-                    #state = C.execute()
-                    outcomes[j] = self.hamiltonian[i].expectation(state)
+        axs.plot(self.domain, outcomes, color='C0',label='Approximation')
+        axs.legend()
 
-                axs[i].plot(self.domain, outcomes, label=self.measurements[i])
-                axs[i].legend()
-
-        plt.show()
+        fig.savefig(name)
 
     def paint_representation_2D(self):
         from mpl_toolkits.mplot3d import Axes3D
@@ -316,3 +310,61 @@ class ApproximantNN:
                 ax.legend()
 
         plt.show()
+
+
+    def paint_historical(self, name):
+        import matplotlib.pyplot as plt
+        fig, axs = plt.subplots(nrows=2)
+        axs[0].plot(np.arange(len(self.hist_chi)), self.hist_chi)
+        axs[0].set(yscale='log', ylabel=r'$\chi^2$')
+        hist_params = np.array(self.hist_params)
+        for i in range(len(self.params)):
+            axs[1].plot(np.arange(len(self.hist_chi)), hist_params[:, i], 'C%s' % i)
+
+        axs[1].set(ylabel='Parameter', xlabel='Function evaluation')
+        fig.suptitle('Historical behaviour', fontsize=16)
+        fig.savefig(name)
+
+    def run_optimization(self, method, options, compile=True, save=False, seed=0):
+        np.random.seed(seed)
+        folder, trial = self.name_folder(method)
+
+        result = self.minimize(method, options, compile=compile, save=save)
+        import pickle
+        with open(folder + '/result.pkl', 'wb') as f:
+            pickle.dump(result, f, pickle.HIGHEST_PROTOCOL)
+        with open(folder + '/options.pkl', 'wb') as f:
+            pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
+
+        if save:
+            self.paint_historical(folder + '/historical.pdf')
+            np.savetxt(folder + '/hist_chi.txt', np.array(self.hist_chi))
+            np.savetxt(folder + '/hist_params.txt', np.array(self.hist_params))
+
+        self.paint_representation_1D(folder + '/plot.pdf')
+        np.savetxt(folder + '/domain.txt', np.array(self.domain))
+        data = {'method': [method],
+                'function':[self.function.name],
+                'layers': [self.layers],
+                'trial':[trial],
+                'seed':[seed],
+                'chi2':[result['fun']]}
+
+        import pandas as pd
+        df = pd.DataFrame(data)
+        print(df)
+        df.to_csv('summary.csv', header=data.keys(), mode='a')
+
+
+    def name_folder(self, method):
+        folder = 'results/' + method + '/' + self.function.name + '/%s_layers'%(self.layers)
+        import os
+        try:
+            trial = len(os.listdir(folder))
+        except:
+            trial = 0
+            os.makedirs(folder)
+        fold_name = 'results/' + method + '/' + self.function.name + '/%s_layers/%s'%(self.layers, trial)
+        os.makedirs(fold_name)
+        return fold_name, trial
+

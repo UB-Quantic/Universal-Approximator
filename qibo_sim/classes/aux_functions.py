@@ -24,14 +24,14 @@ def cosine(x):
     cosine.name = 'cosine'
     return 0.5 * (np.cos(2*np.pi*x) + 1)
 
-def sigmoid(x):
+def sigmoid(x, a=10):
     sigmoid.name = 'sigmoid'
-    return 1 / (1 + np.exp(-10 * x))
+    return 1 / (1 + np.exp(-a * x))
 
-def tanh(x):
+def tanh(x, a=10):
     tanh.name = 'tanh'
-    #return 0.5 * (np.tanh(x) + 1)
-    return np.tanh(x)
+    return 0.5 * (np.tanh(a * x) + 1)
+
 
 def angulator(x):
     return 2 * np.pi * x
@@ -48,7 +48,7 @@ def tanh_2(x):
 
 def relu(x):
     relu.name = 'relu'
-    return 1 - 2 * x * (x > 0)
+    return x * (x > 0)
 
 def poly(x):
     poly.name= 'poly'

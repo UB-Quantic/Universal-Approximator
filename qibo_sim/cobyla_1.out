@@ -1,8 +1,0 @@
-     fun: 0.0226641367211053
-   maxcv: 0.0
- message: 'Optimization terminated successfully.'
-    nfev: 38
-  status: 1
- success: True
-       x: array([1.59886598, 0.79001285])
-(0.0226641367211053, array([1.59886598, 0.79001285]))
