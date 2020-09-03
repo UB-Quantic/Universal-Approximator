@@ -10,60 +10,27 @@ import tensorflow as tf
 np.random.seed(0)
 
 class ApproximantNN:
-    def __init__(self, nqubits, layers, domain, functions, measurable_qubits = 1, measurements=None):
+    def __init__(self, layers, domain, function):
         #Circuit.__init__(self, nqubits)
-        self.nqubits = nqubits
+        self.nqubits = 1
         self.layers = layers
         self.domain = domain
-        self.functions = functions
-        self.target = np.zeros((len(domain), len(functions)))
-        for i, f in enumerate(functions):
-            for j, x in enumerate(self.domain):
-                self.target[j, i] = f(x)
-        # self.target = np.array([f([x for x in self.domain]) for f in functions]) # Seleccionar esto bien, hay problemas de compatibilidad al cambiar el número de funciones / dimensiones
-        self.num_functions = len(functions)
+        self.function = function
+        self.target = self.function(self.domain)
         self.dimension = domain.shape[1]
-        self.q = measurable_qubits
-        if 4**self.q - 1 < self.num_functions:
-            raise ValueError('Too many functions to approximate')
-        self.set_measurements(measurements)
         self.hamiltonian = self.create_hamiltonian()
-        if self.nqubits == 1:
-            self.params = np.random.randn(nqubits * layers * (self.dimension + 2) - 1)
-            self.cir_params = np.zeros(nqubits * layers * 2 - 1)
-        else:
-            self.params = np.random.randn(nqubits * layers * (self.dimension + 2))
-            self.cir_params = np.random.randn(nqubits * layers * 2)
+        self.params = np.random.randn(layers * (self.dimension + 2) - 1)
+        self.cir_params = np.zeros(layers * 2 - 1)
         self.ansatz()
 
-    def set_measurements(self, measurements = None):
-        if measurements is None:
-            if self.num_functions <= self.q:
-                self.measurements = ['I' * (self.nqubits - i - 1)+ 'Z' + 'I' * i for i in range(self.q)]
-            elif self.num_functions <= 3 * self.q:
-                self.measurements = ['I' * (self.nqubits - i - 1) + 'Z' + 'I' * i for i in range(self.q)] + \
-                                    ['I' * (self.nqubits - i - 1) + 'X' + 'I' * i for i in range(self.q)] + \
-                                    ['I' * (self.nqubits - i - 1) + 'Y' + 'I' * i for i in range(self.q)]
-            else:
-                print('Please specify measurements')
-
-        else:
-            self.measurements = measurements
 
     def set_parameters(self, new_params):
         self.params = new_params
 
     def create_hamiltonian(self):
-        H = [[]] * len(self.measurements)
-        for n, measur in enumerate(self.measurements):
-            measur = aux._label_to_hamiltonian(measur)
-            if self.nqubits == 1:
-                h_ = measur[-1]
-            elif self.nqubits >= 2:
-                h_ = np.kron(measur[-2], measur[-1])
-                for m in measur[-3::-1]:
-                    h_ = np.kron(m, h_.hamiltonian)
-            H[n] = Hamiltonian(self.q, h_)
+        measur = aux._label_to_hamiltonian('Z')
+        h_ = measur[-1]
+        H = Hamiltonian(1, h_)
 
         return H
 
@@ -160,7 +127,8 @@ class ApproximantNN:
         outcomes = ([h.expectation(state) for h in self.hamiltonian])
         cf = 0
         for o, f in zip(outcomes, target):
-            cf += (o - f) ** 2
+
+            cf += (.5 * (1 - o) - f) ** 2
         return cf
 
     def cost_function(self, params, a=0.0):
