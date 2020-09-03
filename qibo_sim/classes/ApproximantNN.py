@@ -30,34 +30,30 @@ class ApproximantNN:
     def create_hamiltonian(self):
         measur = aux._label_to_hamiltonian('Z')
         h_ = measur[-1]
-        H = Hamiltonian(1, h_)
+        self.H = Hamiltonian(1, h_)
 
-        return H
 
     def theta_with_x(self, x):
         index = 0
         ch_index = 0
         if self.dimension == 1:
             for l in range(self.layers - 1):
-                for qubit in range(self.nqubits):
-                    self.cir_params[ch_index] = self.params[index : index + self.dimension] * x + self.params[index + self.dimension]
-                    index += self.dimension + 1
-                    ch_index += 1
-                    self.cir_params[ch_index] = self.params[index]
-                    index += 1
-                    ch_index += 1
-
-            for qubit in range(self.nqubits):
-                self.cir_params[ch_index] = self.params[index: index + self.dimension] * x + self.params[index + self.dimension]
+                self.cir_params[ch_index] = self.params[index : index + self.dimension] * x + self.params[index + self.dimension]
                 index += self.dimension + 1
                 ch_index += 1
-                if self.nqubits != 1:
-                    self.cir_params[ch_index] = self.params[index]
-                    index += 1
-                    ch_index += 1
+                self.cir_params[ch_index] = self.params[index]
+                index += 1
+                ch_index += 1
+
+            self.cir_params[ch_index] = self.params[index: index + self.dimension] * x + self.params[index + self.dimension]
+            index += self.dimension + 1
+            ch_index += 1
+            if self.nqubits != 1:
+                self.cir_params[ch_index] = self.params[index]
+                index += 1
+                ch_index += 1
         else:
             for l in range(self.layers - 1):
-                for qubit in range(self.nqubits):
                     self.cir_params[ch_index] = tf.reduce_sum(self.params[index: index + self.dimension] * x) + \
                                                 self.params[index + self.dimension]
                     index += self.dimension + 1
@@ -66,53 +62,23 @@ class ApproximantNN:
                     index += 1
                     ch_index += 1
 
-            for qubit in range(self.nqubits):
-                self.cir_params[ch_index] = tf.reduce_sum(self.params[index: index + self.dimension] * x) + self.params[
-                    index + self.dimension]
-                index += self.dimension + 1
-                ch_index += 1
-                self.cir_params[ch_index] = self.params[index]
-                index += 1
-                ch_index += 1
+            self.cir_params[ch_index] = tf.reduce_sum(self.params[index: index + self.dimension] * x) + self.params[
+                index + self.dimension]
+            index += self.dimension + 1
+            ch_index += 1
+            self.cir_params[ch_index] = self.params[index]
+            index += 1
+            ch_index += 1
 
 
     def ansatz(self):
-        if self.dimension == 1:
-            C = Circuit(self.nqubits)
-            # x = x.transpose()
-            index = 0
-            for l in range(self.layers - 1):
-                for qubit in range(self.nqubits):
-                    C.add(gates.RY(qubit, 0))
-                    C.add(gates.RZ(qubit, 0))
-                for a in range(self.q):
-                    for b in range(self.q, self.nqubits):
-                        C.add(gates.CNOT(b, a))
+        C = Circuit(self.nqubits)
+        # x = x.transpose()
+        for l in range(self.layers - 1):
+            C.add(gates.RY(0, 0))
+            C.add(gates.RZ(0, 0))
 
-            for qubit in range(self.nqubits):
-                C.add(gates.RY(qubit, 0))
-                if self.nqubits != 1:
-                    C.add(gates.RZ(qubit, 0))
-
-        else:
-            C = Circuit(self.nqubits)
-            # x = x.transpose()
-            index = 0
-            for l in range(self.layers - 1):
-                for qubit in range(self.nqubits):
-                    C.add(gates.RY(qubit, 0))
-                    C.add(gates.RZ(qubit, 0))
-                    index += 1
-                for a in range(self.q):
-                    for b in range(self.q, self.nqubits):
-                        C.add(gates.CNOT(b, a))
-
-            for qubit in range(self.nqubits):
-                C.add(gates.RY(qubit,
-                               0))
-                index += self.dimension + 1
-                if self.nqubits != 1:
-                    C.add(gates.RZ(qubit, 0))
+        C.add(gates.RY(0, 0))
 
         self.C = C
 
@@ -122,13 +88,11 @@ class ApproximantNN:
         state = self.C()
         return state
 
-    def cost_function_one_point(self, x, target):
+    def cost_function_one_point(self, x, f):
         state = self.get_state(x)
-        outcomes = ([h.expectation(state) for h in self.hamiltonian])
-        cf = 0
-        for o, f in zip(outcomes, target):
+        o = self.H.expectation(state)
+        cf = (.5 * (1 - o) - f) ** 2
 
-            cf += (.5 * (1 - o) - f) ** 2
         return cf
 
     def cost_function(self, params, a=0.0):
@@ -139,7 +103,7 @@ class ApproximantNN:
         cf /= len(self.domain)
         return cf
 
-    def minimize(self, method='BFGS', options=None, compile=True):
+    def minimize(self, method='L-BFGS-B', options=None, compile=True):
         if method == 'cma':
             # Genetic optimizer
             import cma
