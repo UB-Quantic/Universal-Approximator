@@ -107,7 +107,7 @@ class ApproximantNN:
         return cf
 
     def minimize(self, method='L-BFGS-B', options=None, compile=True, save=False):
-        #### WARNING: only scipy is fully functional
+        # WARNING: ONLY CMA AND SCIPY ARE FUNCTIONAL
         self.save = save
         if save:
             self.hist_params = []
@@ -115,9 +115,10 @@ class ApproximantNN:
         if method == 'cma':
             # Genetic optimizer
             import cma
-            r = cma.fmin2(lambda p: self.cost_function(p).numpy(), self.params, 1, restarts=5, options=options)
-            result = r[1].result.fbest
-            parameters = r[1].result.xbest
+            r = cma.fmin(self.cost_function, self.params, 1, options=options)
+            m = {'fun': r[1], 'x': r[0], 'nfev': r[2], 'nit': r[4], 'xmean': r[5], 'stds': r[6]}
+
+            return m
 
         elif method == 'bayes':
             # Bayesian Optimizer
@@ -352,7 +353,6 @@ class ApproximantNN:
 
         import pandas as pd
         df = pd.DataFrame(data)
-        print(df)
         df.to_csv('summary.csv', header=data.keys(), mode='a')
 
 
