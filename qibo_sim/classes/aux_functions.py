@@ -22,15 +22,15 @@ def step(x):
 
 def cosine(x):
     cosine.name = 'cosine'
-    return 0.5 * (np.cos(2*np.pi*x) + 1)
+    return np.cos(2*np.pi*x)
 
 def sigmoid(x, a=10):
     sigmoid.name = 'sigmoid'
     return 1 / (1 + np.exp(-a * x))
 
-def tanh(x, a=10):
+def tanh(x, a=5):
     tanh.name = 'tanh'
-    return 0.5 * (np.tanh(a * x) + 1)
+    return np.tanh(a * x)
 
 
 def angulator(x):

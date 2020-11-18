@@ -1,124 +1,94 @@
 from qibo.models import Circuit
 from qibo import gates
 import numpy as np
+from qibo.config import matrices
 import classes.aux_functions as aux
 from qibo.hamiltonians import Hamiltonian
 import matplotlib.pyplot as plt
 import tensorflow as tf
 # import tensorflow_probability as tfp
 
-np.random.seed(0)
-
-class ApproximantNN:
-    def __init__(self, layers, domain, function):
+class Approximant:
+    def __init__(self, layers, domain, ansatz):
         #Circuit.__init__(self, nqubits)
         self.nqubits = 1
         self.layers = layers
         self.domain = domain
-        self.function = function
-        self.target = self.function(self.domain)
-        self.dimension = domain.shape[1]
-        self.hamiltonian = self.create_hamiltonian()
-        self.params = np.random.randn(layers * (self.dimension + 2) - 1)
+        self.params = np.random.randn(layers * 3 - 1)
         self.cir_params = np.zeros(layers * 2 - 1)
-        self.ansatz()
-
+        self.ansatz = ansatz
+        self.circuit, self.rotation, self.nparams = globals(
+        )[f"ansatz_{ansatz}"](layers)
+        self.save=False
 
     def set_parameters(self, new_params):
         self.params = new_params
 
-    def create_hamiltonian(self):
-        measur = aux._label_to_hamiltonian('Z')
-        h_ = measur[-1]
-        self.H = Hamiltonian(1, h_)
-
-
-    def theta_with_x(self, x):
-        index = 0
-        ch_index = 0
-        if self.dimension == 1:
-            for l in range(self.layers - 1):
-                self.cir_params[ch_index] = self.params[index : index + self.dimension] * x + self.params[index + self.dimension]
-                index += self.dimension + 1
-                ch_index += 1
-                self.cir_params[ch_index] = self.params[index]
-                index += 1
-                ch_index += 1
-
-            self.cir_params[ch_index] = self.params[index: index + self.dimension] * x + self.params[index + self.dimension]
-            index += self.dimension + 1
-            ch_index += 1
-            if self.nqubits != 1:
-                self.cir_params[ch_index] = self.params[index]
-                index += 1
-                ch_index += 1
-        else:
-            for l in range(self.layers - 1):
-                    self.cir_params[ch_index] = tf.reduce_sum(self.params[index: index + self.dimension] * x) + \
-                                                self.params[index + self.dimension]
-                    index += self.dimension + 1
-                    ch_index += 1
-                    self.cir_params[ch_index] = self.params[index]
-                    index += 1
-                    ch_index += 1
-
-            self.cir_params[ch_index] = tf.reduce_sum(self.params[index: index + self.dimension] * x) + self.params[
-                index + self.dimension]
-            index += self.dimension + 1
-            ch_index += 1
-            self.cir_params[ch_index] = self.params[index]
-            index += 1
-            ch_index += 1
-
-
-    def ansatz(self):
-        C = Circuit(self.nqubits)
-        # x = x.transpose()
-        for l in range(self.layers - 1):
-            C.add(gates.RY(0, 0))
-            C.add(gates.RZ(0, 0))
-
-        C.add(gates.RY(0, 0))
-
-        self.C = C
-
     def get_state(self, x):
-        self.theta_with_x(x)
-        self.C.set_parameters(self.cir_params)
-        state = self.C()
+        par = self.rotation(self.params, x)
+        self.circuit.set_parameters(par)
+        state = self.circuit()
         return state
 
-    def cost_function_one_point(self, x, f):
-        state = self.get_state(x)
-        o = self.H.expectation(state)
-        cf = (.5 * (1 - o) - f) ** 2
-
-        return cf
-
-    def cost_function(self, params, a=0.0):
+    def cost_function(self, params):
+        try:
+            params = params.flatten()
+        except:
+            pass
         self.set_parameters(params)
         cf = 0
         for x, t in zip(self.domain, self.target):
-            cf += self.cost_function_one_point(x, t)
+            cf += self.cf_one_point(x, t)
         cf /= len(self.domain)
         if self.save:
             self.hist_chi.append(cf)
             self.hist_params.append(params)
+
         return cf
 
-    def minimize(self, method='L-BFGS-B', options=None, compile=True, save=False):
+    def cost_function_classical(self):
+        cf = np.mean(np.abs(self.classical - self.target)**2)
+        return cf
+
+    def minimize(self, method, options={}, compile=True, save=False, **kwargs):
         # WARNING: ONLY CMA AND SCIPY ARE FUNCTIONAL
         self.save = save
         if save:
             self.hist_params = []
             self.hist_chi = []
+
         if method == 'cma':
             # Genetic optimizer
             import cma
-            r = cma.fmin(self.cost_function, self.params, 1, options=options)
+            print(method)
+            r = cma.fmin(lambda p: self.cost_function(p).numpy(), self.params, 1, options=options)
             m = {'fun': r[1], 'x': r[0], 'nfev': r[2], 'nit': r[4], 'xmean': r[5], 'stds': r[6]}
 
             return m
+
+        elif method == 'adam':
+            params = adam(self.cost_function, self.derivative_cf, self.params, **kwargs)
+            print(params)
+            print(self.cost_function(params))
+            return params
+
+        elif method=='ego':
+            from smt.applications import EGO
+            from smt.sampling_methods import FullFactorial
+            from smt.problems import Rosenbrock
+            from numpy import pi, array
+            n_iter = 100
+            criterion = 'EI'
+            xlimits = array([[-pi, pi]]*len(self.params))
+            sampling = FullFactorial(xlimits=xlimits)
+            xdoe = sampling(1)
+            print(type(xdoe))
+            ego = EGO(n_iter=n_iter, criterion=criterion, xdoe=xdoe, xlimits=xlimits)
+            x_opt, y_opt , _, x_data, y_data = ego.optimize(fun=lambda p:self.cost_function(p).numpy())
+            print(x_opt, y_opt, _)
+
+            m = {'fun': y_opt, 'x': x_opt, 'nfev': 10, 'nit': n_iter, 'xmean': 0, 'stds': 0}
+
 
         elif method == 'bayes':
             # Bayesian Optimizer
@@ -130,20 +100,37 @@ class ApproximantNN:
             for i in range(len(self.params)):
                 bounds.append({'name': 'var_%s'%i, 'type': 'continuous', 'domain': (-3*pi, 3*pi)})
 
-            def loss(p):
-                f = self.cost_function(p).numpy()
-                return f
-
-            myBopt2D = BayesianOptimization(loss, domain=bounds, acquisition_weight=2,
+            myBopt2D = BayesianOptimization(self.cost_function, domain=bounds, acquisition_weight=2,
                                             model_type='GP', acquisition_type='EI', normalize_Y=False)
 
-            myBopt2D.run_optimization(5000, 100000000, verbosity=True)
+            myBopt2D.run_optimization(500, 50, verbosity=True)
 
             result = myBopt2D.fx_opt
             parameters = myBopt2D.x_opt
             myBopt2D.plot_convergence()
 
+        elif method == 'SimulatedAnnealing':
+            from gradient_free_optimizers import SimulatedAnnealingOptimizer
+            import numpy as np
+            space_dim = np.array([20])
+            init_positions = np.random.rand(len(self.params))
 
+            opt = SimulatedAnnealingOptimizer(init_positions, space_dim, opt_para={})
+            for nth_iter in range(len(init_positions), 100):
+                pos_new = opt.iterate(nth_iter)
+                score_new = self.cost_function(pos_new)  # score must be provided by objective-function
+                opt.evaluate(score_new)
+
+
+        elif method=='OPO':
+            import nevergrad as ng
+            from numpy import pi
+            OPO = ng.optimizers.OnePlusOne(parametrization=len(self.params), budget=10000)
+            recommendation = OPO.minimize(lambda p: self.cost_function(p).numpy()[0])
+
+            m = {'fun': self.cost_function(recommendation.value).numpy()[0],
+                 'x': recommendation.value}
+            return m
 
         elif method == 'sgd':
             from qibo.tensorflow.gates import TensorflowGate
@@ -251,6 +238,17 @@ class ApproximantNN:
             result = params_optimal.objective_value.numpy()
             parameters = params_optimal.position.numpy()
 
+            '''elif method == 'l-bfgs-b':
+            import numpy as np
+            from scipy.optimize import fmin_l_bfgs_b
+            m = fmin_l_bfgs_b(lambda p:self.cost_function(p).numpy(), self.params, fprime=self.derivative_cf, args=(),
+                        approx_grad=0, bounds=None, m=10, factr=10000000.0,
+                        pgtol=1e-05, epsilon=1e-08, iprint=- 1, maxfun=15000, maxiter=15000, disp=None,
+                        callback=None, maxls=20)
+
+            print(m)
+            return m[0]'''
+
         else:
             # Newtonian approaches
             import numpy as np
@@ -259,23 +257,154 @@ class ApproximantNN:
             m = minimize(lambda p: self.cost_function(p).numpy(), self.params,
                          method=method, options=options)
 
+            print(m)
             return m
 
-        # return result, parameters
 
-    # La minimización puede ser como en el VQE de qibo, la misma estructura es válida, y todos los minimizadores deberían funcionar bien
-    # Otro cantar será saber cuál es el minimizador bueno
+    def run_optimization(self, method, options, compile=True, save=False, seed=0):
+        np.random.seed(seed)
+        folder, trial = self.name_folder(method)
+        result = self.minimize(method, options, compile=compile, save=save)
+        import pickle
+        with open(folder + '/result.pkl', 'wb') as f:
+            pickle.dump(result, f, pickle.HIGHEST_PROTOCOL)
+        with open(folder + '/options.pkl', 'wb') as f:
+            pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
+
+        '''if save:
+            self.paint_historical(folder + '/historical.pdf')
+            np.savetxt(folder + '/hist_chi.txt', np.array(self.hist_chi))
+            np.savetxt(folder + '/hist_params.txt', np.array(self.hist_params))'''
+
+        self.paint_representation_1D(folder + '/plot.pdf')
+        np.savetxt(folder + '/domain.txt', np.array(self.domain))
+        try:
+            data = {'method': [method],
+                'function':[self.function.name],
+                'layers': [self.layers],
+                'trial':[trial],
+                'seed':[seed],
+                'chi2':[result['fun']],
+                'classical_chi2':[self.cost_function_classical()],
+                'ansatz': [self.ansatz]}
+        except:
+            data = {'method': [method],
+                'function': [self.f_modulus.name + '_' + self.f_phase.name],
+                'layers': [self.layers],
+                'trial': [trial],
+                'seed': [seed],
+                'chi2': [result['fun']],
+                'classical_chi2':[self.cost_function_classical()],
+                'ansatz': [self.ansatz]}
+
+        import pandas as pd
+        df = pd.DataFrame(data)
+        df.to_csv('summary.csv', mode='a', header=False)
+
+
+class Approximant_real(Approximant):
+    def __init__(self, layers, domain, ansatz, function):
+        self.function = function
+        super().__init__(layers, domain, ansatz)
+        self.target = self.function(self.domain)
+        self.target = 2 * (self.target - np.min(self.target)) / (np.max(self.target) - np.min(self.target)) - 1
+        self.H = Hamiltonian(1, matrices._Z)
+        self.classical = globals(
+        )[f"classical_real_{ansatz}"](layers, self.domain, self.target)
+
+    def name_folder(self, method):
+        folder = 'results_' + self.ansatz + '/' + method + '/' + self.function.name + '/%s_layers'%(self.layers)
+        import os
+        try:
+            trial = len(os.listdir(folder))
+        except:
+            trial = 0
+            os.makedirs(folder)
+        fold_name = 'results_' + self.ansatz + '/' + method + '/' + self.function.name + '/%s_layers/%s'%(self.layers, trial)
+        os.makedirs(fold_name)
+        return fold_name, trial
+
+    def cf_one_point(self, x, f):
+        state = self.get_state(x)
+        o = self.H.expectation(state)
+        cf = (o - f) ** 2
+        return cf
+
+    def derivative_cf_one_point(self, x, f):
+        self.theta_with_x(x)
+        derivatives = np.zeros_like(self.params)
+        index = 0
+        ch_index = 0
+        for l in range(self.layers - 1):
+            cir_params_ = self.cir_params.copy()
+            delta = np.zeros_like(cir_params_)
+            delta[ch_index] = np.pi / 2
+            self.C.set_parameters(cir_params_ + delta)
+            state = self.C()
+            z1 = self.H.expectation(state)
+            self.C.set_parameters(cir_params_ - delta)
+            state = self.C()
+            z2 = self.H.expectation(state)
+            derivatives[index + 1] = 0.5 * ((z1**2 - z2**2) - 2 * f * (z1 - z2))
+            derivatives[index] = x * derivatives[index + 1]
+            index += 2
+            ch_index += 1
+
+            cir_params_ = self.cir_params.copy()
+            delta = np.zeros_like(cir_params_)
+            delta[ch_index] = np.pi / 2
+            self.C.set_parameters(cir_params_ + delta)
+            state = self.C()
+            z1 = self.H.expectation(state)
+            self.C.set_parameters(cir_params_ - delta)
+            state = self.C()
+            z2 = self.H.expectation(state)
+            derivatives[index] = 0.5 * ((z1**2 - z2**2) - 2 * f * (z1 - z2))
+            index += 1
+            ch_index += 1
+
+        cir_params_ = self.cir_params.copy()
+        delta = np.zeros_like(cir_params_)
+        delta[ch_index] = np.pi / 2
+        self.C.set_parameters(cir_params_ + delta)
+        state = self.C()
+        z1 = self.H.expectation(state)
+        self.C.set_parameters(cir_params_ - delta)
+        state = self.C()
+        z2 = self.H.expectation(state)
+        derivatives[index + 1] = 0.5 * ((z1**2 - z2**2) - 2 * f * (z1 - z2))
+        derivatives[index] = x * derivatives[index + 1]
+        index += 2
+        ch_index += 1
+
+        return derivatives
+
+
+    def derivative_cf(self, params):
+        try:
+            params = params.flatten()
+        except:
+            pass
+        self.set_parameters(params)
+        derivatives = np.zeros_like(params)
+        for x, t in zip(self.domain, self.target):
+            derivatives += self.derivative_cf_one_point(x, t)
+        derivatives /= len(self.domain)
+
+        return derivatives
 
     def paint_representation_1D(self, name):
         fig, axs = plt.subplots()
 
-        axs.plot(self.domain, self.function(self.domain), color='black', label='Target Function')
+        axs.plot(self.domain, self.target, color='black', label='Target Function')
         outcomes = np.zeros_like(self.domain)
         for j, x in enumerate(self.domain):
             state = self.get_state(x)
-            outcomes[j] = .5 * (1 - self.H.expectation(state))
+            outcomes[j] = self.H.expectation(state)
 
-        axs.plot(self.domain, outcomes, color='C0',label='Approximation')
+        axs.plot(self.domain, outcomes, color='C1',label='Quantum ' + self.ansatz + ' model')
+        axs.plot(self.domain, self.classical,
+                 color='C0',label='Classical ' + self.ansatz + ' model')
         axs.legend()
 
         fig.savefig(name)
@@ -326,10 +455,95 @@ class ApproximantNN:
         fig.suptitle('Historical behaviour', fontsize=16)
         fig.savefig(name)
 
+class Approximant_complex(Approximant):
+    def __init__(self, layers, domain, ansatz, modulus, phase):
+        self.f_modulus = modulus
+        self.f_phase = phase
+        # self.function.name = lambda:self.modulus.name + '_' + self.phase.name
+        super().__init__(layers, domain, ansatz)
+        self.modulus = self.f_modulus(self.domain)
+        self.modulus = (self.modulus - np.min(self.modulus)) / (np.max(self.modulus) - np.min(self.modulus))
+
+        self.phase = self.f_phase(self.domain)
+        self.phase = 2 * np.pi * (self.phase - np.min(self.phase)) / (np.max(self.phase) - np.min(self.phase))
+
+        self.target = self.modulus * np.exp(1j * self.phase)
+
+        self.H = [Hamiltonian(1, matrices._X), Hamiltonian(1, matrices._Y)]
+        self.classical = globals(
+        )[f"classical_complex_{ansatz}"](layers, self.domain, self.target)
+
+    def name_folder(self, method):
+        folder = 'results_' + self.ansatz + '/' + method + '/' + self.f_modulus.name + '_' + self.f_phase.name + '/%s_layers'%(self.layers)
+        import os
+        try:
+            trial = len(os.listdir(folder))
+        except:
+            trial = 0
+            os.makedirs(folder)
+        fold_name = 'results_' + self.ansatz +'/' + method + '/' + self.f_modulus.name + '_' + self.f_phase.name + '/%s_layers/%s'%(self.layers, trial)
+        os.makedirs(fold_name)
+        return fold_name, trial
+
+
+    def cf_one_point(self, x, f):
+        state = self.get_state(x)
+        o = tf.complex(self.H[0].expectation(state), self.H[1].expectation(state))
+        cf = tf.abs(o - f) ** 2
+        return cf
+
+
+    def paint_representation_1D(self, name):
+        fig, axs = plt.subplots(nrows=2, figsize=(8,10))
+
+        axs[0].plot(self.domain, np.real(self.target), color='black', label='Target Function')
+        outcomes = np.zeros_like(self.domain)
+        for j, x in enumerate(self.domain):
+            state = self.get_state(x)
+            outcomes[j] = self.H[0].expectation(state)
+
+        axs[0].plot(self.domain, outcomes, color='C1',label='Quantum ' + self.ansatz + ' model')
+        axs[0].plot(self.domain, np.real(self.classical),
+                 color='C0',label='Classical ' + self.ansatz + ' model')
+        axs[0].set(title='Real part')
+        axs[0].legend()
+
+        axs[1].plot(self.domain, np.imag(self.target), color='black', label='Target Function')
+        outcomes = np.zeros_like(self.domain)
+        for j, x in enumerate(self.domain):
+            state = self.get_state(x)
+            outcomes[j] = self.H[1].expectation(state)
+
+        axs[1].plot(self.domain, outcomes, color='C1', label='Quantum ' + self.ansatz + ' model')
+        axs[1].plot(self.domain, np.imag(self.classical),
+                    color='C0', label='Classical ' + self.ansatz + ' model')
+        axs[1].set(title='Imag part')
+        # axs[1].legend()
+
+        fig.savefig(name)
+
+class ApproximantFourier(Approximant):
+    def __init__(self, layers, domain, function):
+        super().__init__(layers, domain, function)
+        assert self.dimension == 1
+        self.period = np.max(self.domain) - np.min(self.domain)
+
+    def name_folder(self, method):
+        folder = 'results_F/' + method + '/' + self.function.name + '/%s_layers'%(self.layers)
+        import os
+        try:
+            trial = len(os.listdir(folder))
+        except:
+            trial = 0
+            os.makedirs(folder)
+        fold_name = 'results_F/' + method + '/' + self.function.name + '/%s_layers/%s'%(self.layers, trial)
+        os.makedirs(fold_name)
+        return fold_name, trial
+
+
     def run_optimization(self, method, options, compile=True, save=False, seed=0):
         np.random.seed(seed)
         folder, trial = self.name_folder(method)
-
         result = self.minimize(method, options, compile=compile, save=save)
         import pickle
         with open(folder + '/result.pkl', 'wb') as f:
@@ -342,29 +556,163 @@ class ApproximantNN:
             np.savetxt(folder + '/hist_chi.txt', np.array(self.hist_chi))
             np.savetxt(folder + '/hist_params.txt', np.array(self.hist_params))
 
-        self.paint_representation_1D(folder + '/plot.pdf')
+        self.paint_representation_1D('plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
         data = {'method': [method],
                 'function':[self.function.name],
                 'layers': [self.layers],
                 'trial':[trial],
                 'seed':[seed],
-                'chi2':[result['fun'][0]]}
+                'chi2':[result['fun'][0]],
+                'Fourier':[True]}
 
         import pandas as pd
         df = pd.DataFrame(data)
-        df.to_csv('summary.csv', header=data.keys(), mode='a')
+        df.to_csv('summary.csv', mode='a')
 
 
-    def name_folder(self, method):
-        folder = 'results/' + method + '/' + self.function.name + '/%s_layers'%(self.layers)
-        import os
-        try:
-            trial = len(os.listdir(folder))
-        except:
-            trial = 0
-            os.makedirs(folder)
-        fold_name = 'results/' + method + '/' + self.function.name + '/%s_layers/%s'%(self.layers, trial)
-        os.makedirs(fold_name)
-        return fold_name, trial
+
+def adam(loss_function, derivative, init_state, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-08, T=1000,
+         disp=False):
+    m = np.zeros_like(init_state)
+    v = np.zeros_like(init_state)
+    t = 0
+    moment_grad = 1
+    params = init_state.copy()
+    while moment_grad > 0.0001:
+        g = derivative(params)
+
+        t += 1
+        m = beta1 * m + (1 - beta1) * g
+        v = beta2 * v + (1 - beta2) * g**2
+        m_ = m / (1 - beta1**t)
+        v_ = v / (1 - beta2**t)
+        moment_grad = np.linalg.norm(m)
+        if disp:
+            print('Value of Loss Function at step %s: '%t + str(loss_function(params)), 'Gradient norm: ' + str(moment_grad))
+
+        params -= learning_rate * m_ / (epsilon + v_**.5)
+        if t > T:
+            break
+
+    return params
+
+
+from qibo import models
+
+def ansatz_Weighted(layers, qubits=1):
+    """
+    3 parameters per layer: Ry(wx + a), Rz(b)
+    """
+    circuit = models.Circuit(qubits)
+    for _ in range(layers - 1):
+        circuit.add(gates.RY(0, theta=0))
+        circuit.add(gates.RZ(0, theta=0))
+    circuit.add(gates.RY(0, theta=0))
+
+
+    def rotation(theta, x):
+        p = circuit.get_parameters()
+        i = 0
+        j = 0
+        for l in range(layers - 1):
+            p[i] = theta[j] + theta[j + 1] * x
+            p[i + 1] = theta[j + 2]
+            i += 2
+            j += 3
+
+        p[i] = theta[j] + theta[j + 1] * x
+        i += 1
+        j += 2
+
+        return p
+
+    nparams = 3 * (layers - 1) + 2
+    return circuit, rotation, nparams
+
+def ansatz_Fourier(layers, qubits=1):
+    """
+    3 parameters per layer: Ry(wx + a), Rz(b)
+    """
+    circuit = models.Circuit(qubits)
+    for _ in range(layers - 1):
+        circuit.add(gates.RY(0, theta=0))
+        circuit.add(gates.RZ(0, theta=0))
+        circuit.add(gates.RY(0, theta=0))
+        circuit.add(gates.RZ(0, theta=0))
+    circuit.add(gates.RY(0, theta=0))
+    circuit.add(gates.RZ(0, theta=0))
+    circuit.add(gates.RY(0, theta=0))
+
+
+    def rotation(theta, x):
+        p = circuit.get_parameters()
+        i = 0
+        j = 0
+        for l in range(layers - 1):
+            p[i] = theta[j] + theta[j + 1] * x
+            p[i + 1] = theta[j + 2]
+            i += 2
+            j += 3
+
+        p[i] = theta[j] + theta[j + 1] * x
+        i += 1
+        j += 2
+
+        return p
+
+    nparams = 3 * (layers - 1) + 2
+    return circuit, rotation, nparams
+
+
+def classical_real_Weighted(layers, x, y):
+    from sklearn.neural_network import MLPRegressor
+    NN = MLPRegressor((layers,), solver='lbfgs', activation='logistic')
+    NN.fit(x.reshape(-1, 1), y)
+
+    return NN.predict(x.reshape(-1, 1))
+
+def classical_complex_Weighted(layers, x, y):
+    from sklearn.neural_network import MLPRegressor
+    NN_r = MLPRegressor((layers,), solver='lbfgs')
+    NN_i = MLPRegressor((layers,), solver='lbfgs')
+    NN_r.fit(x.reshape(-1, 1), np.real(y))
+    NN_i.fit(x.reshape(-1, 1), np.imag(y))
+
+    return NN_r.predict(x.reshape(-1, 1)) + 1j * NN_i.predict(x.reshape(-1, 1))
+
+def classical_real_Fourier(layers, x, y):
+    params = np.zeros((layers + 1, 2))
+    period = np.max(x) - np.min(x)
+    params[0, 0] = 2 / period * np.trapz(y, x)
+    for _ in range(1, layers + 1):
+        cos = np.cos(_ * 2 * np.pi / period * x)
+        params[_, 0] = 2 / period * np.trapz(y * cos, x)
+        sin = np.sin(_ * 2 * np.pi / period * x)
+        params[_, 1] = 2 / period * np.trapz(y * sin, x)
+
+    prediction = np.zeros_like(x)
+    for i, p in enumerate(params):
+        prediction += p[0] * np.cos(i * 2 * np.pi / period * x)
+        prediction += p[1] * np.sin(i * 2 * np.pi / period * x)
+
+    return prediction
+
+
+def classical_complex_Fourier(layers, x, y):
+    params = np.zeros((layers + 1, 2), dtype=complex)
+    period = np.max(x) - np.min(x)
+    params[0, 0] = 1 / period * np.trapz(y, x)
+    for _ in range(1, layers + 1):
+        exp = np.exp(-1j * _ * 2 * np.pi / period * x)
+        params[_, 0] = 1 / period * np.trapz(y * exp, x)
+        exp = np.exp(1j * _ * 2 * np.pi / period * x)
+        params[_, 1] = 1 / period * np.trapz(y * exp, x)
+
+    prediction = np.zeros_like(x, dtype=complex)
+    for i, p in enumerate(params):
+        prediction += p[0] * np.exp(1j * i * 2 * np.pi / period * x)
+        prediction += p[1] * np.exp(-1j * i * 2 * np.pi / period * x)
+
+    return prediction
 

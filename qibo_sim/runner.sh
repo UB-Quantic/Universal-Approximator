@@ -1,10 +1,10 @@
-nohup python3 test.py --layers 1 --method bayes > bayes_1.out &
-nohup python3 test.py --layers 2 --method bayes > bayes_2.out &
-nohup python3 test.py --layers 3 --method bayes > bayes_3.out &
-nohup python3 test.py --layers 4 --method bayes > bayes_4.out &
-nohup python3 test.py --layers 5 --method bayes > bayes_5.out &
-nohup python3 test.py --layers 6 --method bayes > bayes_6.out &
-nohup python3 test.py --layers 7 --method bayes > bayes_7.out &
-nohup python3 test.py --layers 8 --method bayes > bayes_8.out &
-nohup python3 test.py --layers 9 --method bayes > bayes_9.out &
-nohup python3 test.py --layers 10 --method bayes > bayes_10.out &
+nohup taskset -c 0 python3 main.py --function relu --method cma --ansatz Fourier > fourier_cma_relu.out &
+nohup taskset -c 1 python3 main.py --function poly --method cma --ansatz Fourier > fourier_cma_poly.out &
+nohup taskset -c 2 python3 main.py --function step --method cma --ansatz Fourier > fourier_cma_step.out &
+nohup taskset -c 3 python3 main.py --function relu --method bfgs --ansatz Fourier > fourier_bfgs_relu.out &
+nohup taskset -c 4 python3 main.py --function poly --method bfgs --ansatz Fourier > fourier_bfgs_poly.out &
+nohup taskset -c 5 python3 main.py --function step --method bfgs --ansatz Fourier > fourier_bfgs_step.out &
+nohup taskset -c 6 python3 main.py --function relu --method l-bfgs-b --ansatz Fourier > fourier_lbfgsb_relu.out &
+nohup taskset -c 7 python3 main.py --function poly --method l-bfgs-b --ansatz Fourier > fourier_lbfgsb_poly.out &
+nohup taskset -c 8 python3 main.py --function step --method l-bfgs-b --ansatz Fourier > fourier_lbfgsb_step.out &
+
