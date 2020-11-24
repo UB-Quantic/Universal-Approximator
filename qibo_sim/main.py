@@ -18,7 +18,7 @@ def main(function, method, ansatz):
             #data = np.array(x).reshape((31, 1))
 
             C = App_r(layers, x, ansatz, func)
-            C.run_optimization(method, options={'maxiter':10000}, compile=True, seed=seed)
+            #C.run_optimization(method, options={'maxiter':10000}, compile=True, seed=seed)
             C.run_optimization_classical('l-bfgs-b', options={'maxiter': 10000}, seed=seed)
 #C.paint_representation_1D('lbfgsb_%s.pdf'%layers)
 

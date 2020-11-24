@@ -46,8 +46,8 @@ class Approximant:
 
         return cf
 
-    def cost_function_classical(self):
-        cf = np.mean(np.abs(self.classical - self.target)**2)
+    def cost_function_classical(self, prediction):
+        cf = np.mean(np.abs(prediction - self.target)**2)
         return cf
 
     def minimize(self, method, options={}, compile=True, save=False, **kwargs):
@@ -263,7 +263,7 @@ class Approximant:
 
     def run_optimization(self, method, options, compile=True, save=False, seed=0):
         np.random.seed(seed)
-        folder, trial = self.name_folder(method)
+        folder, trial = self.name_folder()
         result = self.minimize(method, options, compile=compile, save=save)
         import pickle
         with open(folder + '/result.pkl', 'wb') as f:
@@ -271,10 +271,10 @@ class Approximant:
         with open(folder + '/options.pkl', 'wb') as f:
             pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
 
-        '''if save:
+        if save:
             self.paint_historical(folder + '/historical.pdf')
             np.savetxt(folder + '/hist_chi.txt', np.array(self.hist_chi))
-            np.savetxt(folder + '/hist_params.txt', np.array(self.hist_params))'''
+            np.savetxt(folder + '/hist_params.txt', np.array(self.hist_params))
 
         self.paint_representation_1D(folder + '/plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
@@ -285,21 +285,57 @@ class Approximant:
                 'trial':[trial],
                 'seed':[seed],
                 'chi2':[result['fun']],
-                'classical_chi2':[self.cost_function_classical()],
-                'ansatz': [self.ansatz]}
+                'ansatz': [self.ansatz],
+                'Quantum':[True]}
         except:
             data = {'method': [method],
-                'function': [self.f_modulus.name + '_' + self.f_phase.name],
+                'function': [self.f_real.name + '_' + self.f_imag.name],
                 'layers': [self.layers],
                 'trial': [trial],
                 'seed': [seed],
                 'chi2': [result['fun']],
-                'classical_chi2':[self.cost_function_classical()],
-                'ansatz': [self.ansatz]}
+                'ansatz': [self.ansatz],
+                'Quantum':[True]}
 
         import pandas as pd
         df = pd.DataFrame(data)
         df.to_csv('summary.csv', mode='a', header=False)
+
+    def run_optimization_classical(self, method, options, seed=0):
+        np.random.seed(seed)
+        folder, trial = self.name_folder(quantum=False)
+        prediction, result = globals()[f"classical_real_{self.ansatz}"](self.layers, self.domain, self.target)
+        import pickle
+        with open(folder + '/result.pkl', 'wb') as f:
+            pickle.dump(result, f, pickle.HIGHEST_PROTOCOL)
+        with open(folder + '/options.pkl', 'wb') as f:
+            pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
+
+        self.paint_representation_1D_classical(prediction, folder + '/plot.pdf')
+        np.savetxt(folder + '/domain.txt', np.array(self.domain))
+        try:
+            data = {'method': [method],
+                    'function': [self.function.name],
+                    'layers': [self.layers],
+                    'trial': [trial],
+                    'seed': [seed],
+                    'chi2': [result['fun']],
+                    'ansatz': [self.ansatz],
+                    'Quantum': [False]}
+        except:
+            data = {'method': [method],
+                    'function': [self.f_real.name + '_' + self.f_imag.name],
+                    'layers': [self.layers],
+                    'trial': [trial],
+                    'seed': [seed],
+                    'chi2': [result['fun']],
+                    'ansatz': [self.ansatz],
+                    'Quantum': [False]}
+
+        import pandas as pd
+        df = pd.DataFrame(data)
+        df.to_csv('summary.csv', mode='a', header=False)
+
 
 
 class Approximant_real(Approximant):
@@ -309,18 +345,22 @@ class Approximant_real(Approximant):
         self.target = self.function(self.domain)
         self.target = 2 * (self.target - np.min(self.target)) / (np.max(self.target) - np.min(self.target)) - 1
         self.H = Hamiltonian(1, matrices._Z)
-        self.classical = globals(
-        )[f"classical_real_{ansatz}"](layers, self.domain, self.target)
 
-    def name_folder(self, method):
-        folder = 'results_' + self.ansatz + '/' + method + '/' + self.function.name + '/%s_layers'%(self.layers)
+
+    def name_folder(self, quantum=True):
+        folder = self.ansatz + '/' + self.function.name + '/%s_layers'%(self.layers)
+        if quantum:
+            folder = 'quantum/' + folder
+        else:
+            folder = 'classical/' + folder
+        folder = 'results/' + folder
         import os
         try:
             trial = len(os.listdir(folder))
         except:
             trial = 0
             os.makedirs(folder)
-        fold_name = 'results_' + self.ansatz + '/' + method + '/' + self.function.name + '/%s_layers/%s'%(self.layers, trial)
+        fold_name = folder + '/%s' % (trial)
         os.makedirs(fold_name)
         return fold_name, trial
 
@@ -403,7 +443,16 @@ class Approximant_real(Approximant):
             outcomes[j] = self.H.expectation(state)
 
         axs.plot(self.domain, outcomes, color='C1',label='Quantum ' + self.ansatz + ' model')
-        axs.plot(self.domain, self.classical,
+
+        axs.legend()
+
+        fig.savefig(name)
+
+    def paint_representation_1D_classical(self, prediction, name):
+        fig, axs = plt.subplots()
+
+        axs.plot(self.domain, self.target, color='black', label='Target Function')
+        axs.plot(self.domain, prediction,
                  color='C0',label='Classical ' + self.ansatz + ' model')
         axs.legend()
 
@@ -456,40 +505,46 @@ class Approximant_real(Approximant):
         fig.savefig(name)
 
 class Approximant_complex(Approximant):
-    def __init__(self, layers, domain, ansatz, modulus, phase):
-        self.f_modulus = modulus
-        self.f_phase = phase
-        # self.function.name = lambda:self.modulus.name + '_' + self.phase.name
+    def __init__(self, layers, domain, ansatz, real, imag):
+        self.f_real = real
+        self.f_imag = imag
+        # self.function.name = lambda:self.real.name + '_' + self.imag.name
         super().__init__(layers, domain, ansatz)
-        self.modulus = self.f_modulus(self.domain)
-        self.modulus = (self.modulus - np.min(self.modulus)) / (np.max(self.modulus) - np.min(self.modulus))
+        self.real = self.f_real(self.domain)
+        self.real = 2 * (self.real - np.min(self.real)) / (np.max(self.real) - np.min(self.real)) - 1
 
-        self.phase = self.f_phase(self.domain)
-        self.phase = 2 * np.pi * (self.phase - np.min(self.phase)) / (np.max(self.phase) - np.min(self.phase))
+        self.imag = self.f_imag(self.domain)
+        self.imag = 2 * (self.imag - np.min(self.imag)) / (np.max(self.imag) - np.min(self.imag)) - 1
 
-        self.target = self.modulus * np.exp(1j * self.phase)
+        self.target = self.real + 1j * self.imag
+        self.target /= np.max(np.abs(self.target))
 
         self.H = [Hamiltonian(1, matrices._X), Hamiltonian(1, matrices._Y)]
         self.classical = globals(
         )[f"classical_complex_{ansatz}"](layers, self.domain, self.target)
 
-    def name_folder(self, method):
-        folder = 'results_' + self.ansatz + '/' + method + '/' + self.f_modulus.name + '_' + self.f_phase.name + '/%s_layers'%(self.layers)
+    def name_folder(self, quantum=True):
+        folder = self.ansatz + '/' + self.f_real.name + '_' + self.f_imag.name + '/%s_layers'%(self.layers)
+        if quantum:
+            folder = 'quantum/' + folder
+        else:
+            folder = 'classical/' + folder
+
+        folder = 'results/' + folder
         import os
         try:
             trial = len(os.listdir(folder))
         except:
             trial = 0
             os.makedirs(folder)
-        fold_name = 'results_' + self.ansatz +'/' + method + '/' + self.f_modulus.name + '_' + self.f_phase.name + '/%s_layers/%s'%(self.layers, trial)
+        fold_name = folder + '/%s'%(trial)
         os.makedirs(fold_name)
         return fold_name, trial
 
-
     def cf_one_point(self, x, f):
         state = self.get_state(x)
-        o = tf.complex(self.H[0].expectation(state), self.H[1].expectation(state))
-        cf = tf.abs(o - f) ** 2
+        o = [self.H[0].expectation(state), self.H[1].expectation(state)]
+        cf = (o[0] - np.real(f)) ** 2 + (o[1] - np.imag(f)) ** 2
         return cf
 
 
@@ -503,8 +558,6 @@ class Approximant_complex(Approximant):
             outcomes[j] = self.H[0].expectation(state)
 
         axs[0].plot(self.domain, outcomes, color='C1',label='Quantum ' + self.ansatz + ' model')
-        axs[0].plot(self.domain, np.real(self.classical),
-                 color='C0',label='Classical ' + self.ansatz + ' model')
         axs[0].set(title='Real part')
         axs[0].legend()
 
@@ -515,7 +568,22 @@ class Approximant_complex(Approximant):
             outcomes[j] = self.H[1].expectation(state)
 
         axs[1].plot(self.domain, outcomes, color='C1', label='Quantum ' + self.ansatz + ' model')
-        axs[1].plot(self.domain, np.imag(self.classical),
+        axs[1].set(title='Imag part')
+        # axs[1].legend()
+
+        fig.savefig(name)
+
+    def paint_representation_1D_classical(self, prediction, name):
+        fig, axs = plt.subplots(nrows=2, figsize=(8,10))
+
+        axs[0].plot(self.domain, np.real(self.target), color='black', label='Target Function')
+        axs[0].plot(self.domain, np.real(prediction),
+                 color='C0',label='Classical ' + self.ansatz + ' model')
+        axs[0].set(title='Real part')
+        axs[0].legend()
+
+        axs[1].plot(self.domain, np.imag(self.target), color='black', label='Target Function')
+        axs[1].plot(self.domain, np.imag(prediction),
                     color='C0', label='Classical ' + self.ansatz + ' model')
         axs[1].set(title='Imag part')
         # axs[1].legend()
@@ -569,7 +637,6 @@ class ApproximantFourier(Approximant):
         import pandas as pd
         df = pd.DataFrame(data)
         df.to_csv('summary.csv', mode='a')
-
 
 
 def adam(loss_function, derivative, init_state, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-08, T=1000,
@@ -640,6 +707,7 @@ def ansatz_Fourier(layers, qubits=1):
         circuit.add(gates.RZ(0, theta=0))
         circuit.add(gates.RY(0, theta=0))
         circuit.add(gates.RZ(0, theta=0))
+
     circuit.add(gates.RY(0, theta=0))
     circuit.add(gates.RZ(0, theta=0))
     circuit.add(gates.RY(0, theta=0))
@@ -666,25 +734,53 @@ def ansatz_Fourier(layers, qubits=1):
 
 
 def classical_real_Weighted(layers, x, y):
-    from sklearn.neural_network import MLPRegressor
-    NN = MLPRegressor((layers,), solver='lbfgs', activation='logistic')
-    NN.fit(x.reshape(-1, 1), y)
+    def NN(parameters):
+        predict = np.zeros_like(y)
+        i = 0
+        for l in range(layers):
+            predict += parameters[i] * np.cos(parameters[i + 1] * x + parameters[i + 2])
+            i += 3
 
-    return NN.predict(x.reshape(-1, 1))
+        return predict
+
+    nparams = 3 * layers
+    def loss(parameters):
+        predict = NN(parameters)
+
+        return np.mean((predict - y) ** 2)
+
+    from scipy.optimize import minimize
+    result = minimize(loss, x0=np.random.rand(nparams))
+    prediction = NN(result['x'])
+
+    return prediction, result
 
 def classical_complex_Weighted(layers, x, y):
-    from sklearn.neural_network import MLPRegressor
-    NN_r = MLPRegressor((layers,), solver='lbfgs')
-    NN_i = MLPRegressor((layers,), solver='lbfgs')
-    NN_r.fit(x.reshape(-1, 1), np.real(y))
-    NN_i.fit(x.reshape(-1, 1), np.imag(y))
+    def NN(parameters):
+        predict = np.zeros_like(y)
+        i = 0
+        for l in range(layers):
+            predict += parameters[i] * np.exp(1j * (parameters[i + 1] * x + parameters[i + 2]))
+            i += 3
 
-    return NN_r.predict(x.reshape(-1, 1)) + 1j * NN_i.predict(x.reshape(-1, 1))
+        return predict
+
+    nparams = 3 * layers
+    def loss(parameters):
+        predict = NN(parameters)
+
+        return np.mean(np.abs(predict - y) ** 2)
+
+    from scipy.optimize import minimize
+    result = minimize(loss, x0=np.random.rand(nparams))
+    prediction = NN(result['x'])
+
+    return prediction, result
 
 def classical_real_Fourier(layers, x, y):
     params = np.zeros((layers + 1, 2))
     period = np.max(x) - np.min(x)
-    params[0, 0] = 2 / period * np.trapz(y, x)
+    params[0, 0] = 1 / period * np.trapz(y, x)
     for _ in range(1, layers + 1):
         cos = np.cos(_ * 2 * np.pi / period * x)
         params[_, 0] = 2 / period * np.trapz(y * cos, x)
@@ -696,7 +792,10 @@ def classical_real_Fourier(layers, x, y):
         prediction += p[0] * np.cos(i * 2 * np.pi / period * x)
         prediction += p[1] * np.sin(i * 2 * np.pi / period * x)
 
-    return prediction
+    result = {'fun': np.mean((prediction - y)**2),
+               'x': params}
+
+    return prediction, result
 
 
 def classical_complex_Fourier(layers, x, y):
@@ -713,6 +812,7 @@ def classical_complex_Fourier(layers, x, y):
     for i, p in enumerate(params):
         prediction += p[0] * np.exp(1j * i * 2 * np.pi / period * x)
         prediction += p[1] * np.exp(-1j * i * 2 * np.pi / period * x)
-
-    return prediction
+    result = {'fun': np.mean(np.abs(prediction - y) ** 2),
+              'x': params}
+    return prediction, result
 
