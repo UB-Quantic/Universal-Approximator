@@ -15,15 +15,14 @@ def main(modulus, phase, method, ansatz):
         for seed in range(8):'''
     mod = globals()[f"{modulus}"]
     pha = globals()[f"{phase}"]
-    save=True
-
     x = np.linspace(-1, 1, 31)
     #data = np.array(x).reshape((31, 1))
-
-    C = App_c(5, x, ansatz, mod, pha)
-    print('Classical CF =', C.cost_function_classical())
-
-    C.run_optimization(method, options={'maxiter':10000}, compile=True, save=save, seed=0)
+    for layers in range(1, 7):
+        for seed in range(2):
+            C = App_c(5, x, ansatz, mod, pha)
+            print('Classical CF =', C.cost_function_classical())
+            C.run_optimization(method, options={'maxiter': 10000}, compile=True, seed=seed)
+            C.run_optimization_classical('l-bfgs-b', options={'maxiter': 10000}, seed=seed)
 #C.paint_representation_1D('lbfgsb_%s.pdf'%layers)
 
 
