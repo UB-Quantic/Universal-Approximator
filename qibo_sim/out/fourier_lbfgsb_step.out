@@ -1,0 +1,222 @@
+Classical CF = 0.18904833576108193
+      fun: 0.12416569239628146
+ hess_inv: <2x2 LbfgsInvHessProduct with dtype=float64>
+      jac: array([ 6.13398221e-07, -2.76306755e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 27
+      nit: 8
+   status: 0
+  success: True
+        x: array([ 1.57079691, -2.41046597])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569238253719
+ hess_inv: <2x2 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-4.85722573e-08, -6.30051566e-07])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 27
+      nit: 8
+   status: 0
+  success: True
+        x: array([ 1.57079627, -2.41045798])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569238825585
+ hess_inv: <2x2 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-3.66234820e-06, -1.94289029e-07])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 24
+      nit: 7
+   status: 0
+  success: True
+        x: array([ 1.57079284, -2.41045633])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569239004982
+ hess_inv: <2x2 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-3.31956684e-06,  1.26981758e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 33
+      nit: 8
+   status: 0
+  success: True
+        x: array([-1.57079948,  2.41046036])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569238230611
+ hess_inv: <2x2 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-3.88578059e-08, -5.20417043e-07])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 27
+      nit: 8
+   status: 0
+  success: True
+        x: array([ 1.57079629, -2.41045758])
+Classical CF = 0.18904833576108193
+      fun: 0.1241656923819042
+ hess_inv: <2x2 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-2.83106871e-07, -2.01227923e-07])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 33
+      nit: 7
+   status: 0
+  success: True
+        x: array([-1.5707966 ,  2.41045486])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569246374595
+ hess_inv: <2x2 LbfgsInvHessProduct with dtype=float64>
+      jac: array([2.44526621e-06, 6.50590692e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 27
+      nit: 8
+   status: 0
+  success: True
+        x: array([ 1.57079864, -2.41043127])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569240093815
+ hess_inv: <2x2 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-1.28230759e-06,  3.13082893e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 36
+      nit: 10
+   status: 0
+  success: True
+        x: array([-1.57079755,  2.41046734])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569238927982
+ hess_inv: <5x5 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-3.13776782e-06,  1.22402088e-06, -3.88578059e-08, -3.13499227e-06,
+        1.22124533e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 72
+      nit: 10
+   status: 0
+  success: True
+        x: array([ 1.42684785e+00, -1.04393713e+00, -2.55565482e-07,  1.43945482e-01,
+       -1.36651392e+00])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569240309679
+ hess_inv: <5x5 LbfgsInvHessProduct with dtype=float64>
+      jac: array([5.50115509e-06, 1.76525461e-06, 5.17641485e-07, 5.50115509e-06,
+       1.76386683e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 60
+      nit: 9
+   status: 0
+  success: True
+        x: array([2.39547916e+00, 4.75170784e-01, 4.47315804e-06, 2.31691504e+00,
+       1.93529143e+00])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569238228205
+ hess_inv: <5x5 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-9.13158438e-07,  1.67921232e-07, -9.71445147e-09,  2.72004641e-07,
+       -1.24900090e-08])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 90
+      nit: 14
+   status: 0
+  success: True
+        x: array([ 1.57079554e+00, -2.41045496e+00, -1.71896843e+00,  5.64181512e-07,
+        1.66451769e-07])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569241402083
+ hess_inv: <5x5 LbfgsInvHessProduct with dtype=float64>
+      jac: array([ 3.00870440e-06,  5.62050406e-07,  0.00000000e+00, -1.64868119e-06,
+       -2.55212518e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 78
+      nit: 11
+   status: 0
+  success: True
+        x: array([ 1.21394277e-05, -1.45883340e-05, -2.14425061e+00,  1.57080134e+00,
+       -2.41047307e+00])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569250743414
+ hess_inv: <5x5 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-6.05071548e-06,  5.64132074e-06,  3.00592884e-06,  6.05210326e-06,
+       -5.64409630e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 90
+      nit: 11
+   status: 0
+  success: True
+        x: array([ -7.44741245,   7.17142602,   3.14162493, -12.15979567,
+         4.76094925])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569241947074
+ hess_inv: <5x5 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-1.43773882e-06,  1.34336986e-06, -4.16333634e-09, -6.93750613e-06,
+        2.40640841e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 78
+      nit: 12
+   status: 0
+  success: True
+        x: array([ 1.15092387e-06,  1.00636273e-05, -1.32200366e+00,  1.57078945e+00,
+       -2.41044907e+00])
+Classical CF = 0.18904833576108193
+      fun: 0.12416569238285478
+ hess_inv: <5x5 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-9.88098492e-07,  2.31759056e-07, -3.31679129e-07,  1.00197628e-06,
+       -2.24820162e-07])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 66
+      nit: 10
+   status: 0
+  success: True
+        x: array([ 0.93920699, -1.364503  ,  3.14158971, -0.63158839,  1.04595177])
+Classical CF = 0.18904833576108193
+      fun: 0.12268904006937849
+ hess_inv: <5x5 LbfgsInvHessProduct with dtype=float64>
+      jac: array([ 4.30211422e-08, -9.15933995e-07,  9.67281810e-07,  4.26048086e-07,
+        1.07136522e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 228
+      nit: 30
+   status: 0
+  success: True
+        x: array([7.85399111, 5.26342784, 2.75535237, 9.42478752, 2.84303919])
+Classical CF = 0.10756759636323607
+      fun: 0.12416549915813412
+ hess_inv: <8x8 LbfgsInvHessProduct with dtype=float64>
+      jac: array([-3.27515792e-07, -5.62050406e-07, -1.19446120e-05,  6.99440506e-07,
+        8.02136135e-07,  1.21333499e-05, -3.15858451e-06, -1.47104551e-07])
+  message: b'CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH'
+     nfev: 90
+      nit: 8
+   status: 0
+  success: True
+        x: array([ 1.51500722, -0.26623425,  0.01482391,  0.2320802 , -0.58923599,
+       -0.01725788, -0.17626568, -1.5550655 ])
+Classical CF = 0.10756759636323607
+      fun: 0.021347951719637295
+ hess_inv: <8x8 LbfgsInvHessProduct with dtype=float64>
+      jac: array([ 1.35169653e-06, -7.51829154e-07,  1.64833425e-06, -2.77729229e-06,
+        1.76074433e-06,  1.00336406e-06, -7.22547022e-06,  9.40567069e-07])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 522
+      nit: 48
+   status: 0
+  success: True
+        x: array([ 1.57078572e+00,  2.77253552e+00,  1.37069306e+00,  3.14158632e+00,
+        5.39600535e+00, -1.03869185e+00, -3.35986328e-05, -5.45039238e+00])
+Classical CF = 0.10756759636323607
+      fun: 0.12416569295662215
+ hess_inv: <8x8 LbfgsInvHessProduct with dtype=float64>
+      jac: array([ 1.22679644e-06,  9.27036226e-06, -9.78384040e-06,  1.22957200e-06,
+        9.27036226e-06, -8.76659856e-06, -1.22263311e-06, -9.27036226e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 135
+      nit: 13
+   status: 0
+  success: True
+        x: array([ 1.72273902e+00, -3.56703205e-01,  1.84039126e-05, -1.12898992e+00,
+        1.09760684e+00, -3.14170754e+00,  2.16454426e+00, -1.66958670e+00])
+Classical CF = 0.10756759636323607
+      fun: 0.045885029944752874
+ hess_inv: <8x8 LbfgsInvHessProduct with dtype=float64>
+      jac: array([ 1.03389519e-06, -2.22183383e-06,  1.01307851e-06, -5.73152636e-07,
+        1.30798150e-06,  2.72004641e-07, -3.83026943e-07, -3.07323611e-06])
+  message: b'CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL'
+     nfev: 369
+      nit: 34
+   status: 0
+  success: True
+        x: array([-1.68505163e+00, -2.79097234e-05, -2.26776263e+00, -1.76909236e-01,
+       -5.26341798e+00, -1.73214872e+00, -5.83716949e-07, -2.63175578e+00])

@@ -1,0 +1,491 @@
+cma
+(3_w,6)-aCMA-ES (mu_w=2.0,w_1=63%) in dimension 2 (seed=611559, Fri Nov 27 12:21:14 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1      6 8.195293138932739e-01 1.0e+00 1.40e+00  1e+00  1e+00 0:00.2
+    2     12 4.296684589909216e-01 1.3e+00 1.44e+00  1e+00  1e+00 0:00.3
+    3     18 4.680117597399415e-01 1.0e+00 1.15e+00  9e-01  1e+00 0:00.5
+   23    138 3.986728392320218e-01 1.9e+00 1.64e-01  3e-02  4e-02 0:03.5
+   50    300 3.986157647215495e-01 1.7e+00 7.73e-04  6e-06  1e-05 0:07.7
+   70    420 3.986157647071271e-01 1.9e+00 9.02e-05  2e-07  3e-07 0:10.7
+termination on tolfun=1e-11 (Fri Nov 27 12:21:25 2020)
+final/bestever f-value = 3.986158e-01 3.986158e-01
+incumbent solution: [6.126732651796889e-09, 2.607564063844002]
+std deviation: [1.5836992185376584e-07, 2.582504122371191e-07]
+cma
+(3_w,6)-aCMA-ES (mu_w=2.0,w_1=63%) in dimension 2 (seed=538873, Fri Nov 27 12:21:25 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1      6 6.792029547711094e-01 1.0e+00 9.25e-01  8e-01  9e-01 0:00.2
+    2     12 4.605317028445049e-01 1.4e+00 1.04e+00  1e+00  1e+00 0:00.3
+    3     18 4.131253716349972e-01 2.1e+00 1.15e+00  1e+00  1e+00 0:00.5
+   23    138 3.986299922801612e-01 1.5e+00 9.03e-02  1e-02  2e-02 0:03.5
+   50    300 3.986157647505549e-01 2.5e+00 1.77e-03  2e-05  3e-05 0:07.6
+   71    426 3.986157647071264e-01 2.0e+00 2.90e-05  3e-08  5e-08 0:10.8
+termination on tolfun=1e-11 (Fri Nov 27 12:21:36 2020)
+final/bestever f-value = 3.986158e-01 3.986158e-01
+incumbent solution: [-3.997921965153876e-09, 2.607564011941994]
+std deviation: [2.936378670756464e-08, 5.350416973592278e-08]
+cma
+(4_w,8)-aCMA-ES (mu_w=2.6,w_1=52%) in dimension 5 (seed=593528, Fri Nov 27 12:21:36 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1      8 6.069972761176612e-01 1.0e+00 1.03e+00  9e-01  1e+00 0:00.2
+    2     16 5.914402862535219e-01 1.3e+00 1.01e+00  9e-01  1e+00 0:00.5
+    3     24 7.210139276774725e-01 1.4e+00 9.82e-01  8e-01  1e+00 0:00.7
+   16    128 9.421089511244719e-02 2.6e+00 4.89e-01  3e-01  5e-01 0:03.8
+   33    264 7.588675256124998e-02 4.0e+00 1.87e-01  7e-02  2e-01 0:07.9
+   54    432 6.625548000171040e-02 4.6e+00 3.58e-02  7e-03  2e-02 0:12.9
+   80    640 6.621292050722510e-02 5.9e+00 2.16e-03  2e-04  7e-04 0:19.2
+  100    800 6.621288707920651e-02 5.1e+00 3.29e-04  2e-05  5e-05 0:24.0
+  134   1072 6.621288672197005e-02 7.2e+00 1.03e-05  2e-07  7e-07 0:32.1
+  145   1160 6.621288672192356e-02 7.0e+00 2.75e-06  4e-08  2e-07 0:34.7
+termination on tolfun=1e-11 (Fri Nov 27 12:22:11 2020)
+final/bestever f-value = 6.621289e-02 6.621289e-02
+incumbent solution: [0.6800682914527397, -1.4999688149480888, -0.838336835176511, -0.6099527704867568, 3.8848316553837106]
+std deviation: [4.22491574851944e-08, 7.795807553965872e-08, 3.7165035344936774e-08, 5.969942874314025e-08, 1.5518964764699737e-07]
+cma
+(4_w,8)-aCMA-ES (mu_w=2.6,w_1=52%) in dimension 5 (seed=617763, Fri Nov 27 12:22:11 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1      8 4.846451718006501e-01 1.0e+00 1.03e+00  9e-01  1e+00 0:00.2
+    2     16 8.456591790719553e-01 1.4e+00 1.00e+00  9e-01  1e+00 0:00.5
+    3     24 5.806879313991259e-01 1.6e+00 9.65e-01  8e-01  1e+00 0:00.7
+   16    128 1.819518249699582e-01 2.4e+00 7.77e-01  5e-01  8e-01 0:03.8
+   33    264 7.442739629148211e-02 6.2e+00 1.36e-01  6e-02  1e-01 0:07.9
+   54    432 7.085168371042641e-02 7.1e+00 4.13e-02  7e-03  3e-02 0:13.0
+   79    632 7.082004715419393e-02 5.2e+00 4.31e-03  3e-04  1e-03 0:19.0
+  100    800 7.081983878007449e-02 6.0e+00 6.08e-04  3e-05  1e-04 0:24.0
+  134   1072 7.081983759726157e-02 4.2e+00 5.38e-05  1e-06  3e-06 0:32.2
+  153   1224 7.081983759642260e-02 4.6e+00 8.08e-06  1e-07  3e-07 0:36.8
+termination on tolfun=1e-11 (Fri Nov 27 12:22:48 2020)
+final/bestever f-value = 7.081984e-02 7.081984e-02
+incumbent solution: [2.325520813038601, 1.7335899254391716, -0.8360128686270314, 3.7882057223890104, 0.48757936326690593]
+std deviation: [1.2925645277778433e-07, 2.0524605359627055e-07, 1.0467292675482807e-07, 1.5018050070376159e-07, 3.1566423601622864e-07]
+cma
+(5_w,10)-aCMA-ES (mu_w=3.2,w_1=45%) in dimension 8 (seed=669726, Fri Nov 27 12:22:48 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1     10 1.886664929620765e-01 1.0e+00 1.00e+00  1e+00  1e+00 0:00.3
+    2     20 3.472887619483079e-01 1.3e+00 1.07e+00  1e+00  1e+00 0:00.7
+    3     30 4.496720032927241e-01 1.5e+00 1.18e+00  1e+00  1e+00 0:01.0
+   12    120 1.125296007500103e+00 2.2e+00 3.36e+00  3e+00  5e+00 0:04.1
+   24    240 1.001271170474598e+00 2.7e+00 2.26e+00  2e+00  3e+00 0:08.3
+   39    390 1.003644196477420e+00 3.5e+00 1.76e+00  1e+00  2e+00 0:13.4
+   57    570 8.812109416470623e-01 3.7e+00 1.02e+00  7e-01  1e+00 0:19.6
+   78    780 7.438252372777231e-01 4.1e+00 6.40e-01  4e-01  6e-01 0:26.9
+  100   1000 6.546496143293131e-01 5.2e+00 1.03e-01  5e-02  8e-02 0:34.5
+  127   1270 6.497414840969671e-01 1.0e+01 1.50e-01  5e-02  1e-01 0:43.8
+  156   1560 6.475983201902432e-01 1.1e+01 8.92e-02  2e-02  6e-02 0:53.8
+  188   1880 6.442378753119925e-01 1.9e+01 1.56e-01  3e-02  1e-01 1:04.8
+  200   2000 6.417418546110774e-01 1.9e+01 3.12e-01  7e-02  2e-01 1:09.0
+  238   2380 6.370017108436578e-01 1.8e+01 2.13e-01  4e-02  1e-01 1:22.1
+  279   2790 6.203046324182173e-01 1.5e+01 7.61e-01  6e-02  2e-01 1:36.2
+  300   3000 5.958960712092056e-01 1.2e+01 1.06e+00  5e-02  3e-01 1:43.4
+  347   3470 5.626900794672867e-01 1.1e+01 4.57e-01  1e-02  7e-02 1:59.6
+  397   3970 5.619188958203468e-01 1.1e+01 5.54e-02  8e-04  5e-03 2:16.8
+  400   4000 5.619173590913979e-01 1.2e+01 4.92e-02  7e-04  4e-03 2:17.9
+  456   4560 5.619166983516694e-01 1.7e+01 4.75e-04  3e-06  2e-05 2:37.1
+  492   4920 5.619166983412567e-01 1.6e+01 2.00e-05  7e-08  5e-07 2:49.5
+termination on tolfun=1e-11 (Fri Nov 27 12:25:38 2020)
+final/bestever f-value = 5.619167e-01 1.691002e-01
+incumbent solution: [5.451347567109447, 1.6215702009653727, 1.17339187555066, -8.326290140565956, 4.377187429564272, 0.22770272288796117, 6.106472025116492, -15.287660416799211]
+std deviation: [7.742939204665529e-08, 1.1897043114342589e-07, 8.12738732501539e-08, 3.410911319171159e-07, 4.77730673146509e-07, 7.331956768145753e-08, 4.0799870883217543e-07, 4.6920524204872796e-07]
+cma
+(5_w,10)-aCMA-ES (mu_w=3.2,w_1=45%) in dimension 8 (seed=505241, Fri Nov 27 12:25:39 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1     10 7.212538318970785e-01 1.0e+00 9.97e-01  1e+00  1e+00 0:00.3
+    2     20 5.323492008616588e-01 1.3e+00 1.01e+00  9e-01  1e+00 0:00.7
+    3     30 1.019648564118915e+00 1.4e+00 1.03e+00  9e-01  1e+00 0:01.0
+   12    120 1.129914836612392e+00 2.6e+00 1.22e+00  9e-01  2e+00 0:04.1
+   24    240 1.885270843196747e-01 2.8e+00 6.55e-01  4e-01  8e-01 0:08.2
+   39    390 1.149535317772464e-01 3.6e+00 3.14e-01  2e-01  3e-01 0:13.4
+   57    570 7.161523022801500e-02 5.9e+00 1.57e-01  9e-02  2e-01 0:19.6
+   78    780 6.481934133687908e-02 6.1e+00 5.35e-02  2e-02  5e-02 0:26.8
+  100   1000 6.395236668596754e-02 8.0e+00 3.65e-02  1e-02  3e-02 0:34.3
+  127   1270 6.177225278486162e-02 1.7e+01 1.42e-01  3e-02  1e-01 0:43.6
+  157   1570 4.170650753880302e-02 1.3e+01 3.55e-01  5e-02  3e-01 0:53.9
+  190   1900 3.571413381605960e-02 9.3e+00 2.22e-01  2e-02  9e-02 1:05.3
+  200   2000 3.561180424358260e-02 8.7e+00 1.08e-01  1e-02  3e-02 1:08.7
+  238   2380 3.542226608564301e-02 7.8e+00 7.96e-03  4e-04  1e-03 1:21.8
+  279   2790 3.542204755963001e-02 8.7e+00 3.61e-04  9e-06  4e-05 1:35.9
+  300   3000 3.542204730150326e-02 9.9e+00 7.65e-05  2e-06  6e-06 1:43.1
+  331   3310 3.542204729581026e-02 1.3e+01 8.33e-06  1e-07  4e-07 1:53.7
+termination on tolfun=1e-11 (Fri Nov 27 12:27:33 2020)
+final/bestever f-value = 3.542205e-02 3.542205e-02
+incumbent solution: [2.8318892420283173, 1.9490199960299257, 4.29891606655901, 0.6820545126132698, 3.3772733840123044, -5.617956863204459, 2.6545836618547374, 0.9032323400798985]
+std deviation: [1.1269210417195725e-07, 2.508644609377166e-07, 1.7681580674591272e-07, 3.2151526099234144e-07, 4.078059609884607e-07, 1.6623864343839226e-07, 3.3184090182728615e-07, 4.2657636132909277e-07]
+cma
+(5_w,11)-aCMA-ES (mu_w=3.4,w_1=42%) in dimension 11 (seed=552278, Fri Nov 27 12:27:33 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1     11 3.988355979870414e-01 1.0e+00 9.39e-01  9e-01  1e+00 0:00.4
+    2     22 6.968310664686007e-01 1.2e+00 9.48e-01  9e-01  1e+00 0:00.9
+    3     33 6.143943011261475e-01 1.2e+00 9.49e-01  9e-01  1e+00 0:01.3
+   11    121 4.359394410966065e-01 1.7e+00 9.78e-01  9e-01  1e+00 0:04.7
+   21    231 2.955974445699445e-01 2.0e+00 7.82e-01  6e-01  9e-01 0:08.9
+   33    363 1.705072508879059e-01 2.3e+00 4.78e-01  4e-01  5e-01 0:14.0
+   48    528 8.652472062857816e-02 3.1e+00 2.12e-01  2e-01  2e-01 0:20.4
+   65    715 6.683759700398531e-02 4.2e+00 9.93e-02  6e-02  1e-01 0:27.6
+   84    924 6.642243611680490e-02 7.3e+00 3.29e-02  2e-02  4e-02 0:35.6
+  100   1100 6.624648975099361e-02 1.1e+01 1.67e-02  9e-03  2e-02 0:42.4
+  124   1364 6.620519774088561e-02 2.0e+01 1.64e-02  9e-03  2e-02 0:52.6
+  150   1650 6.585869223659317e-02 4.5e+01 3.25e-02  1e-02  9e-02 1:03.7
+  179   1969 6.456063067220939e-02 5.0e+01 4.27e-02  1e-02  1e-01 1:16.0
+  200   2200 6.120200838694636e-02 4.3e+01 1.31e-01  4e-02  2e-01 1:24.9
+  233   2563 4.618351423277352e-02 2.8e+01 1.78e-01  4e-02  2e-01 1:38.9
+  269   2959 3.495669239867143e-02 1.7e+01 1.22e-01  2e-02  9e-02 1:54.2
+  300   3300 3.384619581470685e-02 1.9e+01 8.52e-02  1e-02  5e-02 2:07.3
+  341   3751 3.221357426821293e-02 3.1e+01 1.27e-01  1e-02  1e-01 2:24.7
+  384   4224 2.947392061490474e-02 3.9e+01 1.44e-01  1e-02  1e-01 2:42.9
+  400   4400 2.807157024258478e-02 3.8e+01 1.62e-01  1e-02  1e-01 2:49.7
+  448   4928 2.532363824122453e-02 3.0e+01 1.30e-01  1e-02  6e-02 3:10.1
+  498   5478 2.487479814460563e-02 2.8e+01 4.17e-02  3e-03  1e-02 3:31.3
+  500   5500 2.487518189729980e-02 2.8e+01 3.63e-02  2e-03  1e-02 3:32.2
+  555   6105 2.486287774028644e-02 2.8e+01 6.68e-03  3e-04  1e-03 3:55.5
+  600   6600 2.486277268112637e-02 3.2e+01 3.38e-04  1e-05  5e-05 4:14.6
+  658   7238 2.486277256489960e-02 3.0e+01 8.00e-06  2e-07  8e-07 4:39.2
+termination on tolfun=1e-11 (Fri Nov 27 12:32:13 2020)
+final/bestever f-value = 2.486277e-02 2.486277e-02
+incumbent solution: [-0.69192512  5.17743753 -0.62896014 -3.0042092  -4.69961758  1.86805496
+ -2.19676019 -3.36295997 ...]
+std deviations: [2.11954710e-07 6.36276112e-07 1.75540215e-07 2.59289613e-07
+ 4.74824173e-07 3.42017975e-07 6.44955589e-07 7.72232078e-07 ...]
+cma
+(5_w,11)-aCMA-ES (mu_w=3.4,w_1=42%) in dimension 11 (seed=589822, Fri Nov 27 12:32:13 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1     11 6.884979148333885e-01 1.0e+00 9.65e-01  9e-01  1e+00 0:00.4
+    2     22 2.717607336857361e-01 1.2e+00 9.25e-01  9e-01  1e+00 0:00.8
+    3     33 1.171933593867502e+00 1.3e+00 8.77e-01  8e-01  9e-01 0:01.3
+   11    121 2.591774541175481e-01 1.8e+00 8.46e-01  7e-01  1e+00 0:04.7
+   21    231 2.611799482998247e-01 2.0e+00 5.67e-01  5e-01  6e-01 0:08.9
+   33    363 1.494049131779752e-01 2.4e+00 3.56e-01  3e-01  4e-01 0:14.0
+   48    528 1.091437832564869e-01 3.1e+00 2.38e-01  2e-01  3e-01 0:20.4
+   65    715 4.869241397764612e-02 3.9e+00 1.35e-01  9e-02  2e-01 0:27.6
+   84    924 4.379745744693785e-02 4.9e+00 4.74e-02  3e-02  5e-02 0:35.7
+  100   1100 4.330979422640160e-02 6.2e+00 2.62e-02  1e-02  3e-02 0:42.4
+  124   1364 4.228683519863106e-02 1.3e+01 3.88e-02  2e-02  5e-02 0:52.6
+  150   1650 4.064906569468048e-02 1.7e+01 4.49e-02  2e-02  8e-02 1:03.7
+  179   1969 3.958164063480545e-02 1.7e+01 3.46e-02  1e-02  6e-02 1:16.0
+  200   2200 3.769519277609858e-02 1.8e+01 5.06e-02  1e-02  7e-02 1:24.9
+  233   2563 2.923063435610021e-02 1.9e+01 1.15e-01  3e-02  1e-01 1:38.9
+  269   2959 2.586065588680534e-02 1.8e+01 4.38e-02  7e-03  5e-02 1:54.2
+  300   3300 2.517496430222417e-02 1.9e+01 5.72e-02  6e-03  5e-02 2:07.3
+  341   3751 2.460117694160214e-02 2.1e+01 6.20e-02  5e-03  5e-02 2:24.7
+  384   4224 2.424529184426153e-02 2.3e+01 3.41e-02  2e-03  2e-02 2:43.0
+  400   4400 2.420520050528631e-02 2.0e+01 4.78e-02  3e-03  3e-02 2:49.8
+  448   4928 2.400384145874897e-02 3.1e+01 5.84e-02  3e-03  3e-02 3:10.1
+  498   5478 2.308827126904350e-02 2.5e+01 7.38e-02  3e-03  3e-02 3:31.4
+  500   5500 2.307310168732451e-02 2.4e+01 6.44e-02  3e-03  2e-02 3:32.2
+  555   6105 2.304807000629369e-02 2.1e+01 4.66e-03  2e-04  1e-03 3:55.6
+  600   6600 2.304800755754718e-02 2.0e+01 2.87e-04  7e-06  4e-05 4:14.7
+  659   7249 2.304800749851540e-02 2.2e+01 7.70e-06  1e-07  7e-07 4:39.7
+termination on tolfun=1e-11 (Fri Nov 27 12:36:53 2020)
+final/bestever f-value = 2.304801e-02 2.304801e-02
+incumbent solution: [ 0.82341512 -1.79914345  0.86114339  1.20605648  3.96627851 -1.97934269
+  2.43616894 -5.00080527 ...]
+std deviations: [2.12261862e-07 4.37240019e-07 2.05622839e-07 2.49153414e-07
+ 4.68732917e-07 2.18282567e-07 4.39459120e-07 6.62907005e-07 ...]
+cma
+(5_w,11)-aCMA-ES (mu_w=3.4,w_1=42%) in dimension 14 (seed=496760, Fri Nov 27 12:36:54 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1     11 6.234891324608075e-01 1.0e+00 9.59e-01  9e-01  1e+00 0:00.5
+    2     22 7.325018046527174e-01 1.2e+00 9.06e-01  9e-01  9e-01 0:00.9
+    3     33 8.701585320294960e-01 1.2e+00 9.12e-01  9e-01  9e-01 0:01.4
+   10    110 7.227298168053594e-01 1.5e+00 9.84e-01  9e-01  1e+00 0:04.7
+   19    209 5.016889946632465e-01 1.8e+00 1.29e+00  1e+00  1e+00 0:08.9
+   30    330 9.354200990053215e-01 2.2e+00 2.22e+00  2e+00  3e+00 0:14.1
+   43    473 7.786965585915718e-01 2.4e+00 1.55e+00  1e+00  2e+00 0:20.3
+   58    638 7.530256300164981e-01 3.0e+00 2.06e+00  2e+00  3e+00 0:27.3
+   75    825 6.162927054392613e-01 3.1e+00 1.97e+00  2e+00  3e+00 0:35.3
+   95   1045 1.028550017496454e+00 3.2e+00 2.85e+00  2e+00  4e+00 0:44.8
+  100   1100 8.225958358849472e-01 3.4e+00 2.23e+00  2e+00  3e+00 0:47.1
+  124   1364 1.141148533704984e+00 3.6e+00 1.86e+00  1e+00  2e+00 0:58.4
+  150   1650 9.076499726752181e-01 4.5e+00 1.99e+00  1e+00  3e+00 1:10.7
+  178   1958 8.563126278842537e-01 5.7e+00 2.46e+00  1e+00  3e+00 1:24.0
+  200   2200 6.422361041161210e-01 6.7e+00 1.42e+00  8e-01  2e+00 1:34.3
+  232   2552 1.230200038817251e+00 6.2e+00 1.61e+00  9e-01  2e+00 1:49.4
+  266   2926 8.970797457339589e-01 7.8e+00 1.80e+00  9e-01  3e+00 2:05.5
+  300   3300 1.255752619521526e+00 8.6e+00 3.74e+00  2e+00  5e+00 2:21.5
+  339   3729 1.223577644330186e+00 1.1e+01 7.24e+00  4e+00  1e+01 2:39.9
+  380   4180 1.232882091297704e+00 1.6e+01 3.30e+00  2e+00  5e+00 2:59.2
+  400   4400 1.305912973864848e+00 1.8e+01 4.02e+00  2e+00  6e+00 3:08.6
+  445   4895 1.194457478494182e+00 1.8e+01 3.79e+00  2e+00  5e+00 3:29.8
+  492   5412 1.167520807798209e+00 2.6e+01 6.69e+00  4e+00  1e+01 3:52.0
+  500   5500 9.079201564160762e-01 2.8e+01 7.63e+00  4e+00  1e+01 3:55.7
+  551   6061 1.142988427950044e+00 3.3e+01 7.18e+00  4e+00  1e+01 4:19.8
+  575   6325 1.236909878667030e+00 3.4e+01 4.16e+00  2e+00  6e+00 4:31.1
+termination on tolstagnation=576 (Fri Nov 27 12:41:25 2020)
+final/bestever f-value = 1.380940e+00 3.504755e-01
+incumbent solution: [ -52.1471707    -7.03280951  -41.32337801    3.11709949 -118.98883333
+  -22.09522039   -8.60864402    5.60943088 ...]
+std deviations: [2.62022927 2.9443443  6.41101437 3.48201995 5.51980704 2.77824355
+ 3.5399125  3.77431917 ...]
+cma
+(5_w,11)-aCMA-ES (mu_w=3.4,w_1=42%) in dimension 14 (seed=590214, Fri Nov 27 12:41:25 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1     11 6.873537674231094e-01 1.0e+00 9.40e-01  9e-01  1e+00 0:00.5
+    2     22 6.923002002224286e-01 1.1e+00 8.78e-01  9e-01  9e-01 0:00.9
+    3     33 7.075953462318519e-01 1.2e+00 8.69e-01  8e-01  9e-01 0:01.4
+   10    110 4.968032962470706e-01 1.5e+00 7.54e-01  7e-01  8e-01 0:04.7
+   19    209 2.510216747956936e-01 1.8e+00 6.39e-01  5e-01  7e-01 0:09.0
+   30    330 2.557837625164406e-01 2.5e+00 6.99e-01  6e-01  9e-01 0:14.1
+   43    473 2.144305321358467e-01 2.5e+00 5.84e-01  4e-01  7e-01 0:20.3
+   58    638 4.035552292275664e-01 2.8e+00 4.81e-01  3e-01  6e-01 0:27.3
+   75    825 1.137155614375206e-01 3.1e+00 3.04e-01  2e-01  4e-01 0:35.4
+   95   1045 5.810976483536843e-02 3.2e+00 1.77e-01  1e-01  2e-01 0:44.8
+  100   1100 5.339805822432148e-02 3.5e+00 1.40e-01  9e-02  1e-01 0:47.1
+  124   1364 4.973488596663343e-02 4.5e+00 9.10e-02  5e-02  1e-01 0:58.4
+  150   1650 4.504640603723666e-02 6.6e+00 1.03e-01  5e-02  1e-01 1:10.7
+  178   1958 4.129950033695905e-02 7.5e+00 7.39e-02  4e-02  8e-02 1:23.9
+  200   2200 3.892646901514655e-02 1.1e+01 3.76e-02  2e-02  4e-02 1:34.3
+  232   2552 3.513350141180167e-02 1.6e+01 5.58e-02  3e-02  7e-02 1:49.4
+  266   2926 3.342585297779261e-02 1.7e+01 2.22e-02  9e-03  3e-02 2:05.4
+  300   3300 3.320638243214678e-02 1.8e+01 2.12e-02  9e-03  2e-02 2:21.4
+  339   3729 3.276298205351431e-02 2.6e+01 3.15e-02  2e-02  4e-02 2:39.8
+  380   4180 2.863560730631799e-02 5.5e+01 6.69e-02  2e-02  1e-01 2:59.1
+  400   4400 2.453409357144096e-02 5.2e+01 6.39e-02  2e-02  1e-01 3:08.6
+  445   4895 2.245993710739314e-02 2.9e+01 3.61e-02  8e-03  4e-02 3:29.8
+  492   5412 2.180472330643084e-02 3.3e+01 4.24e-02  7e-03  5e-02 3:51.9
+  500   5500 2.167440050385818e-02 3.5e+01 3.10e-02  5e-03  4e-02 3:55.7
+  551   6061 2.026141509782215e-02 4.2e+01 7.50e-02  1e-02  8e-02 4:19.8
+  600   6600 1.712755123460527e-02 3.4e+01 1.19e-01  1e-02  9e-02 4:42.9
+  656   7216 1.610990385697372e-02 2.9e+01 6.05e-02  6e-03  3e-02 5:09.3
+  700   7700 1.583555157319409e-02 3.3e+01 3.05e-02  2e-03  2e-02 5:30.0
+  760   8360 1.563881524650914e-02 5.9e+01 6.22e-02  4e-03  5e-02 5:58.3
+  800   8800 1.549982727386713e-02 5.1e+01 4.81e-02  2e-03  3e-02 6:17.2
+  864   9504 1.540168332209432e-02 5.5e+01 4.37e-02  2e-03  2e-02 6:47.4
+  900   9900 1.534941890245439e-02 6.4e+01 6.04e-02  2e-03  3e-02 7:04.3
+  968  10648 1.529387348456285e-02 8.7e+01 3.31e-02  1e-03  2e-02 7:36.4
+ 1000  11000 1.528393821203188e-02 8.0e+01 2.15e-02  8e-04  1e-02 7:51.5
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+ 1073  11803 1.527149598776223e-02 9.7e+01 1.10e-02  3e-04  5e-03 8:25.9
+ 1100  12100 1.527084562173771e-02 1.1e+02 9.78e-03  3e-04  4e-03 8:38.6
+ 1177  12947 1.527068681637860e-02 1.5e+02 1.36e-03  3e-05  6e-04 9:14.9
+ 1200  13200 1.527068205664552e-02 1.6e+02 1.73e-03  3e-05  7e-04 9:25.8
+ 1281  14091 1.526994742092133e-02 1.7e+02 1.74e-02  2e-04  5e-03 10:04.0
+ 1300  14300 1.526969957232584e-02 1.5e+02 1.80e-02  2e-04  4e-03 10:12.9
+ 1385  15235 1.526604296109640e-02 1.4e+02 3.49e-02  3e-04  7e-03 10:53.0
+ 1400  15400 1.526509319616198e-02 1.6e+02 4.64e-02  4e-04  9e-03 11:00.1
+ 1490  16390 1.525172358747785e-02 1.3e+02 8.55e-02  5e-04  9e-03 11:42.5
+ 1500  16500 1.525029722337934e-02 1.2e+02 6.40e-02  4e-04  6e-03 11:47.2
+ 1594  17534 1.515773049883620e-02 8.3e+01 2.94e-01  2e-03  2e-02 12:31.6
+ 1600  17600 1.515280578100358e-02 8.0e+01 3.74e-01  2e-03  2e-02 12:34.4
+ 1697  18667 1.469888535618984e-02 9.3e+01 6.82e-01  3e-03  4e-02 13:20.5
+ 1700  18700 1.468291798846526e-02 9.4e+01 6.91e-01  3e-03  4e-02 13:21.9
+ 1800  19800 1.356005966443651e-02 7.7e+01 2.72e+00  1e-02  1e-01 14:09.0
+ 1900  20900 1.204365849709522e-02 5.1e+01 1.96e+00  6e-03  5e-02 14:56.2
+ 2000  22000 1.142078533632608e-02 3.9e+01 9.32e-01  2e-03  1e-02 15:43.3
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+ 2100  23100 1.141297298941085e-02 4.6e+01 3.33e-03  6e-06  3e-05 16:30.5
+ 2156  23716 1.141297295493921e-02 4.4e+01 1.23e-04  2e-07  9e-07 16:56.9
+termination on tolfun=1e-11 (Fri Nov 27 12:58:25 2020)
+final/bestever f-value = 1.141297e-02 1.141297e-02
+incumbent solution: [ 2.85361746 -5.45055397  2.71874335 -0.68887048 -4.46118984 -0.67967392
+  9.29556876 -6.36469783 ...]
+std deviations: [3.43780354e-07 7.16669149e-07 1.79901045e-07 5.10740347e-07
+ 8.69920822e-07 2.77391715e-07 3.37614774e-07 5.52861947e-07 ...]
+cma
+(6_w,12)-aCMA-ES (mu_w=3.7,w_1=40%) in dimension 17 (seed=553209, Fri Nov 27 12:58:25 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1     12 2.578766048293832e-01 1.0e+00 9.39e-01  9e-01  1e+00 0:00.6
+    2     24 2.767215857724288e-01 1.1e+00 8.95e-01  9e-01  9e-01 0:01.1
+    3     36 2.540500420962353e-01 1.1e+00 8.64e-01  8e-01  9e-01 0:01.7
+    9    108 3.921871938485330e-01 1.3e+00 7.94e-01  8e-01  8e-01 0:05.1
+   17    204 4.026283620645169e-01 1.4e+00 5.47e-01  5e-01  6e-01 0:09.6
+   26    312 2.999401357449791e-01 1.6e+00 4.24e-01  4e-01  5e-01 0:14.7
+   37    444 1.135669141175989e-01 1.6e+00 3.22e-01  3e-01  3e-01 0:21.0
+   50    600 1.232347348419879e-01 1.9e+00 2.60e-01  2e-01  3e-01 0:28.3
+   65    780 9.176604779129577e-02 2.3e+00 2.25e-01  2e-01  2e-01 0:36.8
+   81    972 8.385183680861885e-02 2.6e+00 1.53e-01  1e-01  1e-01 0:45.9
+   99   1188 5.502532812500926e-02 2.8e+00 8.73e-02  7e-02  9e-02 0:56.1
+  100   1200 5.643395634333932e-02 2.8e+00 8.70e-02  7e-02  9e-02 0:56.7
+  122   1464 5.356854090784777e-02 4.1e+00 4.20e-02  3e-02  4e-02 1:09.1
+  145   1740 5.203443689052244e-02 5.9e+00 2.49e-02  2e-02  2e-02 1:22.2
+  170   2040 4.962769204215069e-02 1.1e+01 4.56e-02  3e-02  7e-02 1:36.4
+  197   2364 4.486469240213761e-02 1.4e+01 4.41e-02  3e-02  8e-02 1:51.7
+  200   2400 4.296879818127864e-02 1.4e+01 4.86e-02  3e-02  9e-02 1:53.4
+  230   2760 3.898838394906135e-02 1.7e+01 3.37e-02  2e-02  6e-02 2:10.4
+  262   3144 3.849672627109423e-02 1.6e+01 2.48e-02  1e-02  4e-02 2:28.5
+  296   3552 3.661391541641550e-02 1.7e+01 4.37e-02  2e-02  7e-02 2:47.7
+  300   3600 3.620531451804997e-02 1.7e+01 4.31e-02  2e-02  6e-02 2:50.0
+  338   4056 3.401157282775164e-02 1.8e+01 5.14e-02  2e-02  8e-02 3:11.5
+  377   4524 2.854180557676801e-02 2.7e+01 4.29e-02  2e-02  8e-02 3:33.6
+  400   4800 2.625964837039007e-02 2.5e+01 4.02e-02  2e-02  7e-02 3:46.6
+  443   5316 1.823653772231963e-02 2.2e+01 6.93e-02  3e-02  1e-01 4:11.0
+  488   5856 1.617451885904591e-02 2.0e+01 4.53e-02  1e-02  6e-02 4:36.5
+  500   6000 1.550121398831956e-02 2.0e+01 4.16e-02  1e-02  5e-02 4:43.3
+  548   6576 1.284318360525104e-02 2.4e+01 4.79e-02  1e-02  6e-02 5:10.5
+  598   7176 1.143265576607961e-02 2.0e+01 2.33e-02  7e-03  3e-02 5:38.8
+  600   7200 1.140012845127590e-02 2.0e+01 2.07e-02  6e-03  2e-02 5:40.0
+  653   7836 1.109716820658416e-02 1.7e+01 1.63e-02  4e-03  1e-02 6:10.0
+  700   8400 1.074933922484262e-02 2.2e+01 3.91e-02  1e-02  4e-02 6:36.7
+  757   9084 1.013785100117723e-02 3.0e+01 3.08e-02  8e-03  3e-02 7:08.9
+  800   9600 9.735387279637638e-03 3.1e+01 2.99e-02  6e-03  2e-02 7:33.3
+  861  10332 8.683385750668628e-03 3.6e+01 4.02e-02  6e-03  4e-02 8:07.9
+  900  10800 8.325570502758360e-03 4.3e+01 5.24e-02  7e-03  5e-02 8:30.0
+  964  11568 8.033138179797228e-03 4.0e+01 3.46e-02  4e-03  3e-02 9:06.3
+ 1000  12000 7.917919104299908e-03 4.0e+01 3.34e-02  4e-03  2e-02 9:26.7
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+ 1068  12816 7.869681212278932e-03 5.3e+01 1.31e-02  2e-03  9e-03 10:05.2
+ 1100  13200 7.849710329827082e-03 6.9e+01 2.54e-02  3e-03  2e-02 10:23.3
+ 1171  14052 7.826187922065927e-03 6.9e+01 2.15e-02  2e-03  1e-02 11:03.5
+ 1200  14400 7.816487681359497e-03 7.0e+01 3.73e-02  3e-03  2e-02 11:20.0
+ 1275  15300 7.771065034936899e-03 8.8e+01 3.17e-02  3e-03  2e-02 12:02.5
+ 1300  15600 7.755632035049560e-03 9.8e+01 3.11e-02  2e-03  2e-02 12:16.6
+ 1378  16536 7.666040066311709e-03 1.1e+02 3.99e-02  2e-03  2e-02 13:00.8
+ 1400  16800 7.653902085557340e-03 8.3e+01 3.53e-02  2e-03  2e-02 13:13.3
+ 1482  17784 7.614414780021000e-03 6.3e+01 3.76e-02  2e-03  1e-02 13:59.7
+ 1500  18000 7.609369761449733e-03 6.3e+01 4.16e-02  2e-03  1e-02 14:09.9
+ 1585  19020 7.598363505578607e-03 7.4e+01 9.72e-03  3e-04  3e-03 14:58.1
+ 1600  19200 7.598241791783993e-03 7.9e+01 6.42e-03  2e-04  2e-03 15:06.6
+ 1689  20268 7.598148376613293e-03 9.7e+01 2.88e-04  8e-06  6e-05 15:57.0
+ 1700  20400 7.598148359077632e-03 9.6e+01 1.53e-04  4e-06  3e-05 16:03.2
+ 1753  21036 7.598148347597635e-03 9.1e+01 9.87e-06  2e-07  2e-06 16:33.3
+termination on tolfun=1e-11 (Fri Nov 27 13:15:00 2020)
+final/bestever f-value = 7.598148e-03 7.598148e-03
+incumbent solution: [-0.42816983 -4.30890059 -1.11521177  2.45027741  2.59841264 -1.55849251
+  1.32617029 -6.72613717 ...]
+std deviations: [3.97852487e-07 7.92852402e-07 3.11439461e-07 2.29840803e-07
+ 6.56950408e-07 3.66785986e-07 7.56377657e-07 1.43059637e-06 ...]
+cma
+(6_w,12)-aCMA-ES (mu_w=3.7,w_1=40%) in dimension 17 (seed=612413, Fri Nov 27 13:15:00 2020)
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+    1     12 4.902500007847456e-01 1.0e+00 9.15e-01  9e-01  9e-01 0:00.6
+    2     24 6.366723429946488e-01 1.1e+00 8.89e-01  9e-01  9e-01 0:01.1
+    3     36 8.613662699813421e-01 1.2e+00 8.49e-01  8e-01  9e-01 0:01.7
+    9    108 7.893539376568398e-01 1.4e+00 8.71e-01  8e-01  9e-01 0:05.1
+   17    204 2.491800074128701e-01 1.6e+00 6.18e-01  6e-01  7e-01 0:09.6
+   26    312 2.164458890019361e-01 1.6e+00 3.44e-01  3e-01  4e-01 0:14.7
+   37    444 9.103158750127543e-02 1.8e+00 2.98e-01  3e-01  3e-01 0:20.9
+   50    600 8.476177564252503e-02 2.2e+00 1.79e-01  1e-01  2e-01 0:28.3
+   65    780 7.431253704168575e-02 2.6e+00 1.23e-01  9e-02  1e-01 0:36.8
+   81    972 5.839109196663959e-02 3.0e+00 9.50e-02  7e-02  1e-01 0:45.8
+   99   1188 5.241240320037400e-02 3.7e+00 5.64e-02  4e-02  6e-02 0:56.0
+  100   1200 5.061160390976762e-02 3.6e+00 5.44e-02  4e-02  6e-02 0:56.6
+  122   1464 4.662402698012885e-02 4.7e+00 2.89e-02  2e-02  3e-02 1:09.1
+  145   1740 3.967779683475279e-02 8.3e+00 5.56e-02  4e-02  7e-02 1:22.1
+  170   2040 3.416337377769608e-02 1.0e+01 4.48e-02  3e-02  6e-02 1:36.2
+  197   2364 2.964825280895337e-02 1.0e+01 5.29e-02  3e-02  7e-02 1:51.5
+  200   2400 2.922828288129267e-02 1.1e+01 4.77e-02  3e-02  6e-02 1:53.2
+  230   2760 2.678627555821598e-02 1.0e+01 4.19e-02  3e-02  5e-02 2:10.2
+  262   3144 2.520287576793288e-02 1.4e+01 3.19e-02  2e-02  4e-02 2:28.4
+  296   3552 2.451710277088772e-02 1.6e+01 2.50e-02  1e-02  3e-02 2:47.6
+  300   3600 2.435263265432060e-02 1.6e+01 2.40e-02  1e-02  3e-02 2:49.9
+  338   4056 2.389412870893553e-02 2.1e+01 1.96e-02  7e-03  3e-02 3:11.4
+  377   4524 2.324983176169992e-02 2.4e+01 2.54e-02  8e-03  4e-02 3:33.5
+  400   4800 2.271576675079331e-02 3.9e+01 3.01e-02  9e-03  6e-02 3:46.5
+  443   5316 2.151662501076061e-02 4.5e+01 4.55e-02  1e-02  9e-02 4:10.9
+  488   5856 1.993672756412480e-02 3.7e+01 3.21e-02  8e-03  5e-02 4:36.4
+  500   6000 1.960056148366750e-02 3.9e+01 3.11e-02  8e-03  4e-02 4:43.2
+  548   6576 1.715829077657904e-02 4.0e+01 2.78e-02  6e-03  3e-02 5:10.4
+  598   7176 1.526981904712808e-02 3.9e+01 3.84e-02  9e-03  4e-02 5:38.7
+  600   7200 1.515026042871538e-02 3.8e+01 3.53e-02  8e-03  4e-02 5:39.9
+  653   7836 1.426084567255287e-02 3.6e+01 3.21e-02  7e-03  4e-02 6:09.9
+  700   8400 1.356813247014279e-02 4.2e+01 2.35e-02  4e-03  3e-02 6:36.5
+  757   9084 1.268266190582777e-02 5.0e+01 4.85e-02  8e-03  6e-02 7:08.8
+  800   9600 1.164558781059181e-02 5.2e+01 6.94e-02  1e-02  9e-02 7:33.2
+  860  10320 9.527829519015776e-03 5.5e+01 4.66e-02  5e-03  6e-02 8:07.2
+  900  10800 9.250193431499796e-03 4.7e+01 3.35e-02  3e-03  3e-02 8:29.9
+  964  11568 8.396517980347160e-03 4.1e+01 9.29e-02  9e-03  7e-02 9:06.1
+ 1000  12000 7.840101661869074e-03 3.9e+01 7.75e-02  7e-03  5e-02 9:26.5
+Iterat #Fevals   function value  axis ratio  sigma  min&max std  t[m:s]
+ 1068  12816 7.107779895601867e-03 4.2e+01 6.90e-02  5e-03  4e-02 10:05.0
+ 1100  13200 6.731740597168385e-03 4.3e+01 8.83e-02  5e-03  6e-02 10:23.1
+ 1171  14052 6.231544431176728e-03 4.4e+01 2.97e-02  1e-03  2e-02 11:03.4
+ 1200  14400 6.159923083010606e-03 3.8e+01 4.50e-02  2e-03  2e-02 11:19.8
+ 1275  15300 5.848602051353247e-03 4.9e+01 1.20e-01  5e-03  7e-02 12:02.3
+ 1300  15600 5.630732373945939e-03 6.9e+01 1.23e-01  4e-03  9e-02 12:16.5
+ 1378  16536 4.749234523223901e-03 1.2e+02 1.45e-01  5e-03  1e-01 13:00.7
+ 1400  16800 4.422737780173503e-03 1.2e+02 1.12e-01  3e-03  1e-01 13:13.2
+ 1482  17784 4.171196557214218e-03 6.4e+01 5.21e-02  1e-03  2e-02 13:59.7
+ 1500  18000 4.152369890115835e-03 5.8e+01 7.49e-02  2e-03  3e-02 14:09.9
+ 1585  19020 4.008584653215273e-03 4.7e+01 5.14e-02  1e-03  1e-02 14:58.0
+ 1600  19200 3.993647616315993e-03 5.0e+01 5.96e-02  1e-03  1e-02 15:06.5
+ 1689  20268 3.877999952853496e-03 6.3e+01 7.26e-02  1e-03  2e-02 15:57.0
+ 1700  20400 3.868847556165461e-03 6.5e+01 6.07e-02  9e-04  2e-02 16:03.2
+ 1792  21504 3.834571019963584e-03 7.7e+01 1.39e-02  2e-04  3e-03 16:55.4
+ 1800  21600 3.834555351473349e-03 8.0e+01 1.13e-02  1e-04  3e-03 16:59.9
+ 1896  22752 3.834483055316551e-03 7.9e+01 1.10e-04  1e-06  2e-05 17:54.3
+ 1900  22800 3.834483053258248e-03 7.8e+01 8.95e-05  8e-07  2e-05 17:56.6
+ 1941  23292 3.834483050574471e-03 9.3e+01 1.06e-05  8e-08  2e-06 18:19.8
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:552: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+  fig, axs = plt.subplots(nrows=2, figsize=(8,10))
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:577: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+  fig, axs = plt.subplots(nrows=2, figsize=(8,10))
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:552: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+  fig, axs = plt.subplots(nrows=2, figsize=(8,10))
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:783: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[0, 0] = 1 / period * np.trapz(y, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:786: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 0] = 2 / period * np.trapz(y * cos, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:788: ComplexWarning: Casting complex values to real discards the imaginary part
+  params[_, 1] = 2 / period * np.trapz(y * sin, x)
+/home/adrianps/Universal-Approximator/qibo_sim/classes/ApproximantNN.py:577: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+  fig, axs = plt.subplots(nrows=2, figsize=(8,10))
+termination on tolfun=1e-11 (Fri Nov 27 13:33:22 2020)
+final/bestever f-value = 3.834483e-03 3.834483e-03
+incumbent solution: [-0.08570524 -8.74293297  0.58588512  6.41459293 11.55243673 -1.52203807
+  3.1408814  -5.86461542 ...]
+std deviations: [2.35319892e-07 8.60853526e-07 1.30222493e-07 2.52945406e-07
+ 9.52073872e-07 1.85437139e-07 1.46030128e-07 4.96558133e-07 ...]
