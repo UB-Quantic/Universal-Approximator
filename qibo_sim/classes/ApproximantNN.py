@@ -544,7 +544,7 @@ class Approximant_complex(Approximant):
     def cf_one_point(self, x, f):
         state = self.get_state(x)
         o = [self.H[0].expectation(state), self.H[1].expectation(state)]
-        cf = (o[0] - np.real(f)) ** 2 + (o[1] - np.imag(f)) ** 2
+        cf = np.abs(o[0] - np.real(f)) ** 2 + np.abs(o[1] - np.imag(f)) ** 2
         return cf
 
 
