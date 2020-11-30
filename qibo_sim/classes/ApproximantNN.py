@@ -14,11 +14,11 @@ class Approximant:
         self.nqubits = 1
         self.layers = layers
         self.domain = domain
-        self.params = np.random.randn(layers * 3 - 1)
-        self.cir_params = np.zeros(layers * 2 - 1)
+
         self.ansatz = ansatz
         self.circuit, self.rotation, self.nparams = globals(
         )[f"ansatz_{ansatz}"](layers)
+        self.params = np.random.randn(self.nparams)
         self.save=False
 
     def set_parameters(self, new_params):
@@ -305,7 +305,6 @@ class Approximant:
         np.random.seed(seed)
         folder, trial = self.name_folder(quantum=False)
         prediction, result = self.classical(self.layers, self.domain, self.target)
-        print(prediction)
         import pickle
         with open(folder + '/result.pkl', 'wb') as f:
             pickle.dump(result, f, pickle.HIGHEST_PROTOCOL)
@@ -449,6 +448,7 @@ class Approximant_real(Approximant):
         axs.legend()
 
         fig.savefig(name)
+        plt.close(fig)
 
     def paint_representation_1D_classical(self, prediction, name):
         fig, axs = plt.subplots()
@@ -459,6 +459,7 @@ class Approximant_real(Approximant):
         axs.legend()
 
         fig.savefig(name)
+        plt.close(fig)
 
     def paint_representation_2D(self):
         from mpl_toolkits.mplot3d import Axes3D
@@ -705,6 +706,7 @@ def ansatz_Fourier(layers, qubits=1):
         circuit.add(gates.RZ(0, theta=0))
         circuit.add(gates.RY(0, theta=0))
         circuit.add(gates.RZ(0, theta=0))
+
 
     def rotation(theta, x):
         p = circuit.get_parameters()
