@@ -304,7 +304,8 @@ class Approximant:
     def run_optimization_classical(self, method, options, seed=0):
         np.random.seed(seed)
         folder, trial = self.name_folder(quantum=False)
-        prediction, result = globals()[f"classical_real_{self.ansatz}"](self.layers, self.domain, self.target)
+        prediction, result = self.classical(self.layers, self.domain, self.target)
+        print(prediction)
         import pickle
         with open(folder + '/result.pkl', 'wb') as f:
             pickle.dump(result, f, pickle.HIGHEST_PROTOCOL)
@@ -345,6 +346,7 @@ class Approximant_real(Approximant):
         self.target = self.function(self.domain)
         self.target = 2 * (self.target - np.min(self.target)) / (np.max(self.target) - np.min(self.target)) - 1
         self.H = Hamiltonian(1, matrices._Z)
+        self.classical = globals()[f"classical_real_{self.ansatz}"]
 
 
     def name_folder(self, quantum=True):
@@ -520,8 +522,7 @@ class Approximant_complex(Approximant):
         self.target /= np.max(np.abs(self.target))
 
         self.H = [Hamiltonian(1, matrices._X), Hamiltonian(1, matrices._Y)]
-        self.classical = globals(
-        )[f"classical_complex_{ansatz}"](layers, self.domain, self.target)
+        self.classical = globals()[f"classical_complex_{self.ansatz}"]
 
     def name_folder(self, quantum=True):
         folder = self.ansatz + '/' + self.f_real.name + '_' + self.f_imag.name + '/%s_layers'%(self.layers)
@@ -544,7 +545,7 @@ class Approximant_complex(Approximant):
     def cf_one_point(self, x, f):
         state = self.get_state(x)
         o = [self.H[0].expectation(state), self.H[1].expectation(state)]
-        cf = np.abs(o[0] - np.real(f)) ** 2 + np.abs(o[1] - np.imag(f)) ** 2
+        cf = (o[0] - np.real(f)) ** 2 + (o[1] - np.imag(f)) ** 2
         return cf
 
 
@@ -734,7 +735,7 @@ def ansatz_Fourier(layers, qubits=1):
 
 
 def classical_real_Weighted(layers, x, y):
-    def NN(parameters):
+    def NN_real(parameters):
         predict = np.zeros_like(y)
         i = 0
         for l in range(layers):
@@ -745,19 +746,19 @@ def classical_real_Weighted(layers, x, y):
 
     nparams = 3 * layers
     def loss(parameters):
-        predict = NN(parameters)
+        predict = NN_real(parameters)
 
         return np.mean((predict - y) ** 2)
 
     from scipy.optimize import minimize
     result = minimize(loss, x0=np.random.rand(nparams))
-    prediction = NN(result['x'])
+    prediction = NN_real(result['x'])
 
     return prediction, result
 
 def classical_complex_Weighted(layers, x, y):
-    def NN(parameters):
-        predict = np.zeros_like(y)
+    def NN_complex(parameters):
+        predict = np.zeros(y.shape, dtype=complex)
         i = 0
         for l in range(layers):
             predict += parameters[i] * np.exp(1j * (parameters[i + 1] * x + parameters[i + 2]))
@@ -767,13 +768,13 @@ def classical_complex_Weighted(layers, x, y):
 
     nparams = 3 * layers
     def loss(parameters):
-        predict = NN(parameters)
+        predict = NN_complex(parameters)
 
         return np.mean(np.abs(predict - y) ** 2)
 
     from scipy.optimize import minimize
     result = minimize(loss, x0=np.random.rand(nparams))
-    prediction = NN(result['x'])
+    prediction = NN_complex(result['x'])
 
     return prediction, result
 
