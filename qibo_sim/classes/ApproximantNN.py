@@ -673,29 +673,26 @@ def ansatz_Weighted(layers, qubits=1):
     3 parameters per layer: Ry(wx + a), Rz(b)
     """
     circuit = models.Circuit(qubits)
-    for _ in range(layers - 1):
-        circuit.add(gates.RY(0, theta=0))
+    circuit.add(gates.H(0))
+    for _ in range(layers):
         circuit.add(gates.RZ(0, theta=0))
-    circuit.add(gates.RY(0, theta=0))
+        circuit.add(gates.RY(0, theta=0))
 
 
     def rotation(theta, x):
         p = circuit.get_parameters()
         i = 0
         j = 0
-        for l in range(layers - 1):
+        for l in range(layers):
             p[i] = theta[j] + theta[j + 1] * x
             p[i + 1] = theta[j + 2]
             i += 2
             j += 3
 
-        p[i] = theta[j] + theta[j + 1] * x
-        i += 1
-        j += 2
 
         return p
 
-    nparams = 3 * (layers - 1) + 2
+    nparams = 3 * layers
     return circuit, rotation, nparams
 
 def ansatz_Fourier(layers, qubits=1):
@@ -703,34 +700,27 @@ def ansatz_Fourier(layers, qubits=1):
     3 parameters per layer: Ry(wx + a), Rz(b)
     """
     circuit = models.Circuit(qubits)
-    for _ in range(layers - 1):
+    for _ in range(layers):
         circuit.add(gates.RY(0, theta=0))
         circuit.add(gates.RZ(0, theta=0))
         circuit.add(gates.RY(0, theta=0))
         circuit.add(gates.RZ(0, theta=0))
-
-    circuit.add(gates.RY(0, theta=0))
-    circuit.add(gates.RZ(0, theta=0))
-    circuit.add(gates.RY(0, theta=0))
-
 
     def rotation(theta, x):
         p = circuit.get_parameters()
         i = 0
         j = 0
-        for l in range(layers - 1):
-            p[i] = theta[j] + theta[j + 1] * x
-            p[i + 1] = theta[j + 2]
-            i += 2
-            j += 3
-
-        p[i] = theta[j] + theta[j + 1] * x
-        i += 1
-        j += 2
+        for l in range(layers):
+            p[i] = theta[j]
+            p[i + 1] = theta[j + 1] + theta[j + 2] * x
+            p[i + 2] = theta[j + 3]
+            p[i + 3] = theta[j + 4]
+            i += 4
+            j += 5
 
         return p
 
-    nparams = 3 * (layers - 1) + 2
+    nparams = 5 * (layers)
     return circuit, rotation, nparams
 
 
