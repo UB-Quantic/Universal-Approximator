@@ -26,7 +26,7 @@ def main(modulus, phases, method, ansatz):
         for layers in range(1, 7):
             for seed in range(4):
                 C = App_c(layers, x, ansatz, mod, pha)
-                C.run_optimization(method, options={'maxiter': 10000}, compile=True, seed=seed)
+                C.run_optimization(method, options={'maxiter':10000}, compile=True, seed=seed)
                 C.run_optimization_classical('l-bfgs-b', options={'maxiter': 10000}, seed=seed)
 #C.paint_representation_1D('lbfgsb_%s.pdf'%layers)
 

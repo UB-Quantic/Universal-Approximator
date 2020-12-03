@@ -40,9 +40,6 @@ class Approximant:
         for x, t in zip(self.domain, self.target):
             cf += self.cf_one_point(x, t)
         cf /= len(self.domain)
-        if self.save:
-            self.hist_chi.append(cf)
-            self.hist_params.append(params)
 
         return cf
 
@@ -261,22 +258,17 @@ class Approximant:
             return m
 
 
-    def run_optimization(self, method, options, compile=True, save=False, seed=0):
+    def run_optimization(self, method, options, compile=True, seed=0):
         np.random.seed(seed)
         folder, trial = self.name_folder()
-        result = self.minimize(method, options, compile=compile, save=save)
+        result = self.minimize(method, options, compile=compile)
         import pickle
         with open(folder + '/result.pkl', 'wb') as f:
             pickle.dump(result, f, pickle.HIGHEST_PROTOCOL)
         with open(folder + '/options.pkl', 'wb') as f:
             pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
 
-        if save:
-            self.paint_historical(folder + '/historical.pdf')
-            np.savetxt(folder + '/hist_chi.txt', np.array(self.hist_chi))
-            np.savetxt(folder + '/hist_params.txt', np.array(self.hist_params))
-
-        self.paint_representation_1D(folder + '/plot.pdf')
+        self.paint_representation_2D(folder + '/plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
         try:
             data = {'method': [method],
@@ -301,17 +293,18 @@ class Approximant:
         df = pd.DataFrame(data)
         df.to_csv('summary.csv', mode='a', header=False)
 
-    def run_optimization_classical(self, method, options, seed=0):
+    def run_optimization_classical(self, method, options, seed=0, **kwargs):
         np.random.seed(seed)
         folder, trial = self.name_folder(quantum=False)
-        prediction, result = self.classical(self.layers, self.domain, self.target)
+        prediction, result = self.classical(self.layers, self.domain, self.target, options, method)
+        print(result)
         import pickle
         with open(folder + '/result.pkl', 'wb') as f:
             pickle.dump(result, f, pickle.HIGHEST_PROTOCOL)
         with open(folder + '/options.pkl', 'wb') as f:
             pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
 
-        self.paint_representation_1D_classical(prediction, folder + '/plot.pdf')
+        self.paint_representation_2D_classical(prediction, folder + '/plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
         try:
             data = {'method': [method],
@@ -491,7 +484,8 @@ class Approximant_real(Approximant):
                 ax.scatter(self.domain[:, 0], self.domain[:, 1], outcomes, color='C0', label=self.measurements[i])
                 ax.legend()
 
-        plt.show()
+        fig.savefig(name)
+        plt.close(fig)
 
 
     def paint_historical(self, name):
@@ -592,53 +586,70 @@ class Approximant_complex(Approximant):
 
         fig.savefig(name)
 
-class ApproximantFourier(Approximant):
-    def __init__(self, layers, domain, function):
-        super().__init__(layers, domain, function)
-        assert self.dimension == 1
-        self.period = np.max(self.domain) - np.min(self.domain)
 
-    def name_folder(self, method):
-        folder = 'results_F/' + method + '/' + self.function.name + '/%s_layers'%(self.layers)
+class Approximant_real_2D(Approximant):
+    def __init__(self, layers, domain, function):
+        self.function = function
+        ansatz = 'Weighted_2D'
+        super().__init__(layers, domain, ansatz)
+        self.target = np.array(list(self.function(self.domain)))
+        self.target = 2 * (self.target - np.min(self.target)) / (np.max(self.target) - np.min(self.target)) - 1
+
+        self.H = Hamiltonian(1, matrices._Z)
+        self.classical = globals()[f"classical_real_{self.ansatz}"]
+
+
+    def name_folder(self, quantum=True):
+        folder = self.ansatz + '/' + self.function.name + '/%s_layers'%(self.layers)
+        if quantum:
+            folder = 'quantum/' + folder
+        else:
+            folder = 'classical/' + folder
+        folder = 'results/' + folder
         import os
         try:
             trial = len(os.listdir(folder))
         except:
             trial = 0
             os.makedirs(folder)
-        fold_name = 'results_F/' + method + '/' + self.function.name + '/%s_layers/%s'%(self.layers, trial)
+        fold_name = folder + '/%s' % (trial)
         os.makedirs(fold_name)
         return fold_name, trial
 
+    def cf_one_point(self, x, f):
+        state = self.get_state(x)
+        o = self.H.expectation(state)
+        cf = (o - f) ** 2
+        return cf
 
-    def run_optimization(self, method, options, compile=True, save=False, seed=0):
-        np.random.seed(seed)
-        folder, trial = self.name_folder(method)
-        result = self.minimize(method, options, compile=compile, save=save)
-        import pickle
-        with open(folder + '/result.pkl', 'wb') as f:
-            pickle.dump(result, f, pickle.HIGHEST_PROTOCOL)
-        with open(folder + '/options.pkl', 'wb') as f:
-            pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
+    def paint_representation_2D(self, name):
+        fig = plt.figure()
+        axs = fig.gca(projection='3d')
 
-        if save:
-            self.paint_historical(folder + '/historical.pdf')
-            np.savetxt(folder + '/hist_chi.txt', np.array(self.hist_chi))
-            np.savetxt(folder + '/hist_params.txt', np.array(self.hist_params))
+        axs.plot_trisurf(self.domain[:, 0], self.domain[:, 1], self.target, color='black', label='Target Function', alpha=0.5)
+        outcomes = np.zeros_like(self.target)
+        for j, x in enumerate(self.domain):
+            state = self.get_state(x)
+            outcomes[j] = self.H.expectation(state)
 
-        self.paint_representation_1D('plot.pdf')
-        np.savetxt(folder + '/domain.txt', np.array(self.domain))
-        data = {'method': [method],
-                'function':[self.function.name],
-                'layers': [self.layers],
-                'trial':[trial],
-                'seed':[seed],
-                'chi2':[result['fun'][0]],
-                'Fourier':[True]}
+        axs.scatter(self.domain[:, 0], self.domain[:, 1], outcomes, color='C1',label='Quantum ' + self.ansatz + ' model')
 
-        import pandas as pd
-        df = pd.DataFrame(data)
-        df.to_csv('summary.csv', mode='a')
+        fig.savefig(name)
+        plt.close(fig)
+
+    def paint_representation_2D_classical(self, prediction, name):
+        fig = plt.figure()
+        axs = fig.gca(projection='3d')
+
+        prediction = np.array(list(prediction))
+
+        axs.plot_trisurf(self.domain[:, 0], self.domain[:, 1], self.target, color='black', label='Target Function', alpha=0.5)
+        axs.scatter(self.domain[:, 0], self.domain[:, 1], prediction,
+                 color='C0',label='Classical ' + self.ansatz + ' model')
+
+
+        fig.savefig(name)
+        plt.close(fig)
 
 
 def adam(loss_function, derivative, init_state, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-08, T=1000,
@@ -725,20 +736,47 @@ def ansatz_Fourier(layers, qubits=1):
     nparams = 5 * (layers)
     return circuit, rotation, nparams
 
+def ansatz_Weighted_2D(layers, qubits=1):
+    """
+    3 parameters per layer: Ry(wx + a), Rz(b)
+    """
+    circuit = models.Circuit(qubits)
+    circuit.add(gates.H(0))
+    for _ in range(layers):
+        circuit.add(gates.RZ(0, theta=0))
+        circuit.add(gates.RY(0, theta=0))
+
+
+    def rotation(theta, x):
+        p = circuit.get_parameters()
+        i = 0
+        j = 0
+        for l in range(layers):
+            p[i] = theta[j] + theta[j + 1: j + 3] @ x
+            p[i + 1] = theta[j + 3]
+            i += 2
+            j += 4
+
+
+        return p
+
+    nparams = 4 * layers
+    return circuit, rotation, nparams
+
+
+def NN_real(parameters, layers, x, y):
+    predict = np.zeros_like(y)
+    i = 0
+    for l in range(layers):
+        predict += parameters[i] * np.cos(parameters[i + 1] * x + parameters[i + 2])
+        i += 3
+
+    return predict
 
 def classical_real_Weighted(layers, x, y):
-    def NN_real(parameters):
-        predict = np.zeros_like(y)
-        i = 0
-        for l in range(layers):
-            predict += parameters[i] * np.cos(parameters[i + 1] * x + parameters[i + 2])
-            i += 3
-
-        return predict
-
     nparams = 3 * layers
     def loss(parameters):
-        predict = NN_real(parameters)
+        predict = NN_real(parameters, layers, x, y)
 
         return np.mean((predict - y) ** 2)
 
@@ -748,25 +786,26 @@ def classical_real_Weighted(layers, x, y):
 
     return prediction, result
 
+
+def NN_complex(parameters, layers, x, y):
+    predict = np.zeros(y.shape, dtype=complex)
+    i = 0
+    for l in range(layers):
+        predict += parameters[i] * np.exp(1j * (parameters[i + 1] * x + parameters[i + 2]))
+        i += 3
+
+    return predict
+
 def classical_complex_Weighted(layers, x, y):
-    def NN_complex(parameters):
-        predict = np.zeros(y.shape, dtype=complex)
-        i = 0
-        for l in range(layers):
-            predict += parameters[i] * np.exp(1j * (parameters[i + 1] * x + parameters[i + 2]))
-            i += 3
-
-        return predict
-
     nparams = 3 * layers
     def loss(parameters):
-        predict = NN_complex(parameters)
+        predict = NN_complex(parameters, layers, x, y)
 
         return np.mean(np.abs(predict - y) ** 2)
 
     from scipy.optimize import minimize
     result = minimize(loss, x0=np.random.rand(nparams))
-    prediction = NN_complex(result['x'])
+    prediction = NN_complex(result['x'], layers, x, y)
 
     return prediction, result
 
@@ -809,3 +848,25 @@ def classical_complex_Fourier(layers, x, y):
               'x': params}
     return prediction, result
 
+
+def NN_real_2D(parameters, layers, x, y):
+    predict = np.zeros_like(y)
+    for j, x_ in enumerate(x):
+        i = 0
+        for l in range(layers):
+            predict[j] += parameters[i] * np.cos(parameters[i + 1: i + 3] @ x_ + parameters[i + 3])
+            i += 4
+
+    return predict
+
+def classical_real_Weighted_2D(layers, x, y, options, method):
+    nparams = 4 * layers
+    def loss(parameters):
+        predict = np.array(list(NN_real_2D(parameters, layers, x, y)))
+
+        return np.mean((predict - y) ** 2)
+    from scipy.optimize import minimize
+    result = minimize(loss, x0=np.random.rand(nparams), method=method, options=options)
+    prediction = NN_real_2D(result['x'],layers, x, y)
+
+    return prediction, result

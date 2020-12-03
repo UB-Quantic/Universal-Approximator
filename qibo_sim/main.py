@@ -10,8 +10,8 @@ from classes.ApproximantNN import Approximant_real as App_r
 from importlib import import_module
 
 def main(function, method, ansatz):
-    for layers in range(1, 7):
-        for seed in range(2):
+    for layers in range(1,7):
+        for seed in range(10,11):
             func = globals()[f"{function}"]
 
             x = np.linspace(-1, 1, 31)
