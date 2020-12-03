@@ -2,23 +2,24 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--method", default='cma', help="Optimization method", type=str)
 parser.add_argument("--function", default='tanh_2D', help="Function to fit", type=str)
+parser.add_argument("--ansatz", default='Fourier_2D', help="Ansatz", type=str)
 
 import numpy as np
 from classes.aux_functions import *
 from classes.ApproximantNN import Approximant_real_2D as App_r
 from importlib import import_module
 
-def main(function, method):
+def main(function, method, ansatz):
     x_0 = np.linspace(-1, 1, 15)
     x_1 = np.linspace(-1, 1, 15)
     from itertools import product
     x = np.array(list(product(x_0, x_1)))
-    for layers in range(1,7):
-        for seed in range(4):
+    for layers in range(5,6):
+        for seed in range(1):
             func = globals()[f"{function}"]
 
-            C = App_r(layers, x, func)
-            C.run_optimization(method, options={'maxiter':10}, compile=True, seed=seed)
+            C = App_r(layers, x, func, ansatz)
+            C.run_optimization(method, options={'maxiter':100}, compile=True, seed=seed)
             C.run_optimization_classical('l-bfgs-b', options={'maxiter': 10000, 'disp':True}, seed=seed)
 #C.paint_representation_1D('lbfgsb_%s.pdf'%layers)'''
 

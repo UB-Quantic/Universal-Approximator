@@ -588,15 +588,14 @@ class Approximant_complex(Approximant):
 
 
 class Approximant_real_2D(Approximant):
-    def __init__(self, layers, domain, function):
+    def __init__(self, layers, domain, function, ansatz):
         self.function = function
-        ansatz = 'Weighted_2D'
         super().__init__(layers, domain, ansatz)
         self.target = np.array(list(self.function(self.domain)))
         self.target = 2 * (self.target - np.min(self.target)) / (np.max(self.target) - np.min(self.target)) - 1
 
         self.H = Hamiltonian(1, matrices._Z)
-        self.classical = globals()[f"classical_real_{self.ansatz}"]
+        self.classical = classical_real_Weighted_2D
 
 
     def name_folder(self, quantum=True):
@@ -763,6 +762,35 @@ def ansatz_Weighted_2D(layers, qubits=1):
     nparams = 4 * layers
     return circuit, rotation, nparams
 
+
+def ansatz_Fourier_2D(layers, qubits=1):
+    """
+    3 parameters per layer: Ry(wx + a), Rz(b)
+    """
+    circuit = models.Circuit(qubits)
+    for _ in range(layers):
+        circuit.add(gates.RY(0, theta=0))
+        circuit.add(gates.RZ(0, theta=0))
+        circuit.add(gates.RY(0, theta=0))
+        circuit.add(gates.RZ(0, theta=0))
+
+
+    def rotation(theta, x):
+        p = circuit.get_parameters()
+        i = 0
+        j = 0
+        for l in range(layers):
+            p[i] = theta[j]
+            p[i + 1] = theta[j + 1] + theta[j + 2:j + 4] @ x
+            p[i + 2] = theta[j + 3]
+            p[i + 3] = theta[j + 4]
+            i += 4
+            j += 6
+
+        return p
+
+    nparams = 6 * (layers)
+    return circuit, rotation, nparams
 
 def NN_real(parameters, layers, x, y):
     predict = np.zeros_like(y)
