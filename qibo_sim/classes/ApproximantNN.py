@@ -647,9 +647,9 @@ class Approximant_real_2D(Approximant):
                  color='C0',label='Classical ' + self.ansatz + ' model')
 
 
-        #fig.savefig(name)
-        plt.show()
-        #plt.close(fig)
+        fig.savefig(name)
+        #plt.show()
+        plt.close(fig)
 
 
 def adam(loss_function, derivative, init_state, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-08, T=1000,
