@@ -154,7 +154,7 @@ def paint_real(function, ansatz, ax, df):
         else:
             outcomes = cl_function(layers, x, C.target)[0]
 
-        ax.scatter(C.domain, outcomes, color=colors_classical[str(layers)], label='Classical %s layers' % layers, zorder=layers, s=20)
+        ax.scatter(C.domain, outcomes, color=colors_classical[str(layers)], label='Classical %s layers' % layers, zorder=layers, s=25)
     for layers in range(1, L + 1):
         df_q = df_[(df_['layers']==layers) & (df_['quantum']==True)]
         k_q = df_q['chi2'].idxmin()
@@ -171,7 +171,7 @@ def paint_real(function, ansatz, ax, df):
             state = C.get_state(x)
             outcomes[j] = C.H.expectation(state)
 
-        ax.scatter(C.domain, outcomes, color=colors_quantum[str(layers)], label='Quantum %s layers'%layers, zorder=layers, s=20)
+        ax.scatter(C.domain, outcomes, color=colors_quantum[str(layers)], label='Quantum %s layers'%layers, zorder=layers, s=25)
 
     ax.plot(C.domain, C.target, color='black', linewidth=3)
 
