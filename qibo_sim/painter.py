@@ -154,7 +154,7 @@ def paint_real(function, ansatz, ax, df):
         else:
             outcomes = cl_function(layers, x, C.target)[0]
 
-        ax.scatter(C.domain, outcomes, color=colors_classical[str(layers)], label='Classical %s layers' % layers, zorder=layers)
+        ax.scatter(C.domain, outcomes, color=colors_classical[str(layers)], label='Classical %s layers' % layers, zorder=layers, s=20)
     for layers in range(1, L + 1):
         df_q = df_[(df_['layers']==layers) & (df_['quantum']==True)]
         k_q = df_q['chi2'].idxmin()
@@ -171,9 +171,9 @@ def paint_real(function, ansatz, ax, df):
             state = C.get_state(x)
             outcomes[j] = C.H.expectation(state)
 
-        ax.scatter(C.domain, outcomes, color=colors_quantum[str(layers)], label='Quantum %s layers'%layers, zorder=layers)
+        ax.scatter(C.domain, outcomes, color=colors_quantum[str(layers)], label='Quantum %s layers'%layers, zorder=layers, s=20)
 
-    ax.plot(C.domain, C.target, color='black')
+    ax.plot(C.domain, C.target, color='black', linewidth=3)
 
 
 fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(24,12), sharex=True, sharey=True)
@@ -184,34 +184,49 @@ for ansatz in ['Fourier','Weighted']:
     for function in ['tanh', 'step', 'poly', 'relu']:
         ax = axs.flatten()[i]
         ax.grid(True)
+        ax.tick_params(axis='both', which='major', labelsize=18)
         paint_real(function, ansatz, ax, df)
+        pos = ax.get_position()
+        pos.x0 -= 0.05
+        pos.x1 -= 0.05
+        ax.set_position(pos)
+
         i+=1
 
 
 
-axs.flatten()[0].set_ylabel(r'$f(x)$', fontsize=16)
-axs.flatten()[0].set_title(r'$\tanh(5 x)$', fontsize=16)
-axs.flatten()[1].set_title(r'${\rm poly}(x)$', fontsize=16)
-axs.flatten()[2].set_title(r'${\rm step}(x)$', fontsize=16)
-axs.flatten()[3].set_title(r'${\rm ReLU}(x)$', fontsize=16)
-axs.flatten()[4].set_ylabel(r'$f(x)$', fontsize=16)
-axs.flatten()[4].set_xlabel(r'$x$', fontsize=16)
-axs.flatten()[5].set_xlabel(r'$x$', fontsize=16)
-axs.flatten()[5].set_xlabel(r'$x$', fontsize=16)
-axs.flatten()[6].set_xlabel(r'$x$', fontsize=16)
-axs.flatten()[7].set_xlabel(r'$x$', fontsize=16)
+axs.flatten()[0].set_ylabel(r'$f(x)$', fontsize=24)
+axs.flatten()[0].set_title(r'$\tanh(5 x)$', fontsize=24)
+axs.flatten()[1].set_title(r'${\rm step}(x)$', fontsize=24)
+axs.flatten()[2].set_title(r'${\rm poly}(x)$', fontsize=24)
+axs.flatten()[3].set_title(r'${\rm ReLU}(x)$', fontsize=24)
+axs.flatten()[4].set_ylabel(r'$f(x)$', fontsize=24)
+axs.flatten()[4].set_xlabel(r'$x$', fontsize=24)
+axs.flatten()[5].set_xlabel(r'$x$', fontsize=24)
+axs.flatten()[5].set_xlabel(r'$x$', fontsize=24)
+axs.flatten()[6].set_xlabel(r'$x$', fontsize=24)
+axs.flatten()[7].set_xlabel(r'$x$', fontsize=24)
 
-fig.text(0.05, 0.63, 'Fourier Ansatz', rotation='vertical', fontsize=20)
-fig.text(0.05, 0.23, 'Weighted Ansatz', rotation='vertical', fontsize=20)
+fig.text(0.005, 0.65, 'Fourier', rotation='vertical', fontsize=30, fontweight='bold')
+fig.text(0.005, 0.26, 'UAT', rotation='vertical', fontsize=30, fontweight='bold')
 
 handles = []
 for layers in range(1, L+1):
-    handles.append(mlines.Line2D([], [], color=colors_quantum[str(layers)], markersize=10, label= 'Q %s'%layers, linewidth=0, marker='o'))
-for layers in range(1, L + 1):
-    handles.append(mlines.Line2D([], [], color=colors_classical[str(layers)], markersize=10, label='C %s' % layers,  linewidth=0, marker='o'))
+    handles.append(mlines.Line2D([], [], color=colors_quantum[str(layers)], markersize=10, label= '%s layers'%layers, linewidth=0, marker='o'))
 
-handles.append(mlines.Line2D([], [], color='black', markersize=0, label='Target'))
-fig.legend(handles = handles, bbox_to_anchor=(0.915, 0.4, 0.08, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
+fig.text(0.88, 0.82, 'Quantum', fontsize=22, fontweight='bold')
+fig.legend(handles = handles, bbox_to_anchor=(0.88, 0.6, 0.1, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
+
+handles = []
+for layers in range(1, L + 1):
+    handles.append(mlines.Line2D([], [], color=colors_classical[str(layers)], markersize=10, label='%s layers' % layers,  linewidth=0, marker='o'))
+
+fig.text(0.88, 0.36, 'Classical', fontsize=22, fontweight='bold')
+fig.legend(handles = handles, bbox_to_anchor=(0.88, 0.14, 0.1, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
+
+handles = []
+handles.append(mlines.Line2D([], [], color='black', markersize=0, label='Target', linewidth=4))
+fig.legend(handles = handles, bbox_to_anchor=(0.88, 0.48, 0.1, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
 
 fig.savefig('all_reals.pdf')
 
