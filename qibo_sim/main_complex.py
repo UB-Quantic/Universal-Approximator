@@ -1,8 +1,8 @@
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--method", default='cma', help="Optimization method", type=str)
-parser.add_argument("--modulus", default='poly', help="Function to fit", type=str)
-parser.add_argument("--phases", default=1, help="Function to fit", type=int)
+parser.add_argument("--real", default='relu', help="Function to fit", type=str)
+parser.add_argument("--imag", default='poly', help="Function to fit", type=str)
 parser.add_argument("--ansatz", default='Weighted', help="Ansatz ", type=str)
 
 import numpy as np
@@ -10,24 +10,19 @@ from classes.aux_functions import *
 from classes.ApproximantNN import Approximant_complex as App_c
 from importlib import import_module
 
-def main(modulus, phases, method, ansatz):
+def main(real, imag, method, ansatz):
     '''for layers in range(1, 11):
         for seed in range(8):'''
-    if phases == 1:
-        phases = ['relu', 'poly']
-    elif phases == 2:
-        phases = ['tanh', 'step']
-    mod = globals()[f"{modulus}"]
+    real = globals()[f"{real}"]
 
     x = np.linspace(-1, 1, 31)
     #data = np.array(x).reshape((31, 1))
-    for phase in phases:
-        pha = globals()[f"{phase}"]
-        for layers in range(1, 7):
-            for seed in range(4):
-                C = App_c(layers, x, ansatz, mod, pha)
-                C.run_optimization(method, options={'maxiter':10000}, compile=True, seed=seed)
-                C.run_optimization_classical('l-bfgs-b', options={'maxiter': 10000}, seed=seed)
+    imag = globals()[f"{imag}"]
+    for layers in range(6, 7):
+        for seed in range(11):
+            C = App_c(layers, x, ansatz, real, imag)
+            #C.run_optimization(method, options={'maxiter':10000}, compile=True, seed=seed)
+            C.run_optimization_classical('bfgs', options={'maxiter': 10000}, seed=seed)
 #C.paint_representation_1D('lbfgsb_%s.pdf'%layers)
 
 
