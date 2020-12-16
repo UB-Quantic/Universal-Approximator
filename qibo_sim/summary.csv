@@ -4354,3 +4354,17 @@
 0,bfgs,brent,6,3,3,4.4693717571751764e-06,Weighted_2D,False
 0,bfgs,brent,6,4,4,3.0050977390025487e-05,Weighted_2D,False
 0,bfgs,brent,6,5,5,5.449253070961635e-07,Weighted_2D,False
+0,cma,threehump,3,6,0,0.003656605660608618,Weighted_2D,True
+0,l-bfgs-b,threehump,3,8,0,0.5734494091590625,Weighted_2D,True
+0,l-bfgs-b,threehump,3,9,1,0.24999924877079702,Weighted_2D,True
+0,cma,brent,4,6,0,0.11628662409179351,Weighted_2D,True
+0,l-bfgs-b,threehump,3,10,2,0.6341233166571445,Weighted_2D,True
+0,cma,himmelblau,3,6,0,0.05310368679788861,Fourier_2D,True
+0,l-bfgs-b,himmelblau,3,7,0,0.03426112812999726,Fourier_2D,True
+0,l-bfgs-b,brent,4,7,0,0.006410901812221654,Weighted_2D,True
+0,l-bfgs-b,himmelblau,3,10,10,0.0315032473410226,Fourier_2D,True
+0,l-bfgs-b,brent,4,10,10,0.002466078789948966,Weighted_2D,True
+0,l-bfgs-b,threehump,4,8,10,0.1380245205932645,Fourier_2D,True
+0,l-bfgs-b,himmelblau,4,8,10,0.019831244194212224,Weighted_2D,True
+0,l-bfgs-b,threehump,3,11,10,0.0037994106669243578,Weighted_2D,True
+0,cma,threehump,3,12,10,0.0037051599792365317,Weighted_2D,True
