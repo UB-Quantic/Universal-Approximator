@@ -304,7 +304,7 @@ class Approximant:
         with open(folder + '/options.pkl', 'wb') as f:
             pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
 
-        self.paint_representation_2D_classical(prediction, folder + '/plot.pdf')
+        self.paint_representation_1D_classical(prediction, folder + '/plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
         try:
             data = {'method': [method],
@@ -802,7 +802,7 @@ def NN_real(parameters, layers, x, y):
 
     return predict
 
-def classical_real_Weighted(layers, x, y):
+def classical_real_Weighted(layers, x, y, options, method):
     nparams = 3 * layers
     def loss(parameters):
         predict = NN_real(parameters, layers, x, y)
@@ -810,8 +810,8 @@ def classical_real_Weighted(layers, x, y):
         return np.mean((predict - y) ** 2)
 
     from scipy.optimize import minimize
-    result = minimize(loss, x0=np.random.rand(nparams))
-    prediction = NN_real(result['x'])
+    result = minimize(loss, x0=np.random.rand(nparams), method=method, options=options)
+    prediction = NN_real(result['x'], layers, x, y)
 
     return prediction, result
 
@@ -825,7 +825,7 @@ def NN_complex(parameters, layers, x, y):
 
     return predict
 
-def classical_complex_Weighted(layers, x, y):
+def classical_complex_Weighted(layers, x, y, options, method):
     nparams = 3 * layers
     def loss(parameters):
         predict = NN_complex(parameters, layers, x, y)
@@ -833,7 +833,7 @@ def classical_complex_Weighted(layers, x, y):
         return np.mean(np.abs(predict - y) ** 2)
 
     from scipy.optimize import minimize
-    result = minimize(loss, x0=np.random.rand(nparams))
+    result = minimize(loss, x0=np.random.rand(nparams), options=options, method=method)
     prediction = NN_complex(result['x'], layers, x, y)
 
     return prediction, result
