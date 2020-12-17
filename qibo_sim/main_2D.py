@@ -1,8 +1,8 @@
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--method", default='l-bfgs-b', help="Optimization method", type=str)
-parser.add_argument("--function", default='threehump', help="Function to fit", type=str)
-parser.add_argument("--ansatz", default='Weighted_2D', help="Ansatz", type=str)
+parser.add_argument("--function", default='brent', help="Function to fit", type=str)
+parser.add_argument("--ansatz", default='Fourier_2D', help="Ansatz", type=str)
 
 import numpy as np
 from classes.aux_functions import *
@@ -14,13 +14,16 @@ def main(function, method, ansatz):
     x_1 = np.linspace(-5, 5, 25)
     from itertools import product
     x = np.array(list(product(x_0, x_1)))
-    for layers in range(2, 3):
-        for seed in range(1):
+    for layers in range(1,7):
+        for seed in range(3):
             func = globals()[f"{function}"]
 
             C = App_r(layers, x, func, ansatz)
-            C.run_optimization(method, options={'maxiter':1000}, compile=True, seed=seed)
-            C.run_optimization_classical('l-bfgs-b', options={'maxiter': 10000, 'disp':True}, seed=seed)
+            try:
+                C.run_optimization(method, options={'maxiter':1000, 'disp':True, 'maxfun':np.inf}, compile=True, seed=seed)
+            except:
+                C.run_optimization(method, options={'maxiter': 1000}, compile=True, seed=seed)
+            #C.run_optimization_classical('bfgs', options={'maxiter': 10000, 'disp':True}, seed=seed)
 #C.paint_representation_1D('lbfgsb_%s.pdf'%layers)'''
 
 def himmelblau(x):
