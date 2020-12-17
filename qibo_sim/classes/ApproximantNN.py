@@ -268,7 +268,10 @@ class Approximant:
         with open(folder + '/options.pkl', 'wb') as f:
             pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
 
-        self.paint_representation_2D(folder + '/plot.pdf')
+        try:
+            self.paint_representation_1D(folder + '/plot.pdf')
+        except:
+            self.paint_representation_2D(folder + '/plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
         try:
             data = {'method': [method],
@@ -304,7 +307,10 @@ class Approximant:
         with open(folder + '/options.pkl', 'wb') as f:
             pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
 
-        self.paint_representation_1D_classical(prediction, folder + '/plot.pdf')
+        try:
+            self.paint_representation_1D_classical(prediction, folder + '/plot.pdf')
+        except:
+            self.paint_representation_2D_classical(prediction, folder + '/plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
         try:
             data = {'method': [method],
@@ -783,8 +789,8 @@ def ansatz_Fourier_2D(layers, qubits=1):
         for l in range(layers):
             p[i] = theta[j]
             p[i + 1] = theta[j + 1] + theta[j + 2:j + 4] @ x
-            p[i + 2] = theta[j + 3]
-            p[i + 3] = theta[j + 4]
+            p[i + 2] = theta[j + 4]
+            p[i + 3] = theta[j + 5]
             i += 4
             j += 6
 
