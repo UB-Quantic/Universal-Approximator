@@ -140,7 +140,7 @@ def paint_real(function, ansatz, ax, df):
         df_c = df_[(df_['layers'] == layers) & (df_['quantum'] == False)]
         k_c = df_c['chi2'].idxmin()
         file_c = 'results/classical/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl' % (
-        layers, df_c.loc[k_c]['seed'])
+        layers, df_c.loc[k_c]['trial'])
         x = np.loadtxt(
             'results/classical/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (layers, df_c.loc[k_c]['trial']))
         C = App(layers, x, ansatz, func)
@@ -229,4 +229,57 @@ handles.append(mlines.Line2D([], [], color='black', markersize=0, label='Target'
 fig.legend(handles = handles, bbox_to_anchor=(0.88, 0.48, 0.1, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
 
 fig.savefig('all_reals.pdf')
+
+
+
+fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(15,12), sharex=True, sharey=True)
+
+
+i = 0
+function = 'tanh_relu'
+for ansatz in ['Fourier','Weighted']:
+    ax = axs[i]
+    print(ax.shape)
+    ax[0].grid(True)
+    ax[0].tick_params(axis='both', which='major', labelsize=18)
+    ax[1].grid(True)
+    ax[1].tick_params(axis='both', which='major', labelsize=18)
+    paint_complex(function, ansatz, ax[0], ax[1], df)
+    i += 1
+    pos = ax[1].get_position()
+    pos.x0 -= 0.05
+    pos.x1 -= 0.05
+    ax[1].set_position(pos)
+
+
+
+
+axs.flatten()[0].set_ylabel(r'$f(x)$', fontsize=24)
+axs.flatten()[2].set_ylabel(r'$f(x)$', fontsize=24)
+
+fig.text(0.005, 0.65, 'Fourier', rotation='vertical', fontsize=30, fontweight='bold')
+fig.text(0.005, 0.26, 'UAT', rotation='vertical', fontsize=30, fontweight='bold')
+
+fig.text(0.15, 0.9, r'Real part = $\tanh(5x)$', fontsize=30)
+fig.text(0.52, 0.9, r'Imag part = ${\rm ReLU}(x)$', fontsize=30)
+
+handles = []
+for layers in range(1, L+1):
+    handles.append(mlines.Line2D([], [], color=colors_quantum[str(layers)], markersize=10, label= '%s layers'%layers, linewidth=0, marker='o'))
+
+fig.text(0.86, 0.82, 'Quantum', fontsize=22, fontweight='bold')
+fig.legend(handles = handles, bbox_to_anchor=(0.86, 0.6, 0.138, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
+
+handles = []
+for layers in range(1, L + 1):
+    handles.append(mlines.Line2D([], [], color=colors_classical[str(layers)], markersize=10, label='%s layers' % layers,  linewidth=0, marker='o'))
+
+fig.text(0.86, 0.36, 'Classical', fontsize=22, fontweight='bold')
+fig.legend(handles = handles, bbox_to_anchor=(0.86, 0.14, 0.138, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
+
+handles = []
+handles.append(mlines.Line2D([], [], color='black', markersize=0, label='Target', linewidth=4))
+fig.legend(handles = handles, bbox_to_anchor=(0.86, 0.48, 0.138, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
+
+fig.savefig(function + '_complex.pdf')
 

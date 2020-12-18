@@ -130,3 +130,64 @@ fig.legend(handles = handles, bbox_to_anchor=(0.25, 0.002, 0.4, .4), loc='lower 
            ncol=2, prop={'size': 20})
 fig.savefig('complex_valued.pdf')
 
+
+color={'True': 'red', 'False':'blue'}
+line={'False':'--', 'True':':'}
+marker = {'UAT':'X', 'Fourier':'^'}
+
+functions = ['adjiman', 'threehump', 'brent', 'himmelblau']
+
+ansatze={'UAT':'Weighted_2D', 'Fourier':'Fourier_2D'}
+
+titles = {'adjiman': r'$f(x) = {\rm adjiman}(x)$','threehump':r'$f(x) = {\rm threehump}(x)$', 'brent': r'$f(x) = {\rm brent}(x)$',  'himmelblau':r'$f(x) = {\rm himmelblau}(x)$'}
+
+L = 6
+fig, axs = plt.subplots(nrows=4, sharex=True, sharey=False, figsize=(9, 18))
+handles = []
+i = 0
+for function, ax in zip(functions, axs.flatten()):
+    for ansatz in ['UAT', 'Fourier']:
+        for quantum in [True, False]:
+            chi = []
+            for layers in range(1, L + 1):
+                chi_ = df[(df['function'] == function) & (df['ansatz'] == ansatze[ansatz]) & (df['quantum'] == quantum) & (df['layers'] == layers)]['chi2'].min()
+                chi.append(min(float(chi_), 1))
+            ax.plot(list(range(1, L + 1)), chi, color=color[str(quantum)],
+                    linestyle=line[str(quantum)],
+                    marker=marker[ansatz], markersize=15)
+    pos = ax.get_position()
+    pos.x0 += 0.02
+    pos.x1 += 0.02
+    pos.y1 = 1 - 0.025 - i * 0.2250
+    pos.y0 = pos.y1 - 0.19
+    i += 1
+    ax.set_position(pos)
+    ax.tick_params(axis='both', which='major', labelsize=18)
+    ax.set_title(titles[function], fontsize=22)
+    ax.set(yscale='log')
+    ax.set_ylabel(ylabel=r'$\chi^2$', fontsize=24)
+    ax.grid(True)
+
+ax.set_xlabel('Layers', fontsize=24)
+
+import matplotlib.lines as mlines
+for quantum in [False, True]:
+    for ansatz in ['UAT']:
+        if quantum:
+            q = 'Quantum'
+        else:
+            q = 'Classical'
+        handles.append(mlines.Line2D([], [], color=color[str(quantum)],
+                    linestyle=line[str(quantum)],
+                    marker=marker[ansatz],
+                          markersize=10, label= q + ' ' + ansatz))
+
+ansatz='Fourier'
+handles.append(mlines.Line2D([], [], color=color[str(quantum)],
+                    linestyle=line[str(quantum)],
+                    marker=marker[ansatz],
+                          markersize=10, label= q + ' ' + ansatz))
+
+fig.legend(handles = handles, bbox_to_anchor=(0.63, 0.01, 0.35, .35), loc='lower left', borderaxespad=0., mode='expand',
+           ncol=1, prop={'size': 18})
+fig.savefig('real_valued_2D.pdf')
