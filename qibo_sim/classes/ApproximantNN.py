@@ -356,7 +356,9 @@ class Approximant_real(Approximant):
         folder = 'results/' + folder
         import os
         try:
-            trial = len(os.listdir(folder))
+            l = os.listdir(folder)
+            l.sort()
+            trial = int(l[-1]) + 1
         except:
             trial = 0
             os.makedirs(folder)
@@ -535,7 +537,9 @@ class Approximant_complex(Approximant):
         folder = 'results/' + folder
         import os
         try:
-            trial = len(os.listdir(folder))
+            l = os.listdir(folder)
+            l.sort()
+            trial = int(l[-1]) + 1
         except:
             trial = 0
             os.makedirs(folder)
@@ -613,7 +617,9 @@ class Approximant_real_2D(Approximant):
         folder = 'results/' + folder
         import os
         try:
-            trial = len(os.listdir(folder))
+            l = os.listdir(folder)
+            l.sort()
+            trial = int(l[-1]) + 1
         except:
             trial = 0
             os.makedirs(folder)
