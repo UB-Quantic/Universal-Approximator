@@ -4493,3 +4493,23 @@
 0,bfgs,adjiman,6,9,10,0.08993158126527057,Weighted_2D,True
 0,cma,adjiman,6,8,5,0.03849771037974459,Weighted_2D,True
 
+0,cma,himmelblau,4,14,11,0.05625531631596399,Weighted_2D,True
+0,cma,himmelblau,4,16,2,0.04327427094260263,Weighted_2D,True
+0,cma,adjiman,6,15,11,0.1566063947477032,Weighted_2D,True
+0,cma,adjiman,6,13,12,0.2251263294295643,Weighted_2D,True
+0,cma,brent,4,16,12,0.10397142836393118,Weighted_2D,True
+0,cma,himmelblau,4,20,12,0.2762463967722769,Weighted_2D,True
+0,cma,threehump,6,7,12,0.0037890226955375303,Weighted_2D,True
+0,cma,adjiman,6,17,12,0.035603386561482646,Weighted_2D,True
+0,cma,brent,4,18,13,0.00593378847359134,Weighted_2D,True
+0,cma,himmelblau,4,22,13,0.31718366161181627,Weighted_2D,True
+0,cma,brent,4,20,14,0.28381624075536327,Weighted_2D,True
+0,cma,himmelblau,4,24,14,0.2940017735030216,Weighted_2D,True
+0,cma,threehump,6,9,13,0.32235207632076057,Weighted_2D,True
+0,cma,adjiman,6,19,13,0.038173955831855524,Weighted_2D,True
+0,cma,himmelblau,4,26,15,0.3424751809568944,Weighted_2D,True
+0,cma,brent,4,22,15,0.10479811127959039,Weighted_2D,True
+0,cma,threehump,6,11,14,0.0026916478338630447,Weighted_2D,True
+0,cma,adjiman,6,21,14,0.13766456875146818,Weighted_2D,True
+0,cma,threehump,6,13,15,0.0035364476859209184,Weighted_2D,True
+0,cma,adjiman,6,23,15,0.06395936463434942,Weighted_2D,True
