@@ -357,6 +357,7 @@ class Approximant_real(Approximant):
         import os
         try:
             l = os.listdir(folder)
+            l = [int(_) for _ in l]
             l.sort()
             trial = int(l[-1]) + 1
         except:
@@ -538,6 +539,7 @@ class Approximant_complex(Approximant):
         import os
         try:
             l = os.listdir(folder)
+            l = [int(_) for _ in l]
             l.sort()
             trial = int(l[-1]) + 1
         except:
@@ -618,6 +620,7 @@ class Approximant_real_2D(Approximant):
         import os
         try:
             l = os.listdir(folder)
+            l = [int(_) for _ in l]
             l.sort()
             trial = int(l[-1]) + 1
         except:
