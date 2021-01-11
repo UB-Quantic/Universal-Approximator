@@ -21,4 +21,4 @@ file_name = 'results/' + q + '/' + ansatz + '/' + function + '/' + '%s_layers'%l
 with open(file_name, 'rb') as f:
     data = pickle.load(f)
 
-print(data['x'])
+print(data['fun'], data['x'])

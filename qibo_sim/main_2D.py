@@ -1,6 +1,6 @@
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--method", default='cma', help="Optimization method", type=str)
+parser.add_argument("--method", default='bfgs', help="Optimization method", type=str)
 parser.add_argument("--function", default='brent', help="Function to fit", type=str)
 parser.add_argument("--ansatz", default='Weighted_2D', help="Ansatz", type=str)
 parser.add_argument("--layers", default=6, help="Layers", type=int)
@@ -16,17 +16,17 @@ def main(function, method, ansatz, layers):
     x_1 = np.linspace(-5, 5, 25)
     from itertools import product
     x = np.array(list(product(x_0, x_1)))
-    for seed in range(20, 31):
-        print('seed ', seed)
-        print('function', function)
-        func = globals()[f"{function}"]
+    seed=5
+    print('seed ', seed)
+    print('function', function)
+    func = globals()[f"{function}"]
 
-        C = App_r(layers, x, func, ansatz)
-        try:
-            C.run_optimization(method, options={'maxiter':5000, 'disp':True, 'maxfun':np.inf}, compile=True, seed=seed)
-        except:
-            C.run_optimization(method, options={'maxiter': 5000}, compile=True, seed=seed)
-        #C.run_optimization_classical('l-bfgs-b', options={'maxiter': 10000, 'disp':True}, seed=seed)
+    C = App_r(layers, x, func, ansatz)
+    '''try:
+        C.run_optimization(method, options={'maxiter':5000, 'disp':True, 'maxfun':np.inf}, compile=True, seed=seed)
+    except:
+        C.run_optimization(method, options={'maxiter': 5000}, compile=True, seed=seed)'''
+    C.run_optimization_classical('bfgs', options={'maxiter': 10000, 'disp':True}, seed=seed)
 #C.paint_representation_1D('lbfgsb_%s.pdf'%layers)'''
 
 def himmelblau(x):

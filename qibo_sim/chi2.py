@@ -146,7 +146,7 @@ fig, axs = plt.subplots(nrows=4, sharex=True, sharey=False, figsize=(9, 18))
 handles = []
 i = 0
 for function, ax in zip(functions, axs.flatten()):
-    for ansatz in ['UAT', 'Fourier']:
+    for ansatz in ['UAT']:
         for quantum in [True, False]:
             chi = []
             for layers in range(1, L + 1):
@@ -182,12 +182,51 @@ for quantum in [False, True]:
                     marker=marker[ansatz],
                           markersize=10, label= q + ' ' + ansatz))
 
-ansatz='Fourier'
-handles.append(mlines.Line2D([], [], color=color[str(quantum)],
-                    linestyle=line[str(quantum)],
-                    marker=marker[ansatz],
-                          markersize=10, label= q + ' ' + ansatz))
 
 fig.legend(handles = handles, bbox_to_anchor=(0.63, 0.01, 0.35, .35), loc='lower left', borderaxespad=0., mode='expand',
            ncol=1, prop={'size': 18})
 fig.savefig('real_valued_2D.pdf')
+
+fig, axs = plt.subplots(ncols=4, sharex=True, sharey=False, figsize=(20, 5.8))
+handles = []
+i = 0
+for function, ax in zip(functions, axs.flatten()):
+    for ansatz in ['UAT']:
+        for quantum in [True, False]:
+            chi = []
+            for layers in range(1, L + 1):
+                chi_ = df[(df['function'] == function) & (df['ansatz'] == ansatze[ansatz]) & (df['quantum'] == quantum) & (df['layers'] == layers)]['chi2'].min()
+                chi.append(min(float(chi_), 1))
+            ax.plot(list(range(1, L + 1)), chi, color=color[str(quantum)],
+                    linestyle=line[str(quantum)],
+                    marker=marker[ansatz], markersize=15)
+    pos = ax.get_position()
+    pos.y0 += 0.02
+    pos.y1 += 0.02
+    pos.x0 = 0.07 + i * 0.213
+    pos.x1 = pos.x0 + 0.17
+    i += 1
+    ax.set_position(pos)
+    ax.tick_params(axis='both', which='major', labelsize=18)
+    ax.set_title(titles[function], fontsize=22)
+    ax.set(yscale='log')
+    if i == 1: ax.set_ylabel(ylabel=r'$\chi^2$', fontsize=24)
+    ax.grid(True)
+    ax.set_xlabel('Layers', fontsize=24)
+
+import matplotlib.lines as mlines
+for quantum in [False, True]:
+    for ansatz in ['UAT']:
+        if quantum:
+            q = 'Quantum'
+        else:
+            q = 'Classical'
+        handles.append(mlines.Line2D([], [], color=color[str(quantum)],
+                    linestyle=line[str(quantum)],
+                    marker=marker[ansatz],
+                          markersize=10, label= q))
+
+
+fig.legend(handles = handles, bbox_to_anchor=(0.887, 0.5, 0.11, .35), loc='lower left', borderaxespad=0., mode='expand',
+           ncol=1, prop={'size': 18})
+fig.savefig('real_valued_2D_horizontal.pdf')

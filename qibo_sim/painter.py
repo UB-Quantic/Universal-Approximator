@@ -63,6 +63,31 @@ def poly(x):
     poly.name= 'poly'
     return np.abs(3*x**3 * (1 - x**4))
 
+def himmelblau(x):
+    himmelblau.name = 'himmelblau'
+    for x_ in x:
+        yield (x_[0]**2 + x_[1] - 11)**2 + (x_[0] + x_[1]**2 - 7)**2
+
+def brent(x):
+    brent.name = 'brent'
+    for x_ in x:
+        yield np.linalg.norm(x_ / 2)**2 + np.exp(-np.linalg.norm(x_/2 - 5)**2)
+
+def threehump(x):
+    threehump.name = 'threehump'
+    for x_ in x * 2 / 5:
+        yield 2 * x_[0]**2 - 1.05 * x_[0]**4 + 1/6 * x_[0]**6 + x_[0] * x_[1] + x_[1]**2
+
+def adjiman(x):
+    adjiman.name = 'adjiman'
+    for x_ in x:
+        yield np.cos(x_[0]) * np.sin(x_[1]) - x_[0] / (x_[1]**2 + 1)
+
+def rosenbrock(x):
+    rosenbrock.name = 'rosenbrock'
+    for x_ in x:
+        yield (1 - .4*x_[0])**2 + 100 * (x_[1] - (.4*x_[0])**2)**2
+
 def paint_complex(function, ansatz, ax_real, ax_imag, df):
     df_ = df[(df['function'] == function) & (df['ansatz'] == ansatz)]
     from classes.ApproximantNN import Approximant_complex as App
@@ -176,7 +201,54 @@ def paint_real(function, ansatz, ax, df):
     ax.plot(C.domain, C.target, color='black', linewidth=3)
 
 
-fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(24,12), sharex=True, sharey=True)
+def paint_real_2D(function, ansatz, ax, df, list_layers=list(range(1, 7))):
+    df_ = df[(df['function'] == function) & (df['ansatz'] == ansatz)].copy()
+    from classes.ApproximantNN import Approximant_real_2D as App
+    if ansatz == 'Weighted_2D':
+        from classes.ApproximantNN import NN_real_2D as cl_function
+    else:
+        raise NameError('Ansatz not included in 2D')
+
+    func = globals()[f"{function}"]
+
+    df_c = df_[(df_['layers'] == layers) & (df_['quantum'] == False)]
+    k_c = df_c['chi2'].idxmin()
+    file_c = 'results/classical/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl' % (
+    layers, df_c.loc[k_c]['trial'])
+    x = np.loadtxt(
+        'results/classical/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (layers, df_c.loc[k_c]['trial']))
+    C = App(layers, x, func, ansatz)
+
+    with open(file_c, 'rb') as f:
+        data_c = pickle.load(f)
+    params_c = data_c['x']
+
+    outcomes = cl_function(params_c, layers, x, C.target)
+
+    ax.scatter(C.domain[:, 0], C.domain[:, 1], outcomes, color=colors_classical[str(layers)], label='Classical %s layers' % layers, zorder=layers, s=25)
+
+    df_q = df_[(df_['layers']==layers) & (df_['quantum']==True)]
+    k_q = df_q['chi2'].idxmin()
+    file_q = 'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl'%(layers, df_q.loc[k_q]['trial'])
+    x = np.loadtxt('results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt'%(layers, df_q.loc[k_q]['trial']))
+    with open(file_q, 'rb') as f:
+        data_q = pickle.load(f)
+    params_q = data_q['x']
+
+    C = App(layers, x, func, ansatz)
+    C.set_parameters(params_q)
+    outcomes = np.zeros(len(C.domain))
+    for j, x in enumerate(C.domain):
+        state = C.get_state(x)
+        outcomes[j] = C.H.expectation(state)
+
+    ax.scatter(C.domain[:, 0], C.domain[:, 1], outcomes, color=colors_quantum[str(layers)], label='Quantum %s layers'%layers, zorder=layers, s=25)
+
+    cmap = plt.get_cmap('Greys')
+    ax.plot_trisurf(C.domain[:, 0], C.domain[:, 1], C.target-0.1, cmap=cmap, vmin=-4, vmax=1, alpha=0.75)
+
+
+'''fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(24,12), sharex=True, sharey=True)
 
 
 i = 0
@@ -252,8 +324,6 @@ for ansatz in ['Fourier','Weighted']:
     ax[1].set_position(pos)
 
 
-
-
 axs.flatten()[0].set_ylabel(r'$f(x)$', fontsize=24)
 axs.flatten()[2].set_ylabel(r'$f(x)$', fontsize=24)
 
@@ -281,5 +351,42 @@ handles = []
 handles.append(mlines.Line2D([], [], color='black', markersize=0, label='Target', linewidth=4))
 fig.legend(handles = handles, bbox_to_anchor=(0.86, 0.48, 0.138, .4), loc='lower left', borderaxespad=0., mode='expand', fontsize=20)
 
-fig.savefig(function + '_complex.pdf')
+fig.savefig(function + '_complex.pdf')'''
+
+
+fig = plt.figure(figsize=(15,14))
+i = 1
+layers=6
+ansatz = 'Weighted_2D'
+for function in ['Himmelblau','Brent','Adjiman','Threehump']:
+    ax = fig.add_subplot(2, 2, i, projection='3d')
+
+    paint_real_2D(function.lower(), ansatz, ax, df, layers)
+    pos = ax.get_position()
+    pos.x0 -= 0.05
+    pos.y1 += 0.05
+    if i > 2:
+        pos.y1 -= 0.02
+        pos.y0 -= 0.02
+    ax.set_position(pos)
+    ax.set_xlabel('x', fontsize=20)
+    ax.set_ylabel('y', fontsize=20)
+    ax.set_zlabel('z', fontsize=20)
+    ax.set_title(function, fontsize=20)
+    ax.set_xticks([-5,0,5])
+    ax.set_yticks([-5, 0, 5])
+    ax.set_zticks([-1,0,1])
+    ax.tick_params(axis='both', which='major', labelsize=18)
+    i += 1
+
+handles = []
+
+handles.append(mlines.Line2D([], [], color=colors_classical[str(layers)], markersize=10, label='Classical' , linewidth=0, marker='o'))
+handles.append(mlines.Line2D([], [], color=colors_quantum[str(layers)], markersize=10, label='Quantum' ,
+                             linewidth=0, marker='o'))
+
+fig.legend(handles = handles, bbox_to_anchor=(0.48, -0.128, 0.15, .2),borderaxespad=0., mode='expand', fontsize=20, ncol=1)
+
+fig.text(0.35, 0.04, '%s layers'%layers, fontsize=20, fontweight='bold')
+fig.savefig('all_2D.pdf')
 
