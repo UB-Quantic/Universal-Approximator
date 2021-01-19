@@ -323,12 +323,34 @@ class ScenarioManager():
         qs_rf_info = instr_info( "QuickSyn Signal Generator", "QS RF Source", qs_rf_features )
         self._add_instrument( scn, qs_rf_info )
 
+    def _add_rs_cw_source(self, scn):
+        # Add and configure Rohde&Schwarz RF Source:
+        rs_cw_rf_features = [
+            # Settings
+            feat("Frequency", 7.3793E9),
+            feat("Power",13),
+            feat("Phase", 0),
+            feat("Mode",0),
+            feat("Automatic levelling control (ALC)",1),
+            feat("Output",True),
+            feat("Pulse modulation",0),
+            feat("I/Q modulation",False),
+            feat("I/Q wideband",True),
+            # Reference Oscillator
+            feat("LO Source",1),
+            feat("LO Frequency",0),
+            feat("LO Output Source",2),
+            feat("LO Output Frequency",0)
+        ]
+        rs_rf_info = instr_info( "Rohde&Schwarz RF Source", "RS CW RF Source", rs_cw_rf_features )
+        self._add_instrument( scn, rs_rf_info )
+
     def _add_rs_iq_source(self, scn):
         # Add and configure Rohde&Schwarz RF Source:
         rs_rf_features = [
             # Settings
-            feat("Frequency", 4.895e9),
-            feat("Power",15),
+            feat("Frequency", 4.932e9),
+            feat("Power",13),
             feat("Phase", 0),
             feat("Mode",0),
             feat("Automatic levelling control (ALC)",1),
@@ -426,7 +448,8 @@ class ScenarioManager():
 
         self._add_awg(scn)
         self._add_hvi_trigger(scn)
-        self._add_quicksyn_rf_source(scn)
+        # self._add_quicksyn_rf_source(scn) Changed the rf source
+        self._add_rs_cw_source(scn)
         self._add_rs_iq_source(scn)
         self._add_single_qubit_pulse_generator(scn)
         self._add_digitizer(scn)
@@ -453,7 +476,8 @@ class ScenarioManager():
 
         self._add_awg(scn)
         self._add_hvi_trigger(scn)
-        self._add_quicksyn_rf_source(scn)
+        # self._add_quicksyn_rf_source(scn) 
+        self._add_rs_cw_source(scn)
         self._add_rs_iq_source(scn)
         self._add_single_qubit_pulse_generator(scn)
         self._add_digitizer(scn)

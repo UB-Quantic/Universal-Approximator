@@ -43,7 +43,7 @@ if __name__ == "__main__":
         param_dict = json.load(f)
     # p = param_dict["tanh"]["2L"]["x"][:-1]
 
-    n_layers_range = [4]
+    n_layers_range = [5]
     functions_range = [relu]
 
     for function in functions_range:
@@ -57,10 +57,15 @@ if __name__ == "__main__":
         for n_layers in n_layers_range:
             NL = str(n_layers) + "L" 
             # p = param_dict[f_name]["10k 7n 41p log Powell"][NL]["x"]
-            p = param_dict[f_name][NL]["x"][:-1]
-            p = [2.09231546,   0.77120458, -15.40389215,   0.34309537,   0.06610264,
-                -0.23606795,   0.0220145,   -0.07638291,  -1.32583386,   0.2280512,
-                0.05306048]
+            # p = param_dict[f_name][NL]["x"][:-1]
+            # p = [2.09231546,   0.77120458, -15.40389215,   0.34309537,   0.06610264,
+            #     -0.23606795,   0.0220145,   -0.07638291,  -1.32583386,   0.2280512,
+            #     0.05306048]
+            p = [1.57080042e+00, -7.69543678e+00,  8.73013121e-02, -4.50284027e-06,
+                 5.61631234e+00,  8.53702178e-01, -3.14159346e+00,  9.95691393e+00,
+                -4.15056814e-01,  1.09326620e-06, -5.71742121e+00,  9.43407150e-01,
+                -3.21123805e-07,  5.23764231e+00]
+            # p = [x/2 for x in p]
 
             # Create the Universal Approximant class
             univ_app = ua.UniversalApproximant( ua.EXPERIMENT, n_layers, exp_features )
@@ -79,7 +84,7 @@ if __name__ == "__main__":
 
             plt.plot(x, pe, label="Exp." )
             # # plt.plot(x, pe_the, label="The." )
-            plt.plot(x, relu(x), label="tanh")
+            plt.plot(x, relu(x), label="relu")
             # plt.legend()
             # plt.xlabel("x")
             # plt.ylabel("Pe")

@@ -39,7 +39,7 @@ if __name__ == "__main__":
         }
     }
     # Create the Universal Approximant class
-    n_layers_range = [2,3]
+    n_layers_range = [4]
     function_range = [relu,tanh]
     p0 = []
     for n_layers in n_layers_range:

@@ -43,7 +43,7 @@ class UniversalApproximant():
             - features: dict of features to be changed from default (read docs)
         """
         self._check_meas_type(meas_type)
-        self._check_n_layers(n_layers)
+        # self._check_n_layers(n_layers)
         self._check_features(features)
 
         self._meas_type = meas_type
