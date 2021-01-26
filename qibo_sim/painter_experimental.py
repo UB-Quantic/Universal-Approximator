@@ -290,6 +290,123 @@ def paint_real_2D(function, ansatz, ax, df, layers):
     ax.plot_trisurf(C.domain[:, 0], C.domain[:, 1], C.target-0.1, cmap=cmap, vmin=-4, vmax=1, alpha=0.75)
 
 
+cmap = {'target':plt.get_cmap('Greys'), 'classical':plt.get_cmap('Blues'), 'experiment':plt.get_cmap('Greens'),
+        'quantum':plt.get_cmap('Reds')}
+
+def paint_real_2D_2(function, ansatz, ax, df, layers, data):
+    from classes.ApproximantNN import Approximant_real_2D as App
+    if ansatz == 'Weighted_2D':
+        from classes.ApproximantNN import NN_real_2D as cl_function
+    else:
+        raise NameError('Ansatz not included in 2D')
+
+    func = globals()[f"{function}"]
+    df_ = df[(df['function'] == function) & (df['ansatz'] == ansatz)].copy()
+    if data == 'target':
+        x = np.loadtxt(
+            'results/classical/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (
+            layers, 0))
+        C = App(layers, x, func, ansatz)
+        X, Y = np.meshgrid(np.linspace(-5, 5, 25), np.linspace(-5, 5, 25))
+        outcomes = C.target
+        size = len(outcomes)
+        outcomes = outcomes.reshape((int(np.sqrt(size)), int(np.sqrt(size))))
+
+
+    if data == 'classical':
+        df_c = df_[(df_['layers'] == layers) & (df_['quantum'] == False)]
+        k_c = df_c['chi2'].idxmin()
+        file_c = 'results/classical/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl' % (
+            layers, df_c.loc[k_c]['trial'])
+        x = np.loadtxt(
+            'results/classical/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (layers, df_c.loc[k_c]['trial']))
+        C = App(layers, x, func, ansatz)
+
+
+        with open(file_c, 'rb') as f:
+            data_c = pickle.load(f)
+        params_c = data_c['x']
+
+        outcomes = cl_function(params_c, layers, x, C.target)
+        X, Y = np.meshgrid(np.linspace(-5, 5, 25), np.linspace(-5, 5, 25))
+        size = len(outcomes)
+        outcomes = outcomes.reshape((int(np.sqrt(size)), int(np.sqrt(size))))
+
+    if data == 'quantum':
+        df_q = df_[(df_['layers'] == layers) & (df_['quantum'] == True)]
+        k_q = df_q['chi2'].idxmin()
+        file_q = 'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl' % (
+            layers, df_q.loc[k_q]['trial'])
+
+        x = np.loadtxt(
+            'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (
+            layers, df_q.loc[k_q]['trial']))
+        with open(file_q, 'rb') as f:
+            data_q = pickle.load(f)
+        params_q = data_q['x']
+        C = App(layers, x, func, ansatz)
+        C.set_parameters(params_q)
+        outcomes = np.zeros(len(C.domain))
+        for j, x in enumerate(C.domain):
+            state = C.get_state(x)
+            outcomes[j] = C.H.expectation(state)
+
+        X, Y = np.meshgrid(np.linspace(-5, 5, 25), np.linspace(-5, 5, 25))
+        size = len(outcomes)
+        outcomes = outcomes.reshape((int(np.sqrt(size)), int(np.sqrt(size))))
+
+    if data == 'experiment':
+        func = globals()[f"{function}"]
+
+        file_exp = 'results/experiment/' + ansatz + '/' + function + '/%s_layers/results.txt' % layers
+        y = np.loadtxt(file_exp)
+        y = y.transpose()
+        outcomes = 2 * y.flatten() - 1
+
+        X, Y = np.meshgrid(np.linspace(-5, 5, 25), np.linspace(-5, 5, 25))
+        size = len(outcomes)
+        outcomes = outcomes.reshape((int(np.sqrt(size)), int(np.sqrt(size))))
+
+    import matplotlib as mpl
+    norm = mpl.colors.Normalize(vmin=-1., vmax=1.)
+    cf = ax.contourf(X, Y, outcomes, cmap=cmap[data], levels = np.linspace(-1,1,9))
+    return cf
+    '''df_q = df_[(df_['layers'] == layers) & (df_['quantum'] == True)]
+    k_q = df_q['chi2'].idxmin()
+    file_q = 'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl' % (
+    layers, df_q.loc[k_q]['trial'])
+
+    x = np.loadtxt(
+        'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (layers, df_q.loc[k_q]['trial']))
+    with open(file_q, 'rb') as f:
+        data_q = pickle.load(f)
+    params_q = data_q['x']
+    C = App(layers, x, func, ansatz)
+    C.set_parameters(params_q)
+    outcomes = np.zeros(len(C.domain))
+    for j, x in enumerate(C.domain):
+        state = C.get_state(x)
+        outcomes[j] = C.H.expectation(state)
+
+    ax.scatter(C.domain[:, 0], C.domain[:, 1], outcomes, color=colors['quantum'],
+               label='Quantum %s layers' % layers, zorder=2, s=25)
+
+    func = globals()[f"{function}"]
+
+    try:
+        file_exp = 'results/experiment/' + ansatz + '/' + function + '/%s_layers/results.txt'%layers
+        y = np.loadtxt(file_exp)
+        y = y.transpose()
+        y = 2 * y.flatten() - 1
+
+        ax.scatter(C.domain[:, 0], C.domain[:, 1], y, color=colors['experiment'], label='Experiment %s layers' % layers, zorder=layers, s=25)
+    except:
+        pass
+
+    cmap = plt.get_cmap('Greys')
+    ax.plot_trisurf(C.domain[:, 0], C.domain[:, 1], C.target-0.1, cmap=cmap, vmin=-4, vmax=1, alpha=0.75)'''
+
+
 fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(24,12), sharex=True, sharey=True)
 
 
@@ -410,3 +527,43 @@ fig.legend(handles = handles, bbox_to_anchor=(0.4, -0.07, 0.18, .2),borderaxespa
 #fig.text(0.35, 0.04, '%s layers'%L, fontsize=20, fontweight='bold')
 fig.savefig('functions_2D_%sL.pdf'%L)
 
+
+fig = plt.figure(figsize=(15,14))
+i = 1
+ansatz = 'Weighted_2D'
+function = 'Himmelblau'
+data = ['target', 'classical', 'quantum', 'experiment']
+titles = {'target':'Target', 'classical':'Classical', 'quantum':'Simulation', 'experiment':'Experiment'}
+for d in data:
+    ax = fig.add_subplot(2, 2, i)
+    cf = paint_real_2D_2(function.lower(), ansatz, ax, df, L, d)
+    pos = ax.get_position()
+
+    ax.set_position(pos)
+    if i in [3,4]:
+        ax.set_xlabel('x', fontsize=20)
+        ax.set_xticks([-5,0,5])
+    else:
+        ax.set_xticks([])
+    if i in [1,3]:
+        ax.set_ylabel('y', fontsize=20)
+        ax.set_yticks([-5, 0, 5])
+    else:
+        ax.set_yticks([])
+    ax.set_title(titles[d], fontsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=18)
+    fig.colorbar(cf, ax=ax)
+    i += 1
+
+'''handles = []
+
+handles.append(mlines.Line2D([], [], color=colors['classical'], markersize=10, label='Classical' , linewidth=0, marker=marker['classical']))
+handles.append(mlines.Line2D([], [], color=colors['quantum'], markersize=10, label='Quantum' ,
+                             linewidth=0, marker=marker['quantum']))
+handles.append(mlines.Line2D([], [], color=colors['experiment'], markersize=10, label='Experiment' ,
+                             linewidth=0, marker=marker['experiment']))
+fig.legend(handles = handles, bbox_to_anchor=(0.4, -0.07, 0.18, .2),borderaxespad=0., mode='expand', fontsize=20, ncol=1)'''
+
+#fig.text(0.35, 0.04, '%s layers'%L, fontsize=20, fontweight='bold')
+fig.suptitle('Himmelblau(x, y)', fontsize=36)
+fig.savefig(function + '_2D_%sL_2.pdf'%L)
