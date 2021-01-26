@@ -1,7 +1,7 @@
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--method", default='cma', help="Optimization method", type=str)
-parser.add_argument("--function", default='relu', help="Function to fit", type=str)
+parser.add_argument("--function", default='poly', help="Function to fit", type=str)
 parser.add_argument("--ansatz", default='Weighted', help="Ansatz ", type=str)
 
 import numpy as np
@@ -10,8 +10,8 @@ from classes.ApproximantNN import Approximant_real as App_r
 from importlib import import_module
 
 def main(function, method, ansatz):
-    for layers in range(6,7):
-        for seed in range(21,51):
+    for layers in range(4,5):
+        for seed in range(5,11):
             func = globals()[f"{function}"]
 
             x = np.linspace(-1, 1, 31)
@@ -19,7 +19,7 @@ def main(function, method, ansatz):
 
             C = App_r(layers, x, ansatz, func)
             #C.run_optimization(method, options={'maxiter':10000}, compile=True, seed=seed)
-            C.run_optimization_classical('bfgs', options={'maxiter': 10000}, seed=seed)
+            C.run_optimization_classical('l-bfgs-b', options={'maxiter': 10000}, seed=seed)
 #C.paint_representation_1D('lbfgsb_%s.pdf'%layers)
 
 
