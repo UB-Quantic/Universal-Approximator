@@ -1,7 +1,7 @@
 from qibo.models import Circuit
 from qibo import gates
 import numpy as np
-from qibo.config import matrices
+from qibo import matrices
 import classes.aux_functions as aux
 from qibo.hamiltonians import Hamiltonian
 import matplotlib.pyplot as plt
@@ -268,7 +268,10 @@ class Approximant:
         with open(folder + '/options.pkl', 'wb') as f:
             pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
 
-        self.paint_representation_2D(folder + '/plot.pdf')
+        try:
+            self.paint_representation_1D(folder + '/plot.pdf')
+        except:
+            self.paint_representation_2D(folder + '/plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
         try:
             data = {'method': [method],
@@ -304,7 +307,10 @@ class Approximant:
         with open(folder + '/options.pkl', 'wb') as f:
             pickle.dump(options, f, pickle.HIGHEST_PROTOCOL)
 
-        self.paint_representation_2D_classical(prediction, folder + '/plot.pdf')
+        try:
+            self.paint_representation_1D_classical(prediction, folder + '/plot.pdf')
+        except:
+            self.paint_representation_2D_classical(prediction, folder + '/plot.pdf')
         np.savetxt(folder + '/domain.txt', np.array(self.domain))
         try:
             data = {'method': [method],
@@ -350,7 +356,10 @@ class Approximant_real(Approximant):
         folder = 'results/' + folder
         import os
         try:
-            trial = len(os.listdir(folder))
+            l = os.listdir(folder)
+            l = [int(_) for _ in l]
+            l.sort()
+            trial = int(l[-1]) + 1
         except:
             trial = 0
             os.makedirs(folder)
@@ -529,7 +538,10 @@ class Approximant_complex(Approximant):
         folder = 'results/' + folder
         import os
         try:
-            trial = len(os.listdir(folder))
+            l = os.listdir(folder)
+            l = [int(_) for _ in l]
+            l.sort()
+            trial = int(l[-1]) + 1
         except:
             trial = 0
             os.makedirs(folder)
@@ -607,7 +619,10 @@ class Approximant_real_2D(Approximant):
         folder = 'results/' + folder
         import os
         try:
-            trial = len(os.listdir(folder))
+            l = os.listdir(folder)
+            l = [int(_) for _ in l]
+            l.sort()
+            trial = int(l[-1]) + 1
         except:
             trial = 0
             os.makedirs(folder)
@@ -648,6 +663,7 @@ class Approximant_real_2D(Approximant):
 
 
         fig.savefig(name)
+        #plt.show()
         plt.close(fig)
 
 
@@ -782,8 +798,8 @@ def ansatz_Fourier_2D(layers, qubits=1):
         for l in range(layers):
             p[i] = theta[j]
             p[i + 1] = theta[j + 1] + theta[j + 2:j + 4] @ x
-            p[i + 2] = theta[j + 3]
-            p[i + 3] = theta[j + 4]
+            p[i + 2] = theta[j + 4]
+            p[i + 3] = theta[j + 5]
             i += 4
             j += 6
 
@@ -801,7 +817,7 @@ def NN_real(parameters, layers, x, y):
 
     return predict
 
-def classical_real_Weighted(layers, x, y):
+def classical_real_Weighted(layers, x, y, options, method):
     nparams = 3 * layers
     def loss(parameters):
         predict = NN_real(parameters, layers, x, y)
@@ -809,8 +825,8 @@ def classical_real_Weighted(layers, x, y):
         return np.mean((predict - y) ** 2)
 
     from scipy.optimize import minimize
-    result = minimize(loss, x0=np.random.rand(nparams))
-    prediction = NN_real(result['x'])
+    result = minimize(loss, x0=np.random.rand(nparams), method=method, options=options)
+    prediction = NN_real(result['x'], layers, x, y)
 
     return prediction, result
 
@@ -824,7 +840,7 @@ def NN_complex(parameters, layers, x, y):
 
     return predict
 
-def classical_complex_Weighted(layers, x, y):
+def classical_complex_Weighted(layers, x, y, options, method):
     nparams = 3 * layers
     def loss(parameters):
         predict = NN_complex(parameters, layers, x, y)
@@ -832,7 +848,7 @@ def classical_complex_Weighted(layers, x, y):
         return np.mean(np.abs(predict - y) ** 2)
 
     from scipy.optimize import minimize
-    result = minimize(loss, x0=np.random.rand(nparams))
+    result = minimize(loss, x0=np.random.rand(nparams), options=options, method=method)
     prediction = NN_complex(result['x'], layers, x, y)
 
     return prediction, result
