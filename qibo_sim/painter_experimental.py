@@ -290,8 +290,9 @@ def paint_real_2D(function, ansatz, ax, df, layers):
     ax.plot_trisurf(C.domain[:, 0], C.domain[:, 1], C.target-0.1, cmap=cmap, vmin=-4, vmax=1, alpha=0.75)
 
 
-cmap = {'target':plt.get_cmap('Greys'), 'classical':plt.get_cmap('Blues'), 'experiment':plt.get_cmap('Greens'),
-        'quantum':plt.get_cmap('Reds')}
+cmap = {'target':plt.get_cmap('Greys'), 'classical':plt.get_cmap('Blues'), 'experiment':plt.get_cmap('Greens'), 'quantum':plt.get_cmap('Reds')}
+#cmap = {'target':plt.get_cmap('viridis'), 'classical':plt.get_cmap('inferno'), 'experiment':plt.get_cmap('PiYG'), 'quantum':plt.get_cmap('bwr')}
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 def paint_real_2D_2(function, ansatz, ax, df, layers, data):
     from classes.ApproximantNN import Approximant_real_2D as App
@@ -369,7 +370,8 @@ def paint_real_2D_2(function, ansatz, ax, df, layers, data):
 
     import matplotlib as mpl
     norm = mpl.colors.Normalize(vmin=-1., vmax=1.)
-    cf = ax.contourf(X, Y, outcomes, cmap=cmap[data], levels = np.linspace(-1,1,9))
+    cf = ax.contourf(X, Y, outcomes, cmap=cmap[data], norm=norm, levels = np.linspace(-1,1,21))
+    ax.contour(cf, colors='k', linewidths=1)
     return cf
     '''df_q = df_[(df_['layers'] == layers) & (df_['quantum'] == True)]
     k_q = df_q['chi2'].idxmin()
@@ -537,22 +539,51 @@ titles = {'target':'Target', 'classical':'Classical', 'quantum':'Simulation', 'e
 for d in data:
     ax = fig.add_subplot(2, 2, i)
     cf = paint_real_2D_2(function.lower(), ansatz, ax, df, L, d)
-    pos = ax.get_position()
-
-    ax.set_position(pos)
     if i in [3,4]:
+        pos = ax.get_position()
+        pos.y0 -= .065
+        pos.y1 += 0.005
+        ax.set_position(pos)
         ax.set_xlabel('x', fontsize=20)
         ax.set_xticks([-5,0,5])
     else:
         ax.set_xticks([])
+        pos = ax.get_position()
+        pos.y0 -= 0.02
+        pos.y1 += 0.05
+        ax.set_position(pos)
     if i in [1,3]:
         ax.set_ylabel('y', fontsize=20)
         ax.set_yticks([-5, 0, 5])
+        pos = ax.get_position()
+        pos.x0 -= 0.07
+        pos.x1 -= 0.01
+        ax.set_position(pos)
     else:
         ax.set_yticks([])
+        pos = ax.get_position()
+        pos.x1 += 0.04
+        pos.x0 -= 0.02
+        ax.set_position(pos)
     ax.set_title(titles[d], fontsize=20)
     ax.tick_params(axis='both', which='major', labelsize=18)
-    fig.colorbar(cf, ax=ax)
+
+    axins = inset_axes(ax,
+                       width="3%",  # width = 5% of parent_bbox width
+                       height="90%",  # height : 50%
+                       loc='lower left',
+                       bbox_to_anchor=(1.01, 0.05, 1, 1),
+                       bbox_transform=ax.transAxes,
+                       borderpad=0,
+                       )
+
+    # Controlling the placement of the inset axes is basically same as that
+    # of the legend.  you may want to play with the borderpad value and
+    # the bbox_to_anchor coordinate.
+
+    cbar = fig.colorbar(cf, cax=axins, ticks=[-1., -.5, 0, .5, 1.])
+    cbar.ax.tick_params(labelsize=15)
+    #fig.colorbar(cf, ax=ax)
     i += 1
 
 '''handles = []
