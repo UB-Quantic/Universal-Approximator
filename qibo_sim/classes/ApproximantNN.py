@@ -2,7 +2,7 @@ from qibo.models import Circuit
 from qibo import gates
 import numpy as np
 from qibo import matrices
-import classes.aux_functions as aux
+#import classes.aux_functions as aux
 from qibo.hamiltonians import Hamiltonian
 import matplotlib.pyplot as plt
 import tensorflow as tf
