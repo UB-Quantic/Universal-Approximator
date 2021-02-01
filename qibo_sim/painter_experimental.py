@@ -11,9 +11,13 @@ L = 5
 
 list_layers = [2,4,6]
 
-colors = {'quantum': '#CC0000',
+'''colors = {'quantum': '#CC0000',
           'experiment': '#009933',
-          'classical': '#002AFF'}
+          'classical': '#002AFF'}'''
+
+colors = {'quantum': 'tab:blue',
+          'experiment': 'tab:purple',
+          'classical': 'tab:orange'}
 
 marker = {'classical':'^',
           'quantum':'o',
@@ -226,7 +230,7 @@ def paint_real(function, ansatz, ax, df, layers):
     ax.plot(C.domain, C.target, color='black', linewidth=3, label='Target')
 
 
-def paint_real_2D(function, ansatz, ax, df, layers):
+def paint_real_2D(function, ansatz, ax, df, layers, only_target=False):
     df_ = df[(df['function'] == function) & (df['ansatz'] == ansatz)].copy()
     from classes.ApproximantNN import Approximant_real_2D as App
     if ansatz == 'Weighted_2D':
@@ -244,53 +248,53 @@ def paint_real_2D(function, ansatz, ax, df, layers):
         'results/classical/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (layers, df_c.loc[k_c]['trial']))
     C = App(layers, x, func, ansatz)
 
+    if not only_target:
+        with open(file_c, 'rb') as f:
+            data_c = pickle.load(f)
+        params_c = data_c['x']
 
-    with open(file_c, 'rb') as f:
-        data_c = pickle.load(f)
-    params_c = data_c['x']
+        outcomes = cl_function(params_c, layers, x, C.target)
 
-    outcomes = cl_function(params_c, layers, x, C.target)
+        ax.scatter(C.domain[:, 0], C.domain[:, 1], outcomes, color=colors['classical'],
+                   label='Classical %s layers' % layers, zorder=0, s=25)
 
-    ax.scatter(C.domain[:, 0], C.domain[:, 1], outcomes, color=colors['classical'],
-               label='Classical %s layers' % layers, zorder=0, s=25)
+        df_q = df_[(df_['layers'] == layers) & (df_['quantum'] == True)]
+        k_q = df_q['chi2'].idxmin()
+        file_q = 'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl' % (
+        layers, df_q.loc[k_q]['trial'])
 
-    df_q = df_[(df_['layers'] == layers) & (df_['quantum'] == True)]
-    k_q = df_q['chi2'].idxmin()
-    file_q = 'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl' % (
-    layers, df_q.loc[k_q]['trial'])
+        x = np.loadtxt(
+            'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (layers, df_q.loc[k_q]['trial']))
+        with open(file_q, 'rb') as f:
+            data_q = pickle.load(f)
+        params_q = data_q['x']
+        C = App(layers, x, func, ansatz)
+        C.set_parameters(params_q)
+        outcomes = np.zeros(len(C.domain))
+        for j, x in enumerate(C.domain):
+            state = C.get_state(x)
+            outcomes[j] = C.H.expectation(state)
 
-    x = np.loadtxt(
-        'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (layers, df_q.loc[k_q]['trial']))
-    with open(file_q, 'rb') as f:
-        data_q = pickle.load(f)
-    params_q = data_q['x']
-    C = App(layers, x, func, ansatz)
-    C.set_parameters(params_q)
-    outcomes = np.zeros(len(C.domain))
-    for j, x in enumerate(C.domain):
-        state = C.get_state(x)
-        outcomes[j] = C.H.expectation(state)
+        ax.scatter(C.domain[:, 0], C.domain[:, 1], outcomes, color=colors['quantum'],
+                   label='Quantum %s layers' % layers, zorder=2, s=25)
 
-    ax.scatter(C.domain[:, 0], C.domain[:, 1], outcomes, color=colors['quantum'],
-               label='Quantum %s layers' % layers, zorder=2, s=25)
+        func = globals()[f"{function}"]
 
-    func = globals()[f"{function}"]
+        try:
+            file_exp = 'results/experiment/' + ansatz + '/' + function + '/%s_layers/results.txt'%layers
+            y = np.loadtxt(file_exp)
+            y = y.transpose()
+            y = 2 * y.flatten() - 1
 
-    try:
-        file_exp = 'results/experiment/' + ansatz + '/' + function + '/%s_layers/results.txt'%layers
-        y = np.loadtxt(file_exp)
-        y = y.transpose()
-        y = 2 * y.flatten() - 1
-
-        ax.scatter(C.domain[:, 0], C.domain[:, 1], y, color=colors['experiment'], label='Experiment %s layers' % layers, zorder=layers, s=25)
-    except:
-        pass
+            ax.scatter(C.domain[:, 0], C.domain[:, 1], y, color=colors['experiment'], label='Experiment %s layers' % layers, zorder=layers, s=25)
+        except:
+            pass
 
     cmap = plt.get_cmap('Greys')
     ax.plot_trisurf(C.domain[:, 0], C.domain[:, 1], C.target-0.1, cmap=cmap, vmin=-4, vmax=1, alpha=0.75)
 
 
-cmap = {'target':plt.get_cmap('Greys'), 'classical':plt.get_cmap('Blues'), 'experiment':plt.get_cmap('Greens'), 'quantum':plt.get_cmap('Reds')}
+cmap = {'target':plt.get_cmap('Greys'), 'classical':plt.get_cmap('Blues'), 'experiment':plt.get_cmap('Purples'), 'quantum':plt.get_cmap('Oranges')}
 #cmap = {'target':plt.get_cmap('viridis'), 'classical':plt.get_cmap('inferno'), 'experiment':plt.get_cmap('PiYG'), 'quantum':plt.get_cmap('bwr')}
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
@@ -373,42 +377,9 @@ def paint_real_2D_2(function, ansatz, ax, df, layers, data):
     cf = ax.contourf(X, Y, outcomes, cmap=cmap[data], norm=norm, levels = np.linspace(-1,1,21))
     ax.contour(cf, colors='k', linewidths=1)
     return cf
-    '''df_q = df_[(df_['layers'] == layers) & (df_['quantum'] == True)]
-    k_q = df_q['chi2'].idxmin()
-    file_q = 'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/result.pkl' % (
-    layers, df_q.loc[k_q]['trial'])
-
-    x = np.loadtxt(
-        'results/quantum/' + ansatz + '/' + function + '/%s_layers/%s/domain.txt' % (layers, df_q.loc[k_q]['trial']))
-    with open(file_q, 'rb') as f:
-        data_q = pickle.load(f)
-    params_q = data_q['x']
-    C = App(layers, x, func, ansatz)
-    C.set_parameters(params_q)
-    outcomes = np.zeros(len(C.domain))
-    for j, x in enumerate(C.domain):
-        state = C.get_state(x)
-        outcomes[j] = C.H.expectation(state)
-
-    ax.scatter(C.domain[:, 0], C.domain[:, 1], outcomes, color=colors['quantum'],
-               label='Quantum %s layers' % layers, zorder=2, s=25)
-
-    func = globals()[f"{function}"]
-
-    try:
-        file_exp = 'results/experiment/' + ansatz + '/' + function + '/%s_layers/results.txt'%layers
-        y = np.loadtxt(file_exp)
-        y = y.transpose()
-        y = 2 * y.flatten() - 1
-
-        ax.scatter(C.domain[:, 0], C.domain[:, 1], y, color=colors['experiment'], label='Experiment %s layers' % layers, zorder=layers, s=25)
-    except:
-        pass
-
-    cmap = plt.get_cmap('Greys')
-    ax.plot_trisurf(C.domain[:, 0], C.domain[:, 1], C.target-0.1, cmap=cmap, vmin=-4, vmax=1, alpha=0.75)'''
 
 
+plt.style.use('seaborn')
 fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(24,12), sharex=True, sharey=True)
 
 
@@ -418,6 +389,7 @@ for ansatz in ['Fourier', 'Weighted']:
         ax = axs.flatten()[i]
         ax.grid(True)
         ax.tick_params(axis='both', which='major', labelsize=18)
+
         paint_real(function, ansatz, ax, df, L)
         pos = ax.get_position()
         pos.x0 -= 0.05
@@ -499,7 +471,7 @@ i = 1
 ansatz = 'Weighted_2D'
 for function in ['Himmelblau','Brent','Adjiman','Threehump']:
     ax = fig.add_subplot(2, 2, i, projection='3d')
-    paint_real_2D(function.lower(), ansatz, ax, df, L)
+    paint_real_2D(function.lower(), ansatz, ax, df, L, only_target=True)
     pos = ax.get_position()
     pos.x0 -= 0.05
     pos.y1 += 0.05
@@ -527,7 +499,7 @@ handles.append(mlines.Line2D([], [], color=colors['experiment'], markersize=10, 
 fig.legend(handles = handles, bbox_to_anchor=(0.4, -0.07, 0.18, .2),borderaxespad=0., mode='expand', fontsize=20, ncol=1)
 
 #fig.text(0.35, 0.04, '%s layers'%L, fontsize=20, fontweight='bold')
-fig.savefig('functions_2D_%sL.pdf'%L)
+fig.savefig('model_2D_2x2.pdf')
 
 
 fig = plt.figure(figsize=(15,14))

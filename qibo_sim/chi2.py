@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 df = pd.read_csv('summary.csv')
-color={'True': 'red', 'False':'blue', 'Experiment':'green'}
+color={'True': 'tab:orange', 'False':'tab:blue', 'Experiment':'tab:purple'}
 line={'False':'--', 'True':':', 'Experiment':'-.'}
 marker = {'UAT':'X', 'Fourier':'^', 'Experiment':'+'}
 
@@ -77,6 +77,7 @@ def rosenbrock(x):
     for x_ in x:
         yield (1 - .4*x_[0])**2 + 100 * (x_[1] - (.4*x_[0])**2)**2
 
+plt.style.use('seaborn')
 
 L = 6
 fig, axs = plt.subplots(nrows=4, sharex=True, sharey=False, figsize=(9, 18))
@@ -279,7 +280,6 @@ fig.legend(handles = handles, bbox_to_anchor=(0.47, 0.002, 0.15, .4), loc='lower
 fig.savefig('chi_complex.pdf')
 
 
-color={'True': 'red', 'False':'blue', 'Experiment':'green'}
 line={'False':'--', 'True':':', 'Experiment':'-.'}
 marker = {'UAT':'X', 'Fourier':'^', 'Experiment':'+'}
 
