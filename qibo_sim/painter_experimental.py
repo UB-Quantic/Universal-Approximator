@@ -25,6 +25,8 @@ marker = {'classical':'^',
 
 df = pd.read_csv('summary.csv')
 
+error = 0.015
+
 def step(x):
     step.name = 'step'
     return 0.5 * (np.sign(x) + 1)
@@ -89,6 +91,7 @@ def rosenbrock(x):
         yield (1 - .4*x_[0])**2 + 100 * (x_[1] - (.4*x_[0])**2)**2
 
 def paint_complex(function, ansatz, ax_real, ax_imag, df, layers):
+    error = 0.015
     df_ = df[(df['function'] == function) & (df['ansatz'] == ansatz)]
     from classes.ApproximantNN import Approximant_complex as App
 
@@ -150,16 +153,14 @@ def paint_complex(function, ansatz, ax_real, ax_imag, df, layers):
     file_exp_x = 'results/experiment/' + ansatz + '/' + function + '/%s_layers/results_x.txt'%layers
     domain, x = np.loadtxt(file_exp_x)
 
-    #ax_real.errorbar(domain, 2*x - 1, yerr=error, color=colors['experiment'], zorder=layers, marker=marker['experiment'], ms=5, lw=0, elinewidth=1, capsize=3)
-    ax_real.scatter(domain, 2 * x - 1, color=colors['experiment'], zorder=layers,
-                     marker=marker['experiment'])
+    ax_real.errorbar(domain, 2*x - 1, yerr=error, color=colors['experiment'], zorder=layers, marker=marker['experiment'], ms=5, lw=0, elinewidth=1, capsize=3)
+    #ax_real.scatter(domain, 2 * x - 1, color=colors['experiment'], zorder=layers, marker=marker['experiment'])
     file_exp_y = 'results/experiment/' + ansatz + '/' + function + '/%s_layers/results_y.txt'%layers
     domain, y = np.loadtxt(file_exp_y)
-    '''ax_imag.errorbar(domain, 2 * y - 1, yerr=error, color=colors['experiment'], zorder=layers, marker=marker['experiment'],
+    ax_imag.errorbar(domain, 2 * y - 1, yerr=error, color=colors['experiment'], zorder=layers, marker=marker['experiment'],
                      ms=5, lw=0,
-                     elinewidth=1, capsize=3)'''
-    ax_imag.scatter(domain, 2 * y - 1, color=colors['experiment'], zorder=layers,
-                    marker=marker['experiment'])
+                     elinewidth=1, capsize=3)
+    #ax_imag.scatter(domain, 2 * y - 1, color=colors['experiment'], zorder=layers, marker=marker['experiment'])
 
     ax_real.plot(C.domain, np.real(C.target), color='black', linewidth=3, label='Target')
     ax_imag.plot(C.domain, np.imag(C.target), color='black', linewidth=3, label='Target')
@@ -218,14 +219,13 @@ def paint_real(function, ansatz, ax, df, layers):
     file_exp = 'results/experiment/' + ansatz + '/' + function + '/%s_layers/results.txt'%layers
     x, y = np.loadtxt(file_exp)
     y = 2 * y - 1
-    error = 1/20
     C = App(layers, x, ansatz, func)
 
-    ax.scatter(x, y, color=colors['experiment'], label='Experiment',
-               zorder=layers, s=25, marker=marker['experiment'])
+    '''ax.scatter(x, y, color=colors['experiment'], label='Experiment',
+               zorder=layers, s=25, marker=marker['experiment'])'''
 
-    '''ax.errorbar(x, y, yerr=error, color=colors['experiment'], zorder=layers,ms=5, lw=0, elinewidth=1, capsize=3, label='Experiment',
-                marker=marker['experiment'])'''
+    ax.errorbar(x, y, yerr=error, color=colors['experiment'], zorder=layers,ms=5, lw=0, elinewidth=1, capsize=3, label='Experiment',
+                marker=marker['experiment'])
 
     ax.plot(C.domain, C.target, color='black', linewidth=3, label='Target')
 

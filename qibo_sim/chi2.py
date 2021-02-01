@@ -13,7 +13,7 @@ ansatze={'UAT':'Weighted', 'Fourier':'Fourier'}
 
 titles = {'tanh': r'f(x) = $\tanh(5 x)$','poly':r'$f(x) = {\rm poly}(x)$', 'step': r'$f(x) = {\rm step}(x)$',  'relu':r'$f(x) = {\rm ReLU}(x)$'}
 
-
+error = 0.015
 def step(x):
     step.name = 'step'
     return 0.5 * (np.sign(x) + 1)
@@ -106,7 +106,8 @@ for function, ax in zip(functions, axs.flatten()):
             C = App(layers, x, ansatze[ansatz], func)
             chi_ = np.mean(np.abs(y - C.target) ** 2)
             chi.append(min(float(chi_), 1))
-        ax.plot(list(range(1, L + 1)), chi, color=color[str(quantum)],
+        chi = np.array(chi)
+        ax.plot(list(range(1, L + 1)), chi + 2* error**2, color=color[str(quantum)],
                 linestyle=line[str(quantum)],
                 marker=marker[ansatz], markersize=15)
         ax.grid(True)
@@ -195,7 +196,8 @@ for i, function1 in enumerate(functions):
                     C = App(layers, domain, ansatze[ansatz], func1, func2)
                     chi_ = np.mean(np.abs(x + 1j * y - C.target) ** 2)
                     chi.append(min(float(chi_), 1))
-                ax.plot(list(range(1, L + 1)), chi, color=color[str(quantum)],
+                chi = np.array(chi)
+                ax.plot(list(range(1, L + 1)), chi + 2 * error**2, color=color[str(quantum)],
                         linestyle=line[str(quantum)],
                         marker=marker[ansatz], markersize=10)
             except:pass
@@ -323,7 +325,8 @@ for function, ax in zip(functions, axs.flatten()):
             C = App(layers, x, func, ansatze[ansatz])
             chi_ = np.mean(np.abs(y - C.target) ** 2)
             chi.append(min(float(chi_), 1))
-        ax.plot(list(range(1, L + 1)), chi, color=color[str(quantum)],
+        chi = np.array(chi)
+        ax.plot(list(range(1, L + 1)), chi + 2 * error**2, color=color[str(quantum)],
                 linestyle=line[str(quantum)],
                 marker=marker[ansatz], markersize=15)
     except:pass
