@@ -4,6 +4,9 @@ import numpy as np
 
 df = pd.read_csv('summary.csv')
 color={'True': 'tab:orange', 'False':'tab:blue', 'Experiment':'tab:purple'}
+color = {'True': '#CC0000',
+          'Experiment': '#009933',
+          'False': '#002AFF'}
 line={'False':'--', 'True':':', 'Experiment':'-.'}
 marker = {'UAT':'X', 'Fourier':'^', 'Experiment':'+'}
 
@@ -76,8 +79,6 @@ def rosenbrock(x):
     rosenbrock.name = 'rosenbrock'
     for x_ in x:
         yield (1 - .4*x_[0])**2 + 100 * (x_[1] - (.4*x_[0])**2)**2
-
-plt.style.use('seaborn')
 
 L = 6
 fig, axs = plt.subplots(nrows=4, sharex=True, sharey=False, figsize=(9, 18))

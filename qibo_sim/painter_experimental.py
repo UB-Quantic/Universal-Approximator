@@ -11,14 +11,14 @@ L = 5
 
 list_layers = [2,4,6]
 
-'''colors = {'quantum': '#CC0000',
+colors = {'quantum': '#CC0000',
           'experiment': '#009933',
-          'classical': '#002AFF'}'''
+          'classical': '#002AFF'}
 
-colors = {'quantum': 'tab:blue',
+'''colors = {'quantum': 'tab:blue',
           'experiment': 'tab:purple',
           'classical': 'tab:orange'}
-
+'''
 marker = {'classical':'^',
           'quantum':'o',
           'experiment':'s'}
@@ -294,7 +294,7 @@ def paint_real_2D(function, ansatz, ax, df, layers, only_target=False):
     ax.plot_trisurf(C.domain[:, 0], C.domain[:, 1], C.target-0.1, cmap=cmap, vmin=-4, vmax=1, alpha=0.75)
 
 
-cmap = {'target':plt.get_cmap('Greys'), 'classical':plt.get_cmap('Blues'), 'experiment':plt.get_cmap('Purples'), 'quantum':plt.get_cmap('Oranges')}
+cmap = {'target':plt.get_cmap('Greys'), 'classical':plt.get_cmap('Blues'), 'experiment':plt.get_cmap('Greens'), 'quantum':plt.get_cmap('Reds')}
 #cmap = {'target':plt.get_cmap('viridis'), 'classical':plt.get_cmap('inferno'), 'experiment':plt.get_cmap('PiYG'), 'quantum':plt.get_cmap('bwr')}
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
@@ -379,7 +379,7 @@ def paint_real_2D_2(function, ansatz, ax, df, layers, data):
     return cf
 
 
-plt.style.use('seaborn')
+#plt.style.use('seaborn')
 fig, axs = plt.subplots(nrows=2, ncols=4, figsize=(24,12), sharex=True, sharey=True)
 
 
@@ -558,15 +558,54 @@ for d in data:
     #fig.colorbar(cf, ax=ax)
     i += 1
 
-'''handles = []
-
-handles.append(mlines.Line2D([], [], color=colors['classical'], markersize=10, label='Classical' , linewidth=0, marker=marker['classical']))
-handles.append(mlines.Line2D([], [], color=colors['quantum'], markersize=10, label='Quantum' ,
-                             linewidth=0, marker=marker['quantum']))
-handles.append(mlines.Line2D([], [], color=colors['experiment'], markersize=10, label='Experiment' ,
-                             linewidth=0, marker=marker['experiment']))
-fig.legend(handles = handles, bbox_to_anchor=(0.4, -0.07, 0.18, .2),borderaxespad=0., mode='expand', fontsize=20, ncol=1)'''
-
-#fig.text(0.35, 0.04, '%s layers'%L, fontsize=20, fontweight='bold')
 fig.suptitle('Himmelblau(x, y)', fontsize=36)
 fig.savefig(function + '_2D_%sL_2.pdf'%L)
+
+
+fig = plt.figure(figsize=(20,5.6))
+i = 1
+ansatz = 'Weighted_2D'
+function = 'Himmelblau'
+data = ['target', 'classical', 'quantum', 'experiment']
+titles = {'target':'Target', 'classical':'Classical', 'quantum':'Simulation', 'experiment':'Experiment'}
+for d in data:
+    ax = fig.add_subplot(1, 4, i)
+    cf = paint_real_2D_2(function.lower(), ansatz, ax, df, L, d)
+    if i == 1:
+        ax.set_ylabel('y', fontsize=20)
+        ax.set_yticks([-5, 0, 5])
+    else:
+        ax.set_yticks([])
+    ax.set_xlabel('x', fontsize=20)
+    ax.set_xticks([-5, 0, 5])
+
+    pos = ax.get_position()
+    pos.x0 = 0.245 * (i-1) + 0.04
+    pos.x1 = pos.x0 + 0.185
+    pos.y1 = pos.y0 + 0.7
+    ax.set_position(pos)
+
+
+    ax.set_title(titles[d], fontsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=18)
+
+    axins = inset_axes(ax,
+                       width="3%",  # width = 5% of parent_bbox width
+                       height="90%",  # height : 50%
+                       loc='lower left',
+                       bbox_to_anchor=(1.01, 0.05, 1, 1),
+                       bbox_transform=ax.transAxes,
+                       borderpad=0,
+                       )
+
+    # Controlling the placement of the inset axes is basically same as that
+    # of the legend.  you may want to play with the borderpad value and
+    # the bbox_to_anchor coordinate.
+
+    cbar = fig.colorbar(cf, cax=axins, ticks=[-1., -.5, 0, .5, 1.])
+    cbar.ax.tick_params(labelsize=15)
+    #fig.colorbar(cf, ax=ax)
+    i += 1
+
+fig.suptitle('Himmelblau(x, y)', fontsize=36)
+fig.savefig(function + '_2D_%sL_3.pdf'%L)
