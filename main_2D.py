@@ -7,8 +7,7 @@ parser.add_argument("--layers", default=6, help="Layers", type=int)
 
 
 import numpy as np
-from classes.aux_functions import *
-from classes.ApproximantNN import Approximant_real_2D as App_r
+from ApproximantNN import Approximant_real_2D as App_r
 from importlib import import_module
 
 def main(function, method, ansatz, layers):
@@ -48,12 +47,6 @@ def adjiman(x):
     adjiman.name = 'adjiman'
     for x_ in x:
         yield np.cos(x_[0]) * np.sin(x_[1]) - x_[0] / (x_[1]**2 + 1)
-
-def rosenbrock(x):
-    rosenbrock.name = 'rosenbrock'
-    for x_ in x:
-        yield (1 - .4*x_[0])**2 + 100 * (x_[1] - (.4*x_[0])**2)**2
-
 
 if __name__ == "__main__":
     args = vars(parser.parse_args())
