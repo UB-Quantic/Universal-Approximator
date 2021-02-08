@@ -6,7 +6,7 @@ qubit as a Universal Approximant*, [arXiv:xxxx.xxxxx](https://arxiv.org/abs/xxxx
 - The files `main*.py` summarize all the code needed for performing optimizations as
 explained in the paper. 
 - The inner engine of the simulations is written in 
-`classes/ApproximantNN.py`
+`ApproximantNN.py`
 - The file `chi2.py` corresponds to a code for painting final results on $\chi^2$
 - The file `painter_experimental.py` paints all the different approximations of
 different functions
