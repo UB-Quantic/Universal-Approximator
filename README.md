@@ -14,12 +14,14 @@ different functions
 
 If you find our work interesting, please cite us as:
 
-```@misc{single-qubit-universal-approximant,
+```
+@misc{single-qubit-universal-approximant,
       title={One qubit as a Universal Approximant}, 
       author={Adrián Pérez-Salinas and David López-Núñez and Artur García-Sáez and P. Forn-Díaz and José I. Latorre},
       year={2021},
       eprint={2102.04032},
       archivePrefix={arXiv},
       primaryClass={quant-ph}
-}'''
+      }
+```
 
