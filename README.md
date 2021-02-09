@@ -1,7 +1,7 @@
 # One qubit as a Universal Approximant
 
 In this repository one can find all the code related to the paper *One 
-qubit as a Universal Approximant*, [arXiv:xxxx.xxxxx](https://arxiv.org/abs/xxxx.xxxxx) 
+qubit as a Universal Approximant*, [arXiv:2102.04032](https://arxiv.org/abs/2102.04032) 
 
 - The files `main*.py` summarize all the code needed for performing optimizations as
 explained in the paper. 
@@ -14,4 +14,12 @@ different functions
 
 If you find our work interesting, please cite us as:
 
+```@misc{single-qubit-universal-approximant,
+      title={One qubit as a Universal Approximant}, 
+      author={Adrián Pérez-Salinas and David López-Núñez and Artur García-Sáez and P. Forn-Díaz and José I. Latorre},
+      year={2021},
+      eprint={2102.04032},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph}
+}'''
 
