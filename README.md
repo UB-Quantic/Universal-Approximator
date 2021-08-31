@@ -15,13 +15,17 @@ different functions
 If you find our work interesting, please cite us as:
 
 ```
-@misc{single-qubit-universal-approximant,
-      title={One qubit as a Universal Approximant}, 
-      author={Adrián Pérez-Salinas and David López-Núñez and Artur García-Sáez and P. Forn-Díaz and José I. Latorre},
-      year={2021},
-      eprint={2102.04032},
-      archivePrefix={arXiv},
-      primaryClass={quant-ph}
-      }
+@article{PerezSalinas2021,
+  doi = {10.1103/physreva.104.012405},
+  url = {https://doi.org/10.1103/physreva.104.012405},
+  year = {2021},
+  month = jul,
+  publisher = {American Physical Society ({APS})},
+  volume = {104},
+  number = {1},
+  author = {Adri{\'{a}}n P{\'{e}}rez-Salinas and David L{\'{o}}pez-N{\'{u}}{\~{n}}ez and Artur Garc{\'{\i}}a-S{\'{a}}ez and P. Forn-D{\'{\i}}az and Jos{\'{e}} I. Latorre},
+  title = {One qubit as a universal approximant},
+  journal = {Physical Review A}
+}
 ```
 
