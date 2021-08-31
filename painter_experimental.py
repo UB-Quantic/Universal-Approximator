@@ -15,10 +15,6 @@ colors = {'quantum': '#CC0000',
           'experiment': '#009933',
           'classical': '#002AFF'}
 
-'''colors = {'quantum': 'tab:blue',
-          'experiment': 'tab:purple',
-          'classical': 'tab:orange'}
-'''
 marker = {'classical':'^',
           'quantum':'o',
           'experiment':'s'}
